@@ -1,0 +1,23 @@
+export type UnitType = {
+  id: number;
+  property_id: string;
+  block_number: string;
+  floor: string;
+  unit_number: string;
+  rental_type: string;
+  square_feet: string;
+  business_partner_id: string;
+  bedroom_count: string;
+  bathroom_count: string;
+  floor_plan_img: string | null;
+  unit_img: string | null;
+  description: string;
+  is_active: string;
+  beneficiary: string;
+  remarks: string;
+  service_fee_percent: string;
+  profit_share_percent: string;
+  created_at: string;
+  updated_at: string;
+  property: import("./PropertyType").PropertyType;
+};
