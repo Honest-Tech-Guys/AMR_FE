@@ -23,30 +23,30 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
+import { toast } from "sonner";
+import { useState } from "react";
+
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
   property_name: yup.string().required("Property name is required"),
-  property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
+  tenant_type: yup.string().required("Tenant is required"),
+  date_of_agreement: yup.string().required("Date of agreement is required"),
+  rental_fee: yup.string().required("Rental fee is required"),
+  tenancy_period_start_date: yup
     .string()
-    .required("Contact phone number is required"),
+    .required("Tenancy period start date is required"),
+  tenancy_period_end_date: yup
+    .string()
+    .required("Tenancy period end date is required"),
+  rental_payment_frequency: yup
+    .string()
+    .required("Rental payment frequency is required"),
   remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
 const CreateTenancy = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -76,22 +76,27 @@ const CreateTenancy = () => {
     { id: "4", name: "Landed" },
     { id: "5", name: "Townhouse" },
   ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
+  const { mutate, isPending } = useCreateTenancy();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    const tenancyData = {
+      ...data,
+      remarks: data.remarks || null,
+    };
+
+    mutate(tenancyData, {
+      onSuccess: () => {
+        toast.success("Tenancy created successfully!");
+        reset();
+        setIsOpen(false);
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || "Failed to create tenancy.");
+      },
+    });
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] bg-transparent hover:bg-transparent m-0 shadow-none p-0 text-black font-normal text-start">
           Add Tenancy
@@ -175,20 +180,29 @@ const CreateTenancy = () => {
               />
               <div>
                 <Label className="mb-3">Rental Payment Frequency</Label>
-                <ToggleGroup variant="outline" type="single">
-                  <ToggleGroupItem value="bold" aria-label="Toggle bold">
+                <ToggleGroup
+                  variant="outline"
+                  type="single"
+                  value={watch("rental_payment_frequency")}
+                  onValueChange={(val) =>
+                    setValue("rental_payment_frequency", val)
+                  }
+                >
+                  <ToggleGroupItem value="monthly" aria-label="Monthly">
                     Monthly
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="italic" aria-label="Toggle italic">
+                  <ToggleGroupItem value="daily" aria-label="Daily">
                     Daily
                   </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="strikethrough"
-                    aria-label="Toggle strikethrough"
-                  >
+                  <ToggleGroupItem value="one_time" aria-label="One Time">
                     One Time
                   </ToggleGroupItem>
                 </ToggleGroup>
+                {errors.rental_payment_frequency && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.rental_payment_frequency.message}
+                  </p>
+                )}
               </div>
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
@@ -206,13 +220,15 @@ const CreateTenancy = () => {
             </div>
 
             <DialogFooter className="mt-6">
-              <DialogClose asChild>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="text-white" disabled={isPending}>
+                {isPending ? "Creating..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>

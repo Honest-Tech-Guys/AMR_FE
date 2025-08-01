@@ -18,36 +18,66 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
+import useUpdateProperty, {
+  UpdatePropertyInput,
+} from "@/lib/services/hooks/useUpdateProperties";
+import { PropertyType } from "@/types/PropertyType";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
 // Schema & type
 const schema = yup.object({
   country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
+  postcode: yup.string().required("Postcode is required"),
+  city: yup.string().required("City is required"),
+  state: yup.string().required("State is required"),
   property_name: yup.string().required("Property name is required"),
   property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
-    .string()
-    .required("Contact phone number is required"),
+  attention_name: yup.string().nullable(),
+  attention_phone_number: yup.string().nullable(),
   remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
+  address_line_1: yup.string().nullable(),
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
   sauna: yup.boolean().default(false),
   free_text: yup.boolean().default(false),
 });
+
 type schemaType = yup.InferType<typeof schema>;
-const EditProperty = () => {
+
+interface EditPropertyProps {
+  property?: PropertyType;
+  onSuccess?: () => void;
+}
+
+const EditProperty = ({ property, onSuccess }: EditPropertyProps) => {
+  const updatePropertyMutation = useUpdateProperty();
+  const [isOpen, setIsOpen] = useState(false);
+
   const form = useForm<schemaType>({
     mode: "onTouched",
+    defaultValues: {
+      property_name: "",
+      property_type: "",
+      attention_name: "",
+      attention_phone_number: "",
+      remarks: "",
+      address_line_1: "",
+      city: "",
+      state: "",
+      postcode: "",
+      country: "",
+      meeting_room: false,
+      game_room: false,
+      basketball_court: false,
+      sauna: false,
+      free_text: false,
+    },
   });
+
   const {
     setValue,
     getValues,
@@ -57,6 +87,30 @@ const EditProperty = () => {
     handleSubmit,
     formState: { errors },
   } = form;
+
+  // Populate form when property data is available
+  useEffect(() => {
+    if (property) {
+      reset({
+        property_name: property.property_name,
+        property_type: property.property_type,
+        attention_name: property.attention_name || "",
+        attention_phone_number: property.attention_phone_number || "",
+        remarks: property.remarks || "",
+        address_line_1: property.address_line_1 || "",
+        city: property.city,
+        state: property.state,
+        postcode: property.postcode,
+        country: property.country,
+        meeting_room: property.facilities.includes("meeting_room"),
+        game_room: property.facilities.includes("game_room"),
+        basketball_court: property.facilities.includes("basketball_court"),
+        sauna: property.facilities.includes("sauna"),
+        free_text: property.facilities.includes("free_text"),
+      });
+    }
+  }, [property, reset]);
+
   const COUNTRIES = [
     { id: "us", name: "United States" },
     { id: "uk", name: "United Kingdom" },
@@ -67,6 +121,7 @@ const EditProperty = () => {
     { id: "jp", name: "Japan" },
     { id: "br", name: "Brazil" },
   ];
+
   const PartnerType = [
     { id: "1", name: "Apartment" },
     { id: "2", name: "Condominium" },
@@ -74,22 +129,64 @@ const EditProperty = () => {
     { id: "4", name: "Landed" },
     { id: "5", name: "Townhouse" },
   ];
+
   const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
+    { id: "meeting_room" as const, label: "Meeting Room" },
+    { id: "game_room" as const, label: "Game Room" },
+    { id: "basketball_court" as const, label: "Basketball Court" },
+    { id: "sauna" as const, label: "Sauna" },
+    { id: "free_text" as const, label: "Free Text" },
   ];
+
   const onSubmit: SubmitHandler<schemaType> = (data) => {
+    if (!property?.id) {
+      console.error("No property ID found");
+      toast.error("No property selected for update");
+      return;
+    }
+
     const facilitiesList = facilities
       .filter((f) => data[f.id]) // only where checkbox is true
       .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+
+    const updateData: UpdatePropertyInput = {
+      id: property.id,
+      property_name: data.property_name,
+      property_type: data.property_type,
+      attention_name: data.attention_name,
+      attention_phone_number: data.attention_phone_number,
+      remarks: data.remarks || "",
+      address_line_1: data.address_line_1,
+      city: data.city,
+      state: data.state,
+      postcode: data.postcode,
+      country: data.country,
+      facilities: facilitiesList,
+    };
+
+    // Show loading toast
+    const loadingToast = toast.loading("Updating property...");
+
+    updatePropertyMutation.mutate(updateData, {
+      onSuccess: () => {
+        onSuccess?.();
+        // Reset form after successful update
+        reset();
+        toast.dismiss(loadingToast);
+        toast.success("Property updated successfully!");
+        // Close the dialog
+        setIsOpen(false);
+      },
+      onError: (error) => {
+        console.error("Update property error:", error);
+        toast.dismiss(loadingToast);
+        toast.error("Failed to update property. Please try again.");
+      },
+    });
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] bg-transparent hover:bg-transparent m-0 shadow-none p-0 text-black font-normal text-start">
           Edit Property
@@ -122,57 +219,34 @@ const EditProperty = () => {
                 options={PartnerType}
               />
               <CustomInput
-                id="owner_name"
-                name="owner_name"
+                id="attention_name"
+                name="attention_name"
                 type="text"
-                label="Owner Name"
-                value={watch("owner_name")}
-                onChange={(e) => setValue("owner_name", e.target.value)}
-                errors={errors.owner_name?.message}
-                placeholder="Enter Owner Name"
+                label="Attention Name"
+                value={watch("attention_name")}
+                onChange={(e) => setValue("attention_name", e.target.value)}
+                errors={errors.attention_name?.message}
+                placeholder="Enter Attention Name"
               />
 
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Owner Phone Number
+                  Attention Phone Number
                 </label>
                 <Controller
                   control={control}
-                  name="owner_phone_number"
+                  name="attention_phone_number"
                   render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Owner Number" />
+                    <PhoneInput
+                      {...field}
+                      value={field.value ?? ""}
+                      placeholder="Enter Attention Number"
+                    />
                   )}
                 />
-                {errors.owner_phone_number && (
+                {errors.attention_phone_number && (
                   <p className="text-sm text-red-500 mt-1">
-                    {errors.owner_phone_number.message}
-                  </p>
-                )}
-              </div>
-              <CustomInput
-                id="contact_name"
-                name="contact_name"
-                type="text"
-                value={watch("contact_name")}
-                label="Contact Name"
-                onChange={(e) => setValue("contact_name", e.target.value)}
-                errors={errors.contact_name?.message}
-                placeholder="Enter Contact Name"
-              />
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Contact Phone Number
-                </label>
-                <Controller
-                  control={control}
-                  name="contact_phone_number"
-                  render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Contact Number" />
-                  )}
-                />
-                {errors.contact_phone_number && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.contact_phone_number.message}
+                    {errors.attention_phone_number.message}
                   </p>
                 )}
               </div>
@@ -194,13 +268,13 @@ const EditProperty = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <CustomInput
-                id="address"
-                name="address"
+                id="address_line_1"
+                name="address_line_1"
                 type="text"
-                value={watch("address")}
+                value={watch("address_line_1")}
                 label="Address"
-                onChange={(e) => setValue("address", e.target.value)}
-                errors={errors.address?.message}
+                onChange={(e) => setValue("address_line_1", e.target.value)}
+                errors={errors.address_line_1?.message}
                 placeholder="Enter Address"
               />
               <CustomInput
@@ -238,7 +312,7 @@ const EditProperty = () => {
                   name={facility.id}
                   label={facility.label}
                   type="checkbox"
-                  checkboxDefaultValue={watch(facility.id) as boolean}
+                  checkboxDefaultValue={watch(facility.id)}
                   onCheckedChange={(checked) =>
                     setValue(facility.id, checked as boolean)
                   }
@@ -246,13 +320,21 @@ const EditProperty = () => {
               ))}
             </div>
             <DialogFooter className="mt-6">
-              <DialogClose asChild>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="text-white"
+                disabled={updatePropertyMutation.isPending}
+              >
+                {updatePropertyMutation.isPending
+                  ? "Updating..."
+                  : "Update Property"}
               </Button>
             </DialogFooter>
           </form>

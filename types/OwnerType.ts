@@ -1,0 +1,26 @@
+type OwnerType = {
+  id: number;
+  type: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  alt_phone_number: string;
+  nationality: string;
+  identity_type: string;
+  identity_number: string;
+  race: string;
+  gender: string;
+  address_line_1: string;
+  city: string;
+  postcode: string;
+  state: string;
+  country: string;
+  emergency_name: string;
+  emergency_relationship: string;
+  emergency_phone: string;
+  emergency_email: string;
+  remarks: string;
+  created_at: string;
+  updated_at: string;
+};
+export default OwnerType;

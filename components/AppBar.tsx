@@ -24,12 +24,39 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import RenterIcon from "@/lib/icons/RenterIcon";
+import DashboardIconB from "@/lib/icons/DashboardIconB";
+import DashboardIconA from "@/lib/icons/DashboardIconA";
+import PropertyIconA from "@/lib/icons/PropertyIconA";
+import PropertyIconB from "@/lib/icons/PropertyIconB";
+import TenancyIconA from "@/lib/icons/TenancyIconA";
+import TenancyIconB from "@/lib/icons/TenancyIconB";
+import BookingIconA from "@/lib/icons/BookingIconA";
+import BookingIconB from "@/lib/icons/BookingIconB";
+import SmartHomeIconA from "@/lib/icons/SmartHomeIconA";
+import SmartHomeIconB from "@/lib/icons/SmartHomeIconB";
+import PayoutIconA from "@/lib/icons/PayoutIconA";
+import PayoutIconB from "@/lib/icons/PayoutIconB";
+import PeopleIconA from "@/lib/icons/PeopleIconA";
+import PeopleIconB from "@/lib/icons/PeopleIconB";
+import AccountigIconA from "@/lib/icons/AccountigIconA";
+import AccountingIconB from "@/lib/icons/AccountingIconB";
+import NotificationIconA from "@/lib/icons/NotificationIconA";
+import NotificationIconB from "@/lib/icons/NotificationIconB";
+import ReportIconA from "@/lib/icons/ReportIconA";
+import ReportIconB from "@/lib/icons/ReportIconB";
 
 // Menu configuration
 const menuItems = [
-  { title: "Dashboard", url: "/", icon: <RenterIcon /> },
+  {
+    title: "Dashboard",
+    url: "/",
+    icon_active: <DashboardIconA />,
+    icon: <DashboardIconB />,
+  },
   {
     title: "Property",
+    icon_active: <PropertyIconA />,
+    icon: <PropertyIconB />,
     items: [
       { title: "List View", url: "/property/list-view" },
       { title: "Grid View", url: "/property/grid-view" },
@@ -37,10 +64,14 @@ const menuItems = [
   },
   {
     title: "Tenancy",
+    icon_active: <TenancyIconA />,
+    icon: <TenancyIconB />,
     items: [{ title: "Tenant", url: "/tenancy/tenant" }],
   },
   {
     title: "Booking",
+    icon_active: <BookingIconA />,
+    icon: <BookingIconB />,
     items: [
       { title: "List View", url: "/booking/list-view" },
       { title: "Grid View", url: "/booking/grid-view" },
@@ -50,6 +81,8 @@ const menuItems = [
   },
   {
     title: "Smart Home",
+    icon_active: <SmartHomeIconA />,
+    icon: <SmartHomeIconB />,
     items: [
       { title: "Meter", url: "/smart-home/meter" },
       { title: "Lock", url: "/smart-home/lock" },
@@ -57,6 +90,8 @@ const menuItems = [
   },
   {
     title: "Payout",
+    icon_active: <PayoutIconA />,
+    icon: <PayoutIconB />,
     items: [
       { title: "Pending", url: "/payout/pending" },
       { title: "Generated", url: "/payout/generated" },
@@ -64,6 +99,8 @@ const menuItems = [
   },
   {
     title: "People",
+    icon_active: <PeopleIconA />,
+    icon: <PeopleIconB />,
     items: [
       { title: "Tenant", url: "/people/tenant" },
       { title: "Owner", url: "/people/owner" },
@@ -71,6 +108,8 @@ const menuItems = [
   },
   {
     title: "Accounting",
+    icon_active: <AccountigIconA />,
+    icon: <AccountingIconB />,
     items: [
       { title: "Invoice", url: "/accounting/invoice" },
       { title: "Expenses", url: "/accounting/expenses" },
@@ -79,9 +118,16 @@ const menuItems = [
       { title: "Auto Collection", url: "/accounting/auto-collection" },
     ],
   },
-  { title: "Notifications", url: "/notifications" },
+  {
+    title: "Notifications",
+    url: "/notifications",
+    icon_active: <NotificationIconA />,
+    icon: <NotificationIconB />,
+  },
   {
     title: "Reports",
+    icon_active: <ReportIconA />,
+    icon: <ReportIconB />,
     items: [
       { title: "Tenancy Status", url: "/reports/tenancy-status" },
       { title: "Property Status", url: "/reports/property-status" },
@@ -130,8 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       }
                     >
                       <a href={item.url}>
-                        <House strokeWidth={2.5} />
-
+                        {isItemActive ? item.icon_active : item.icon}
                         {item.title}
                       </a>
                     </SidebarMenuButton>
@@ -157,8 +202,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   }`}
                 >
                   <CollapsibleTrigger className="cursor-pointer">
-                    <House className="mr-2" strokeWidth={2.5} />
-                    {item.title}
+                    {/* <House className="mr-2" strokeWidth={2.5} /> */}
+                    <div className="flex gap-1">
+                      {isChildActive ? item.icon_active : item.icon}
+                      {item.title}
+                    </div>
                     <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                   </CollapsibleTrigger>
                 </SidebarGroupLabel>

@@ -14,6 +14,7 @@ import { ResponsiveFilter } from "@/components/responsive-filter";
 import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import CreateNewProperty from "./CreateNewProperty";
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ import CreateEquipment from "./Actions/CreateEquipment";
 import MapWithPoints from "@/components/ImageMapper";
 import CreateInvoice from "./Actions/CreateInvoice";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { PropertyType } from "@/types/PropertyType";
 const options = [
   {
     value: "Vacant",
@@ -43,7 +45,22 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
-type property = {
+// type property = {
+//   property_id: string;
+//   unit: string;
+//   room: string;
+//   smart_home: string;
+//   owner_name: string;
+//   rental: string;
+//   tenancy: string;
+//   status: string;
+// };
+interface PaginationData {
+  page: number;
+  per_page: number;
+}
+
+interface PropertyTableData {
   property_id: string;
   unit: string;
   room: string;
@@ -52,20 +69,19 @@ type property = {
   rental: string;
   tenancy: string;
   status: string;
-};
-interface PaginationData {
-  page: number;
-  per_page: number;
+  // Include the original PropertyType for actions
+  originalData: PropertyType;
 }
 
 const Page = () => {
+  const router = useRouter();
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,
   });
-  const invoiceColumns: Column<property>[] = [
+  const invoiceColumns: Column<PropertyTableData>[] = [
     {
       title: "Property",
       key: "Property_id",
@@ -132,15 +148,16 @@ const Page = () => {
                   e.preventDefault();
                 }}
               >
-                <EditProperty />
+                <EditProperty property={order.originalData} />
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="hover:bg-gray-100 hover:cursor-pointer"
                 onSelect={(e) => {
                   e.preventDefault();
+                  router.push("/unit");
                 }}
               >
-                <CreateUnit />
+                {/* <CreateUnit /> */}Add Unit
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="hover:bg-gray-100 hover:cursor-pointer"
@@ -205,13 +222,18 @@ const Page = () => {
   // Map API data to table format
   const tableData = (data || []).map((item) => ({
     property_id: item.property_name ?? "-",
-    unit: "-", // Replace with actual unit info if available
-    room: "-", // Replace with actual room info if available
-    smart_home: "-", // Replace with actual smart home info if available
-    owner_name: "-", // Replace with actual owner name if available
-    rental: "-", // Replace with actual rental info if available
-    tenancy: "-", // Replace with actual tenancy info if available
-    status: "-", // Replace with actual status if available
+    unit: item.property_type ?? "-",
+    room: item.facilities?.length ? item.facilities.join(", ") : "-",
+    smart_home:
+      item.facilities?.includes("meeting_room") ||
+      item.facilities?.includes("game_room")
+        ? "Yes"
+        : "No",
+    owner_name: item.attention_name ?? "-",
+    rental: item.address_line_1 ? `${item.address_line_1}, ${item.city}` : "-",
+    tenancy: `${item.city}, ${item.state}`,
+    status: item.remarks || "Active",
+    originalData: item, // Store the original item for actions
   }));
 
   return (
@@ -241,13 +263,13 @@ const Page = () => {
             </Button>
           </div>
         </div>
-        <Datatable<property>
+        <Datatable<PropertyTableData>
           columns={invoiceColumns}
           data={tableData}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item: property) => item.property_id}
+          rowKey={(item: PropertyTableData) => item.property_id}
           isFilter={isFilter}
         />
         {error && (

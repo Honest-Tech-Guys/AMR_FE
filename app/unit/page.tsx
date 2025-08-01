@@ -27,6 +27,10 @@ import CreateUnit from "./CreateUnit";
 import AddRoomTagging from "./AddRoomTagging";
 import AddRoomDetails from "./AddRoomDetails";
 import CreateNewTenant from "./CreateNewTenant";
+import EditUnit from "./EditUnit";
+import useGetUnitsList from "@/lib/services/hooks/useGetUnit";
+import { UnitType } from "@/types/UnitType";
+
 const options = [
   {
     value: "Vacant",
@@ -41,7 +45,8 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
-type property = {
+
+interface UnitTableData {
   property_id: string;
   unit: string;
   room: string;
@@ -50,7 +55,9 @@ type property = {
   rental: string;
   tenancy: string;
   status: string;
-};
+  originalData: UnitType;
+}
+
 interface PaginationData {
   page: number;
   per_page: number;
@@ -63,10 +70,25 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const invoiceColumns: Column<property>[] = [
+
+  const { data, isLoading, error } = useGetUnitsList();
+
+  // Map API data to table format
+  const tableData = (data || []).map((item) => ({
+    property_id: item.property_id ?? "-",
+    unit: `${item.block_number} - ${item.unit_number}`,
+    room: `${item.bedroom_count} Bed, ${item.bathroom_count} Bath`,
+    smart_home: item.is_active === "1" ? "Active" : "Inactive",
+    owner_name: item.beneficiary ?? "-",
+    rental: item.rental_type ?? "-",
+    tenancy: `${item.square_feet} sq ft`,
+    status: item.is_active === "1" ? "Active" : "Inactive",
+    originalData: item,
+  }));
+  const invoiceColumns: Column<UnitTableData>[] = [
     {
       title: "#",
-      key: "Property_id",
+      key: "property_id",
       sortable: true,
       className: "pl-6 py-4",
       render: (order) => (
@@ -135,6 +157,14 @@ const Page = () => {
                   e.preventDefault();
                 }}
               >
+                <EditUnit unit={order.originalData} />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="hover:bg-gray-100 hover:cursor-pointer"
+                onSelect={(e) => {
+                  e.preventDefault();
+                }}
+              >
                 Add Smart Home
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -195,26 +225,18 @@ const Page = () => {
             </div>
           </div>
           <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-            <Datatable<property>
+            <Datatable<UnitTableData>
               columns={invoiceColumns}
-              data={[
-                {
-                  property_id: "P-001",
-                  unit: "Unit A",
-                  room: "Room 101",
-                  smart_home: "Yes",
-                  owner_name: "John Doe",
-                  rental: "$1200",
-                  tenancy: "12 months",
-                  status: "Occupied",
-                },
-              ]}
-              isPending={false}
+              data={tableData}
+              isPending={isLoading}
               pagination={pagination}
               setPagination={setPagination}
-              rowKey={(item: property) => item.property_id}
+              rowKey={(item: UnitTableData) => item.property_id}
               isFilter={isFilter}
             />
+            {error && (
+              <div className="text-red-500 mt-2">Error loading units.</div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

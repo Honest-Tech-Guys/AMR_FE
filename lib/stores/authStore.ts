@@ -51,8 +51,8 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "auth-storage",
       // partialize: (state) => ({
-      //   partner_id: state.user_id,
-      //   partner_name: state.user_name,
+      //   user_id: state.user_id,
+      //   user_name: state.user_name,
       //   setIsAuth: false,
       // }),
       // onRehydrateStorage: () => (state) => {

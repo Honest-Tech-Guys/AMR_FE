@@ -51,7 +51,7 @@ function LayoutShell({ children }: { children: React.ReactNode }) {
               <AvatarImage src="/testImage.png" alt="@shadcn" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <span className="tracking-tight">johanson</span>
+            <span className="tracking-tight">Johanson</span>
           </div>
         </header>
 
@@ -73,7 +73,7 @@ export default function RootLayout({
       <body className={` antialiased`}>
         <ReactQueryProvider>
           <Toaster position="top-right" />
-          {!isAuth ? (
+          {isAuth ? (
             <Login />
           ) : (
             <SidebarProvider>

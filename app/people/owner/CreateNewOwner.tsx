@@ -25,8 +25,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import MultiFileUpload from "@/components/input-11";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import useAddTenant from "@/lib/services/hooks/useAddTenant";
+import useCreateOwner from "@/lib/services/hooks/useCreateOwner";
 import { toast } from "sonner";
+import { useState } from "react";
+
 // Schema & type
 const schema = yup.object({
   type: yup.string().required("Type is required"),
@@ -60,6 +62,7 @@ const schema = yup.object({
 });
 type schemaType = yup.InferType<typeof schema>;
 const CreateNewOwner = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -95,21 +98,22 @@ const CreateNewOwner = () => {
     { id: "sauna", label: "Sauna" },
     { id: "free_text", label: "Free Text" },
   ];
-  const { mutate, isPending } = useAddTenant();
+  const { mutate, isPending } = useCreateOwner();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     mutate(data, {
       onSuccess: () => {
-        toast.success("Tenant created successfully!");
+        toast.success("Owner created successfully!");
         reset();
+        setIsOpen(false);
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Failed to create tenant.");
+        toast.error(err?.message || "Failed to create owner.");
       },
     });
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">Create New Owner</Button>
       </DialogTrigger>
@@ -130,11 +134,11 @@ const CreateNewOwner = () => {
                 className="flex items-center gap-3"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Individual" id="type-individual" />
+                  <RadioGroupItem value="individual" id="type-individual" />
                   <Label htmlFor="type-individual">Individual</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Company" id="type-company" />
+                  <RadioGroupItem value="company" id="type-company" />
                   <Label htmlFor="type-company">Company</Label>
                 </div>
               </RadioGroup>

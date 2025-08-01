@@ -16,7 +16,7 @@ import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
-import CreateInvoice from "./CreateInvoice";
+// import CreateInvoice from "./CreateInvoice";
 const options = [
   {
     value: "Vacant",
@@ -47,7 +47,7 @@ interface PaginationData {
   per_page: number;
 }
 
-const Page = () => {
+const InvoiceTap = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -133,35 +133,13 @@ const Page = () => {
     </Button>
   );
 
-  const { data, isLoading, error } = useGetPropertiesList();
-
   // Map API data to table format
-  const tableData = (data || []).map((item) => ({
-    property_id: item.property_name ?? "-",
-    unit: "-", // Replace with actual unit info if available
-    room: "-", // Replace with actual room info if available
-    smart_home: "-", // Replace with actual smart home info if available
-    owner_name: "-", // Replace with actual owner name if available
-    rental: "-", // Replace with actual rental info if available
-    tenancy: "-", // Replace with actual tenancy info if available
-    status: "-", // Replace with actual status if available
-  }));
 
   return (
     <div>
-      <HeaderPage title="Invoice" />
-      <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
-        {/* Actions */}
-        <div className="flex w-full justify-end my-3">
-          <div className="flex flex-wrap space-x-3">
-            {/* <Button className="rounded-[6px] text-white ">
-              Create New Invoice
-            </Button> */}
-            <CreateInvoice />
-          </div>
-        </div>
-        <Separator />
+      <div className="w-full  rounded-[6px] p-3 bg-white">
+        <span className="font-semibold">Invoice Summary</span>
+        <Separator className="mt-3" />
         <div className="grid w-full grid-cols-2 md:grid-cols-4 my-5">
           <div>
             <h2 className="text-xs text-gray-500">Total invoice</h2>
@@ -251,19 +229,16 @@ const Page = () => {
               property: "Ocean View Residences",
             },
           ]}
-          isPending={isLoading}
+          isPending={false}
           pagination={pagination}
           setPagination={setPagination}
           rowKey={(item: invoice) => item.invoice_no}
           isFilter={isFilter}
         />
-        {error && (
-          <div className="text-red-500 mt-2">Error loading properties.</div>
-        )}
       </div>
       {/* <MapWithPoints /> */}
     </div>
   );
 };
 
-export default Page;
+export default InvoiceTap;

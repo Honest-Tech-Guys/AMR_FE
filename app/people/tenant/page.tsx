@@ -1,69 +1,21 @@
 "use client";
 import HeaderPage from "@/components/HeaderPage";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { InputWithIcon } from "@/components/InpuWithIcon";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Ellipsis,
-  Funnel,
-  Search,
-  User,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
-import Datatable, { Column } from "@/components/datatable";
+import { Button } from "@/components/ui/button";
+import { Calendar, Search } from "lucide-react";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import MapWithPoints from "@/components/ImageMapper";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Badge } from "@/components/ui/badge";
 import CreateNewTenant from "./CreateNewTenant";
-const options = [
-  {
-    value: "Vacant",
-    label: "Vacant (50)",
-  },
-  {
-    value: "Occupied",
-    label: "Occupied (32)",
-  },
-  {
-    value: "Deactivated ",
-    label: "Deactivated (24)",
-  },
-];
-type property = {
-  property_id: string;
-  unit: string;
-  room: string;
-  smart_home: string;
-  owner_name: string;
-  rental: string;
-  tenancy: string;
-  status: string;
-};
-interface PaginationData {
-  page: number;
-  per_page: number;
-}
+import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
+import { TenantType } from "@/types/TenantType";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
+  const { data, isLoading, error } = useGetTenantsList();
+
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -77,6 +29,7 @@ const Page = () => {
       <Search className="size-4 text-white" strokeWidth={2.5} />
     </Button>
   );
+
   return (
     <div>
       <HeaderPage title="Tenant" />
@@ -88,25 +41,87 @@ const Page = () => {
             <CreateNewTenant />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gpa-5 ">
-          <div className=" border rounded-2xl p-3">
-            <label className="font-bold text-[#337AB7]">John Doe</label>
-            <div>
-              <p>Entity: Individual</p>
-              <p> +60102871792</p>
-              <p>aaronbro07@gmail.com</p>
-              <p>iCoins: -</p>
-              <p>
-                Status:{" "}
-                <Badge className="bg-[#F6FFED] text-[#52C41A] rounded-[6px] border-[#B7EB8F]">
-                  Active
-                </Badge>
-              </p>
-            </div>
+
+        {isLoading && (
+          <div className="text-center py-8">
+            <div className="text-gray-500">Loading tenants...</div>
           </div>
-        </div>
+        )}
+
+        {error && (
+          <div className="text-center py-8">
+            <div className="text-red-500">Error loading tenants.</div>
+          </div>
+        )}
+
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data?.map((tenant) => (
+              <div
+                key={tenant.id}
+                className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
+              >
+                <label className="font-bold text-[#337AB7] text-lg">
+                  {tenant.name}
+                </label>
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Entity:</span> {tenant.type}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Phone:</span>{" "}
+                    {tenant.phone_number}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Email:</span> {tenant.email}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Nationality:</span>{" "}
+                    {tenant.nationality}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Gender:</span> {tenant.gender}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Race:</span> {tenant.race}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Identity:</span>{" "}
+                    {tenant.identity_type} - {tenant.identity_number}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Address:</span>{" "}
+                    {tenant.address_line_1}, {tenant.city}, {tenant.state}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Emergency Contact:</span>{" "}
+                    {tenant.emergency_name} ({tenant.emergency_relationship})
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Emergency Phone:</span>{" "}
+                    {tenant.emergency_phone}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">iCoins:</span> -
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="font-medium text-sm">Status:</span>
+                    <Badge className="bg-[#F6FFED] text-[#52C41A] rounded-[6px] border-[#B7EB8F]">
+                      Active
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !error && (!data || data.length === 0) && (
+          <div className="text-center py-8">
+            <div className="text-gray-500">No tenants found.</div>
+          </div>
+        )}
       </div>
-      {/* <MapWithPoints /> */}
     </div>
   );
 };

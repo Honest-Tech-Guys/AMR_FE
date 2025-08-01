@@ -48,6 +48,7 @@ const schema = yup.object({
 });
 type schemaType = yup.InferType<typeof schema>;
 const CreateNewProperty = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -83,7 +84,6 @@ const CreateNewProperty = () => {
     { id: "game_room", label: "Game Room" },
     { id: "basketball_court", label: "Basketball Court" },
     { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
   ] as const;
   type FacilityId = (typeof facilities)[number]["id"];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
@@ -109,6 +109,7 @@ const CreateNewProperty = () => {
       onSuccess: () => {
         toast.success("Property created successfully!");
         reset();
+        setIsOpen(false);
       },
       onError: (err) => {
         toast.error((err as any)?.message || "Failed to create property.");
@@ -117,7 +118,7 @@ const CreateNewProperty = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">
           Create New Property
@@ -277,11 +278,13 @@ const CreateNewProperty = () => {
             </div>
             {/* Toast notifications are handled by 'sonner', so no need for local success/error display here */}
             <DialogFooter className="mt-6">
-              <DialogClose asChild>
-                <Button variant="outline" type="button">
-                  Cancel
-                </Button>
-              </DialogClose>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
               <Button type="submit" className="text-white" disabled={isPending}>
                 {isPending ? "Submitting..." : "Submit"}
               </Button>

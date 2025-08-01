@@ -22,18 +22,8 @@ import useAddUnit from "@/lib/services/hooks/useAddUnit";
 import { toast } from "sonner";
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Postcode is required"),
-  city: yup.string().required("City is required"),
-  state: yup.string().required("State is required"),
-  property_name: yup.string().required("Property name is required"),
-  unit: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
-    .string()
-    .required("Contact phone number is required"),
+  property_id: yup.string().required("Property name is required"),
+  unit_number: yup.string().required("Block / Floor / Unit Number is required"),
   remarks: yup.string().nullable(),
   address: yup.string().required("Address is required"),
   meeting_room: yup.boolean().default(false),
@@ -41,9 +31,6 @@ const schema = yup.object({
   basketball_court: yup.boolean().default(false),
   sauna: yup.boolean().default(false),
   free_text: yup.boolean().default(false),
-  block_floor_unit: yup
-    .string()
-    .required("Block / Floor / Unit Number is required"),
   bedroom: yup.string().required("Bedroom is required"),
   bathroom: yup.string().required("Bathroom is required"),
   square_feet: yup.string().required("Square Feet is required"),
@@ -108,20 +95,18 @@ const CreateUnit = () => {
   const { mutate, isPending, isSuccess, isError } = useAddUnit();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     // Example transformation (you'll need to adjust as per your actual data)
-    const [block_number, floor, unit_number] = data.block_floor_unit.split("/");
+
     mutate(
       {
-        property_id: "some_property_id", // get this from context or selection
-        block_number: block_number?.trim(),
-        floor: floor?.trim(),
-        unit_number: unit_number?.trim(),
+        property_id: data.property_id, // get this from context or selection
+        unit_number: data.unit_number,
         rental_type: "whole" /* or "sublet", map from toggle */,
         square_feet: data.square_feet,
-        business_partner_id: "some_partner_id", // get this from context or selection
+        business_partner_id: "1", // get this from context or selection
         bedroom_count: data.bedroom,
         bathroom_count: data.bathroom,
-        floor_plan_img: data.floor_plan_image?.[0]?.base64 || null,
-        unit_img: data.unit_image?.[0]?.base64 || null,
+        // floor_plan_img: data.floor_plan_image?.[0]?.base64 || null,
+        // unit_img: data.unit_image?.[0]?.base64 || null,
         description: data.remarks || "",
         is_active: data.is_activated ? "1" : "0",
         beneficiary: data.beneficiary,
@@ -153,19 +138,19 @@ const CreateUnit = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <SelectWithForm<schemaType>
-                name="unit"
+                name="property_id"
                 title="Property Name"
                 options={PartnerType}
               />
             </div>
             <CustomInput
-              id="block_floor_unit"
-              name="block_floor_unit"
+              id="unit_number"
+              name="unit_number"
               type="text"
               label="Block / Floor / Unit Number"
-              value={watch("block_floor_unit")}
-              onChange={(e) => setValue("block_floor_unit", e.target.value)}
-              errors={errors.block_floor_unit?.message}
+              value={watch("unit_number")}
+              onChange={(e) => setValue("unit_number", e.target.value)}
+              errors={errors.unit_number?.message}
               placeholder="Enter Block / Floor / Unit Number"
             />
             <div>

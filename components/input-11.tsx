@@ -68,7 +68,7 @@ export default function MultiFileUpload({
 
   return (
     <div className="space-y-4">
-      <div className="mt-3">
+      <div className="">
         <input
           id={`file-upload-${field}`}
           type="file"
