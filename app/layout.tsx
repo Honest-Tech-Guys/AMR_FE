@@ -73,7 +73,7 @@ export default function RootLayout({
       <body className={` antialiased`}>
         <ReactQueryProvider>
           <Toaster position="top-right" />
-          {isAuth ? (
+          {!isAuth ? (
             <Login />
           ) : (
             <SidebarProvider>
