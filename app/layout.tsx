@@ -16,6 +16,7 @@ import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import { Input } from "@/components/ui/input";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 import { Toaster } from "sonner";
+import React from "react";
 
 // Fonts
 // const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -44,7 +45,7 @@ function LayoutShell({ children }: { children: React.ReactNode }) {
             <Bell className="size-5 text-primary" strokeWidth={2.5} />
             <LogOut
               onClick={logout}
-              className="size-5 text-primary"
+              className="size-5 text-primary cursor-pointer"
               strokeWidth={2.5}
             />
             <Avatar>
@@ -60,20 +61,23 @@ function LayoutShell({ children }: { children: React.ReactNode }) {
     </>
   );
 }
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuth } = useAuthStore();
+  const { isAuth, isAuthLoading, checkAuth } = useAuthStore();
+
+  React.useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <html lang="en">
-      <body className={` antialiased`}>
+      <body className="antialiased">
         <ReactQueryProvider>
           <Toaster position="top-right" />
-          {!isAuth ? (
+          {isAuthLoading ? null : !isAuth ? (
             <Login />
           ) : (
             <SidebarProvider>

@@ -8,6 +8,7 @@ type AuthStore = {
   user_email: string;
   user_role: string;
   isAuth: boolean;
+  isAuthLoading: boolean;
   setUser: (value: {
     id: number;
     name: string;
@@ -15,49 +16,59 @@ type AuthStore = {
     role: string;
   }) => void;
   setIsAuth: (value: boolean) => void;
+  setAuthLoading: (value: boolean) => void;
+  checkAuth: () => void;
   logout: () => void;
 };
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => {
-      return {
-        user_id: 0,
-        user_name: "",
-        user_email: "",
-        user_role: "",
-        isAuth: false,
-        setUser: (value) =>
-          set({
-            user_id: value.id,
-            user_name: value.name,
-            user_email: value.email,
-            user_role: value.role,
-          }),
-        setIsAuth: (value) => {
-          set({ isAuth: value });
-        },
-        logout: () => {
-          set({
-            user_id: 0,
-            user_name: "",
-          });
-          localStorage.clear();
-          sessionStorage.clear();
-          window.location.href = "/"; // adjust path as needed
-        },
-      };
-    },
+    (set, get) => ({
+      user_id: 0,
+      user_name: "",
+      user_email: "",
+      user_role: "",
+      isAuth: false,
+      isAuthLoading: true,
+
+      setUser: (value) =>
+        set({
+          user_id: value.id,
+          user_name: value.name,
+          user_email: value.email,
+          user_role: value.role,
+        }),
+
+      setIsAuth: (value) => {
+        set({ isAuth: value });
+      },
+
+      setAuthLoading: (value) => {
+        set({ isAuthLoading: value });
+      },
+
+      checkAuth: () => {
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+        set({ isAuth: !!token, isAuthLoading: false });
+      },
+
+      logout: () => {
+        set({
+          user_id: 0,
+          user_name: "",
+          user_email: "",
+          user_role: "",
+          isAuth: false,
+        });
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/";
+      },
+    }),
     {
       name: "auth-storage",
-      // partialize: (state) => ({
-      //   user_id: state.user_id,
-      //   user_name: state.user_name,
-      //   setIsAuth: false,
-      // }),
-      // onRehydrateStorage: () => (state) => {
-      //   state?.setIsAuth(true);
-      // },
     }
   )
 );
