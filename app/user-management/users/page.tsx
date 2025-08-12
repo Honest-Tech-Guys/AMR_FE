@@ -15,7 +15,9 @@ import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import CreateNewPayout from "./CreateNewPayout";
+import { Separator } from "@/components/ui/separator";
+import CreateNewUser from "./CreateNewUser";
+// import CreateInvoice from "./CreateInvoice";
 const options = [
   {
     value: "Vacant",
@@ -30,17 +32,15 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
-type payout = {
-  posting_date: string;
-  pay_to: string;
-  invoice_no: string;
-  invoice_date: string;
-  description: string;
+type user = {
+  user_no: string;
   property: string;
-  tenant: string;
-  amount: string;
-  amount_fee: string;
-  action: string;
+  user_id: string;
+  user_name: string;
+  email: string;
+  contract_no: string;
+  role: string;
+  status: string;
 };
 interface PaginationData {
   page: number;
@@ -54,82 +54,59 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const invoiceColumns: Column<payout>[] = [
+  const UserColumns: Column<user>[] = [
     {
-      title: "Posting Date",
-      key: "posting_date",
+      title: "No",
+      key: "user_no",
       sortable: true,
       className: "pl-6 py-4",
       render: (order) => (
         <div className="pl-4 text-primary font-medium ">
-          {order.posting_date ?? "-"}
+          {order.user_no ?? "-"}
         </div>
       ),
     },
     {
-      title: "Pay To",
-      key: "pay_to",
-      sortable: true,
-      render: (user) => <div>{user.pay_to}</div>,
-    },
-    {
-      title: "Invoice No",
-      key: "invoice_no",
-      sortable: true,
-    },
-    {
-      title: "Invoice Date",
-      key: "invoice_date",
-      render: (order) => <div>{order.invoice_date}</div>,
-    },
-    {
-      title: "Description",
-      key: "description",
-      render: (order) => <div>{order.description}</div>,
-    },
-    {
       title: "Property",
       key: "property",
-      render: (order) => <div>{order.property}</div>,
+      sortable: true,
+      render: (user) => <div>{user.property}</div>,
     },
     {
-      title: "Tenant",
-      key: "tenant",
-      render: (order) => <div>{order.tenant}</div>,
+      title: "User ID",
+      key: "user_id",
+      render: (order) => <div>{order.user_id}</div>,
     },
     {
-      title: "Amount",
-      key: "amount",
-      render: (order) => <div>{order.amount}</div>,
+      title: "User Name",
+      key: "user_name",
+      render: (order) => <div>{order.user_name}</div>,
     },
     {
-      title: "Amount Fee",
-      key: "amount_fee",
-      render: (order) => <div>{order.amount_fee}</div>,
+      title: "Email Address",
+      key: "email",
+      render: (order) => <div>{order.email}</div>,
     },
     {
-      title: "Action",
-      key: "action",
-      render: (order) => <div>{order.action}</div>,
+      title: "Contract NO",
+      key: "contract_no",
+      render: (order) => <div>{order.contract_no ?? "-"}</div>,
+    },
+    {
+      title: "Role",
+      key: "role",
+      render: (order) => <div>{order.role ?? "-"}</div>,
+    },
+    {
+      title: "Status",
+      key: "status",
+      sortable: true,
     },
   ];
   const filters = [
-    <InputWithIcon
-      key="beneficiary"
-      icon={Search}
-      placeholder="Beneficiary Name"
-    />,
-    <InputWithIcon
-      key="invoice_start_date"
-      icon={Calendar}
-      placeholder="Invoice Start Date"
-    />,
-    <InputWithIcon
-      key="invoice_end_date"
-      icon={Calendar}
-      placeholder="Invoice End Date"
-    />,
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
+    <InputWithIcon key="user_name" icon={Search} placeholder="User Name" />,
+    <InputWithIcon key="user_id" icon={Search} placeholder="UserId" />,
+    <InputWithIcon key="status" icon={Search} placeholder="Status" />,
   ];
 
   const actionButton = (
@@ -154,15 +131,19 @@ const Page = () => {
 
   return (
     <div>
-      <HeaderPage title="Pending Payout" />
+      <HeaderPage title="User Management" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter filters={filters} actionButton={actionButton} />
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <CreateNewPayout />
+            {/* <Button className="rounded-[6px] text-white ">
+              Create New Expenses
+            </Button> */}
+            <CreateNewUser />
           </div>
         </div>
+
         <div className="flex items-end justify-end">
           <div className=" flex justify-end">
             <Button
@@ -175,26 +156,34 @@ const Page = () => {
             </Button>
           </div>
         </div>
-        <Datatable<payout>
-          columns={invoiceColumns}
+        <Datatable<user>
+          columns={UserColumns}
           data={[
             {
-              posting_date: "12/15/2024",
-              pay_to: "Property Owner",
-              invoice_no: "INV-0001",
-              invoice_date: "12/15/2024",
-              description: "Rental payment",
-              property: "Sky Residence Punching",
-              tenant: "John Doe",
-              amount: "1,500.00",
-              amount_fee: "50.00",
-              action: "Un-Post",
+              user_no: "001",
+              property: "Sky Residence",
+              user_id: "U1001",
+              user_name: "John Doe",
+              email: "john.doe@example.com",
+              contract_no: "C-2023-001",
+              role: "Admin",
+              status: "Active",
+            },
+            {
+              user_no: "002",
+              property: "Green Valley",
+              user_id: "U1002",
+              user_name: "Jane Smith",
+              email: "jane.smith@example.com",
+              contract_no: "C-2023-002",
+              role: "Owner",
+              status: "Inactive",
             },
           ]}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item: payout) => item.invoice_no}
+          rowKey={(item: user) => item.user_no}
           isFilter={isFilter}
         />
         {error && (

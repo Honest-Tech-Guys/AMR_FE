@@ -31,6 +31,7 @@ import MapWithPoints from "@/components/ImageMapper";
 import CreateInvoice from "./Actions/CreateInvoice";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { PropertyType } from "@/types/PropertyType";
+import ViewProperty from "./ViewProperty";
 const options = [
   {
     value: "Vacant",
@@ -89,7 +90,8 @@ const Page = () => {
       className: "pl-6 py-4",
       render: (order) => (
         <div className="pl-4 text-primary font-medium ">
-          {order.property_id ?? "-"}
+          {/* {order.property_id ?? "-"} */}
+          <ViewProperty property={order.originalData} />
         </div>
       ),
     },
@@ -154,7 +156,7 @@ const Page = () => {
                 className="hover:bg-gray-100 hover:cursor-pointer"
                 onSelect={(e) => {
                   e.preventDefault();
-                  router.push("/unit");
+                  router.push("/property/1/unit");
                 }}
               >
                 {/* <CreateUnit /> */}Add Unit

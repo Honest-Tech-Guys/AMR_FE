@@ -23,13 +23,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import MapWithPoints from "@/components/ImageMapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CreateUnit from "./CreateUnit";
 import AddRoomTagging from "./AddRoomTagging";
 import AddRoomDetails from "./AddRoomDetails";
 import CreateNewTenant from "./CreateNewTenant";
 import EditUnit from "./EditUnit";
 import useGetUnitsList from "@/lib/services/hooks/useGetUnit";
 import { UnitType } from "@/types/UnitType";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const options = [
   {
@@ -63,7 +63,7 @@ interface PaginationData {
   per_page: number;
 }
 
-const Page = () => {
+const ViewUnit = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -195,27 +195,10 @@ const Page = () => {
 
   return (
     <div>
-      <HeaderPage title="View Unit" />
-      <Tabs defaultValue="basic">
-        <TabsList>
-          <TabsTrigger
-            className="data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
-            value="basic"
-          >
-            Basic Information
-          </TabsTrigger>
-          <TabsTrigger
-            className="data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
-            value="room"
-          >
-            Room
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="basic">
-          <CreateUnit />
-        </TabsContent>
-        <TabsContent value="room">
-          {" "}
+      <Dialog>
+        <DialogTrigger className="cursor-pointer">unint 1</DialogTrigger>
+        <DialogContent className="md:max-w-[1000px] bg-white md:p-10 max-h-[95vh] overflow-y-auto">
+          <HeaderPage title="View Unit" />
           <div className="flex gap-4 ">
             <MapWithPoints />
             <div className="flex flex-col gap-2 my-5">
@@ -238,10 +221,34 @@ const Page = () => {
               <div className="text-red-500 mt-2">Error loading units.</div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* <Tabs defaultValue="basic">
+        <TabsList>
+          <TabsTrigger
+            className="data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
+            value="basic"
+          >
+            Basic Information
+          </TabsTrigger>
+          <TabsTrigger
+            className="data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
+            value="room"
+          >
+            Room
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="basic">
+          <CreateUnit />
         </TabsContent>
-      </Tabs>
+        <TabsContent value="room">
+          {" "}
+         
+        </TabsContent>
+      </Tabs> */}
     </div>
   );
 };
 
-export default Page;
+export default ViewUnit;

@@ -15,7 +15,11 @@ import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import CreateNewPayout from "./CreateNewPayout";
+import { Separator } from "@/components/ui/separator";
+import CreateExpenses from "./CreateExpenses";
+import CreateUnit from "./CreateUnit";
+import ViewUnit from "./ViewUnit";
+// import CreateInvoice from "./CreateInvoice";
 const options = [
   {
     value: "Vacant",
@@ -30,17 +34,16 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
-type payout = {
-  posting_date: string;
-  pay_to: string;
-  invoice_no: string;
-  invoice_date: string;
-  description: string;
-  property: string;
-  tenant: string;
+type expenses = {
+  expenses_no: string;
+  tenancy: string;
+  type: string;
+  status: string;
+  p_status: string;
+  bill_to: string;
+  date: string;
   amount: string;
-  amount_fee: string;
-  action: string;
+  property: string;
 };
 interface PaginationData {
   page: number;
@@ -54,82 +57,53 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const invoiceColumns: Column<payout>[] = [
+  const invoiceColumns: Column<expenses>[] = [
     {
-      title: "Posting Date",
-      key: "posting_date",
+      title: "Unit No",
+      key: "expenses_no",
       sortable: true,
       className: "pl-6 py-4",
       render: (order) => (
         <div className="pl-4 text-primary font-medium ">
-          {order.posting_date ?? "-"}
+          {/* {order.expenses_no ?? "-"} */}
+          <ViewUnit />
         </div>
       ),
     },
     {
-      title: "Pay To",
-      key: "pay_to",
+      title: "Unit Name",
+      key: "tenancy",
       sortable: true,
-      render: (user) => <div>{user.pay_to}</div>,
+      render: (user) => <div>{user.tenancy}</div>,
     },
     {
-      title: "Invoice No",
-      key: "invoice_no",
+      title: "Status",
+      key: "status",
       sortable: true,
-    },
-    {
-      title: "Invoice Date",
-      key: "invoice_date",
-      render: (order) => <div>{order.invoice_date}</div>,
-    },
-    {
-      title: "Description",
-      key: "description",
-      render: (order) => <div>{order.description}</div>,
-    },
-    {
-      title: "Property",
-      key: "property",
-      render: (order) => <div>{order.property}</div>,
-    },
-    {
-      title: "Tenant",
-      key: "tenant",
-      render: (order) => <div>{order.tenant}</div>,
-    },
-    {
-      title: "Amount",
-      key: "amount",
-      render: (order) => <div>{order.amount}</div>,
-    },
-    {
-      title: "Amount Fee",
-      key: "amount_fee",
-      render: (order) => <div>{order.amount_fee}</div>,
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (order) => <div>{order.action}</div>,
     },
   ];
   const filters = [
     <InputWithIcon
-      key="beneficiary"
+      key="invoice_no"
       icon={Search}
-      placeholder="Beneficiary Name"
+      placeholder="Invoice Number"
     />,
     <InputWithIcon
-      key="invoice_start_date"
-      icon={Calendar}
-      placeholder="Invoice Start Date"
+      key="tenancy_code"
+      icon={Search}
+      placeholder="Tenancy Code"
     />,
     <InputWithIcon
-      key="invoice_end_date"
-      icon={Calendar}
-      placeholder="Invoice End Date"
+      key="bill_to_name"
+      icon={Search}
+      placeholder="Bill To Name"
     />,
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
+    <InputWithIcon
+      key="property_name"
+      icon={Search}
+      placeholder="Property Name"
+    />,
+    <InputWithIcon key="date_range" icon={Calendar} placeholder="Date Range" />,
   ];
 
   const actionButton = (
@@ -154,15 +128,19 @@ const Page = () => {
 
   return (
     <div>
-      <HeaderPage title="Pending Payout" />
+      <HeaderPage title="#28139819031231" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
+        {/* <ResponsiveFilter filters={filters} actionButton={actionButton} /> */}
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <CreateNewPayout />
+            {/* <Button className="rounded-[6px] text-white ">
+              Create New Expenses
+            </Button> */}
+            <CreateUnit />
           </div>
         </div>
+
         <div className="flex items-end justify-end">
           <div className=" flex justify-end">
             <Button
@@ -175,26 +153,25 @@ const Page = () => {
             </Button>
           </div>
         </div>
-        <Datatable<payout>
+        <Datatable<expenses>
           columns={invoiceColumns}
           data={[
             {
-              posting_date: "12/15/2024",
-              pay_to: "Property Owner",
-              invoice_no: "INV-0001",
-              invoice_date: "12/15/2024",
-              description: "Rental payment",
+              expenses_no: "EXP-0001",
+              tenancy: "TEN-001",
+              type: "Utilities",
+              status: "Paid",
+              p_status: "Posted",
+              bill_to: "John Doe",
+              date: "2024-06-01",
+              amount: "1500.00",
               property: "Sky Residence Punching",
-              tenant: "John Doe",
-              amount: "1,500.00",
-              amount_fee: "50.00",
-              action: "Un-Post",
             },
           ]}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item: payout) => item.invoice_no}
+          rowKey={(item: expenses) => item.expenses_no}
           isFilter={isFilter}
         />
         {error && (

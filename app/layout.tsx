@@ -81,7 +81,7 @@ export default function RootLayout({
             <Login />
           ) : (
             <SidebarProvider>
-              <LayoutShell>{children}</LayoutShell>
+              <LayoutShell>{children}</LayoutShell> 
             </SidebarProvider>
           )}
         </ReactQueryProvider>

@@ -20,9 +20,6 @@ import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import MultiFileUpload from "@/components/input-11";
 // Schema & type
 const schema = yup.object({
   country: yup.string().required("Country is required"),
@@ -39,30 +36,6 @@ const schema = yup.object({
     .required("Contact phone number is required"),
   remarks: yup.string().nullable(),
   address: yup.string().required("Address is required"),
-  floor_plan_image: yup
-    .array()
-    .of(
-      yup.object({
-        name: yup.string().required("File name is required"),
-        size: yup.number().required("File size is required"),
-        type: yup.string().required("File type is required"),
-        base64: yup.string().required("File content is required"),
-      })
-    )
-    .min(1, "proposed attach form is required")
-    .required("proposed attach form is required"),
-  unit_image: yup
-    .array()
-    .of(
-      yup.object({
-        name: yup.string().required("File name is required"),
-        size: yup.number().required("File size is required"),
-        type: yup.string().required("File type is required"),
-        base64: yup.string().required("File content is required"),
-      })
-    )
-    .min(1, "proposed attach form is required")
-    .required("proposed attach form is required"),
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
@@ -70,7 +43,7 @@ const schema = yup.object({
   free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
-const ViewNotification = () => {
+const CreateNewUser = () => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -101,9 +74,11 @@ const ViewNotification = () => {
     { id: "5", name: "Townhouse" },
   ];
   const facilities = [
-    { id: "passcode", label: "Passcode" },
-    { id: "fingerprint", label: "Fingerprint" },
-    { id: "IC_card", label: "IC Card" },
+    { id: "meeting_room", label: "Meeting Room" },
+    { id: "game_room", label: "Game Room" },
+    { id: "basketball_court", label: "Basketball Court" },
+    { id: "sauna", label: "Sauna" },
+    { id: "free_text", label: "Free Text" },
   ];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const facilitiesList = facilities
@@ -115,105 +90,108 @@ const ViewNotification = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <label className="font-normal cursor-pointer text-[#337AB7]">
-          123512350
-        </label>
+        <Button className="rounded-[6px] text-white">Create New User</Button>
       </DialogTrigger>
 
       <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
-            View Announcement
+            Create New User
           </div>
         </DialogHeader>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <HeaderSection title="Announcement Information" />
+            <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <CustomInput
+                  id="property_name"
+                  name="property_name"
+                  type="text"
+                  label="Property Name"
+                  value={watch("property_name")}
+                  onChange={(e) => setValue("property_name", e.target.value)}
+                  errors={errors.property_name?.message}
+                  placeholder="Enter Property Name"
+                />
+              </div>
+              <CustomInput
+                id="meter_name"
+                name="meter_name"
+                type="text"
+                label="User Name"
+                value={watch("meter_name")}
+                onChange={(e) => setValue("meter_name", e.target.value)}
+                errors={errors.meter_name?.message}
+                placeholder="Enter Meter Name"
+              />
+
               <CustomInput
                 id="serial_number"
                 name="serial_number"
                 type="text"
-                label="Title"
+                label="Email"
                 value={watch("serial_number")}
                 onChange={(e) => setValue("serial_number", e.target.value)}
                 errors={errors.serial_number?.message}
-                placeholder="Enter Title"
+                placeholder="Enter Serial Number"
+              />
+
+              <CustomInput
+                id="unit_price"
+                name="unit_price"
+                type="text"
+                label="Password"
+                value={watch("unit_price")}
+                onChange={(e) => setValue("unit_price", e.target.value)}
+                errors={errors.unit_price?.message}
+                placeholder="Enter Unit Price"
+              />
+
+              <CustomInput
+                id="minimum_topup_unit"
+                name="minimum_topup_unit"
+                type="text"
+                value={watch("minimum_topup_unit")}
+                label="Confirm Password"
+                onChange={(e) => setValue("minimum_topup_unit", e.target.value)}
+                errors={errors.minimum_topup_unit?.message}
+                placeholder="Enter Minimum Topup Unit"
               />
               <CustomInput
-                id="property_name"
-                name="property_name"
+                id="minimum_topup_value"
+                name="minimum_topup_value"
                 type="text"
-                label="Property Name"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Property Name"
+                value={watch("minimum_topup_value")}
+                label="Role"
+                onChange={(e) =>
+                  setValue("minimum_topup_value", e.target.value)
+                }
+                errors={errors.minimum_topup_value?.message}
+                placeholder="Enter Minimum Topup Value"
               />
               <CustomInput
-                id="property_name"
-                name="property_name"
+                id="minimum_topup_unit"
+                name="minimum_topup_unit"
                 type="text"
+                value={watch("minimum_topup_unit")}
                 label="Status"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Status"
+                onChange={(e) => setValue("minimum_topup_unit", e.target.value)}
+                errors={errors.minimum_topup_unit?.message}
+                placeholder="Enter Minimum Topup Unit"
               />
 
-              <div className="">
-                <span className="font-semibold">Documents</span>
-                <Controller
-                  control={control}
-                  name="floor_plan_image"
-                  rules={{ required: "Company statutory form is required" }}
-                  render={({ field: { onChange, value } }) => (
-                    <MultiFileUpload
-                      isMulti={false}
-                      field="companyStatutoryForm"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
-                {errors.floor_plan_image && (
-                  <span className="text-red-500 text-sm">
-                    {errors.floor_plan_image.message}
-                  </span>
-                )}
-              </div>
-              <CustomInput
-                id="property_name"
-                name="property_name"
-                type="date"
-                label="Start Date"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Status"
-              />
-              <CustomInput
-                id="property_name"
-                name="property_name"
-                type="date"
-                label="End Date"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Status"
-              />
-
-              <div className="col-span-2">
-                {" "}
+              <div className="col-span-1 md:col-span-2">
                 <CustomInput
                   id="remarks"
-                  name="remarks"
-                  type="textArea"
                   label="Remarks"
+                  type="textArea"
+                  name="remarks"
                   value={watch("remarks")}
                   onChange={(e) => setValue("remarks", e.target.value)}
-                  errors={errors.remarks?.message}
+                  placeholder="E.g describe more about the reason for change"
                   className="bg-gray-100"
+                  errors={errors.remarks?.message}
                 />
               </div>
             </div>
@@ -221,9 +199,12 @@ const ViewNotification = () => {
             <DialogFooter className="mt-6">
               <DialogClose asChild>
                 <Button variant="outline" type="button">
-                  Close
+                  Cancel
                 </Button>
               </DialogClose>
+              <Button type="submit" className="text-white">
+                Submit
+              </Button>
             </DialogFooter>
           </form>
         </FormProvider>
@@ -232,4 +213,4 @@ const ViewNotification = () => {
   );
 };
 
-export default ViewNotification;
+export default CreateNewUser;

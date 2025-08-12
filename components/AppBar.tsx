@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { ChevronRight, House } from "lucide-react";
+import { ChevronRight, House, UserCog } from "lucide-react";
 import Image from "next/image";
 
 import {
@@ -44,6 +44,7 @@ import NotificationIconA from "@/lib/icons/NotificationIconA";
 import NotificationIconB from "@/lib/icons/NotificationIconB";
 import ReportIconA from "@/lib/icons/ReportIconA";
 import ReportIconB from "@/lib/icons/ReportIconB";
+import Link from "next/link";
 
 // Menu configuration
 const menuItems = [
@@ -104,6 +105,18 @@ const menuItems = [
     items: [
       { title: "Tenant", url: "/people/tenant" },
       { title: "Owner", url: "/people/owner" },
+    ],
+  },
+  {
+    title: "User Management",
+    icon_active: <UserCog className="text-primary-foreground" />,
+    icon: <UserCog className="text-gray-400" />,
+    items: [
+      { title: "Users", url: "/user-management/users" },
+      {
+        title: "Role & Permissions",
+        url: "/user-management/role_and_permissions",
+      },
     ],
   },
   {
@@ -175,10 +188,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           : "font-semibold py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
                       }
                     >
-                      <a href={item.url}>
+                      <Link
+                        href={item.url as string}
+                        className="flex items-center gap-2"
+                      >
                         {isItemActive ? item.icon_active : item.icon}
                         {item.title}
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -203,7 +219,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <CollapsibleTrigger className="cursor-pointer">
                     {/* <House className="mr-2" strokeWidth={2.5} /> */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-center">
                       {isChildActive ? item.icon_active : item.icon}
                       {item.title}
                     </div>
@@ -225,7 +241,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 isActive ? " text-primary font-semibold" : ""
                               }
                             >
-                              <a href={child.url}>{child.title}</a>
+                              <Link href={child.url}>{child.title}</Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         );

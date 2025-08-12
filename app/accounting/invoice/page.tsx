@@ -7,13 +7,14 @@ import {
   ChevronUp,
   Ellipsis,
   Funnel,
+  Printer,
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
 import CreateInvoice from "./CreateInvoice";
@@ -31,6 +32,9 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 type invoice = {
   invoice_no: string;
   tenancy: string;
@@ -41,6 +45,7 @@ type invoice = {
   due_date: string;
   amount: string;
   property: string;
+  action?: ReactNode;
 };
 interface PaginationData {
   page: number;
@@ -101,6 +106,49 @@ const Page = () => {
       title: "Amount",
       key: "amount",
       render: (order) => <div>{order.amount ?? "-"}</div>,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (invoice) => (
+        <div className="flex justify-center">
+          <Printer
+            className="text-primary cursor-pointer"
+            onClick={() =>
+              generateStyledInvoicePDF({
+                invoice_no: "AuntieMichelle-IV25002278",
+                date: "12 March 2025",
+                due_date: "17 March 2025",
+                tax_rate: "0.00",
+                customer_name: "Johnson Lim",
+                property_address:
+                  "Sky Residence Puchong 47100\npuchong selangor",
+                customer_info: {
+                  name: "Kee Chi Yu-E9 B-23A-12 (R4)",
+                  phone: "+60108184103",
+                  email: "keechiyu0206@gmail.com",
+                },
+                items: [
+                  {
+                    name: "Rental Deposit",
+                    qty: 1,
+                    unit_price: "RM 500",
+                    total: "RM 500.00",
+                  },
+                ],
+                sub_total: "RM 500.00",
+                tax: "RM 0.00",
+                total: "RM 500.00",
+                notes: [
+                  "Lorem ipsum is a dummy text, RMxxx",
+                  "Lorem ipsum is a dummy text, RMxxx",
+                  "Lorem ipsum is a dummy text, RMxxx",
+                ],
+              })
+            }
+          />
+        </div>
+      ),
     },
   ];
   const filters = [
@@ -239,17 +287,6 @@ const Page = () => {
               amount: "950.00",
               property: "Riverside Condos",
             },
-            {
-              invoice_no: "INV-0005",
-              tenancy: "TEN-005",
-              status: "Pending",
-              p_status: "Draft",
-              bill_to: "David Brown",
-              date: "12/18/2024",
-              due_date: "01/18/2025",
-              amount: "3,100.00",
-              property: "Ocean View Residences",
-            },
           ]}
           isPending={isLoading}
           pagination={pagination}
@@ -265,5 +302,156 @@ const Page = () => {
     </div>
   );
 };
+
+export async function generateStyledInvoicePDF(invoice) {
+  const doc = new jsPDF("p", "pt", "a4");
+  let y = 40;
+  const LOGO_URL = "/logo.png";
+  // Draw logo (async if using URL)
+  if (LOGO_URL) {
+    const img = await loadImageAsBase64(LOGO_URL);
+    doc.addImage(img, "PNG", 50, y, 100, 60);
+  }
+
+  // Company Info
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Auntie Michelle Resources Sdn BHD", 170, y + 10);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("(Business Reg - 1234567890)", 170, y + 28);
+  doc.text("Contact: +60122363030", 170, y + 44);
+  doc.text("Email: laimeesum@gmail.com", 170, y + 60);
+
+  // Invoice Title
+  y += 90;
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Invoice Tax", 250, y);
+
+  // Invoice Info
+  y += 30;
+  doc.setFontSize(11);
+  doc.text("From", 50, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "No 5 Jalan SS 21/30 Damansara Utama,,\nPetaling Jaya, 47400, Selangor, Malaysia",
+    100,
+    y
+  );
+  doc.text("Invoice No", 350, y);
+  doc.setFont("helvetica", "bold");
+  doc.text(invoice.invoice_no, 430, y);
+  doc.setFont("helvetica", "normal");
+
+  y += 30;
+  doc.setFont("helvetica", "bold");
+  doc.text("To", 50, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(invoice.customer_name, 100, y);
+  doc.text("Date", 350, y);
+  doc.text(invoice.date, 430, y);
+
+  y += 18;
+  doc.setFont("helvetica", "bold");
+  doc.text("Address", 50, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(invoice.property_address, 100, y);
+  doc.text("Due Date", 350, y);
+  doc.text(invoice.due_date, 430, y);
+
+  y += 18;
+  doc.text("Tax Rate", 350, y);
+  doc.text(invoice.tax_rate, 430, y);
+
+  // Customer Info
+  y += 30;
+  doc.setFont("helvetica", "bold");
+  doc.text("Customer Info", 50, y);
+  doc.setFont("helvetica", "normal");
+  y += 16;
+  doc.text(invoice.customer_info.name, 50, y);
+  y += 14;
+  doc.text(invoice.customer_info.phone, 50, y);
+  y += 14;
+  doc.text(invoice.customer_info.email, 50, y);
+
+  // Table
+  y += 20;
+  autoTable(doc, {
+    startY: y,
+    head: [["#", "Item", "Qty", "Unit Price", "Total Amount"]],
+    body: invoice.items.map((item, idx) => [
+      idx + 1,
+      item.name,
+      item.qty,
+      item.unit_price,
+      item.total,
+    ]),
+    headStyles: {
+      fillColor: [240, 242, 245],
+      textColor: [100, 110, 130],
+      fontStyle: "normal",
+    },
+    bodyStyles: { textColor: [50, 60, 80] },
+    styles: { font: "helvetica", fontSize: 10 },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 200 },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 80 },
+      4: { cellWidth: 150 },
+    },
+    margin: { left: 50, right: 50 },
+  });
+
+  // Totals
+  let finalY = doc.lastAutoTable.finalY + 20;
+  doc.setFont("helvetica", "normal");
+  doc.text("Sub Total", 420, finalY);
+  doc.text(invoice.sub_total, 550, finalY, { align: "right" });
+
+  finalY += 16;
+  doc.text("Tax 6%", 420, finalY);
+  doc.text(invoice.tax, 550, finalY, { align: "right" });
+
+  finalY += 25;
+  doc.setFont("helvetica", "bold");
+  doc.text("Total amount:", 420, finalY);
+  doc.setFontSize(14);
+  finalY += 20;
+  doc.text(invoice.total, 420, finalY);
+
+  // Notes
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("Notes", 50, 780);
+  doc.setFont("helvetica", "normal");
+  let notesY = 795;
+  invoice.notes.forEach((note, idx) => {
+    doc.text(`${idx + 1}. ${note}`, 50, notesY);
+    notesY += 14;
+  });
+
+  // Open PDF in new tab
+  const pdfUrl = doc.output("bloburl");
+  window.open(pdfUrl, "_blank");
+}
+
+function loadImageAsBase64(url: string) {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = function () {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.src = url;
+  });
+}
 
 export default Page;

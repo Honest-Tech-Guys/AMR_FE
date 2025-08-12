@@ -18,8 +18,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CircleArrowDown, PenLine, Search, Share2 } from "lucide-react";
+import UpdateUnitInformation from "./UpdateUnitInformation";
+import { useState } from "react";
+import UpdateRoomInformation from "./UpdateRoomInformation";
 
 const Page = () => {
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const filters = [
     <InputWithIcon
       className="w-full"
@@ -92,7 +97,10 @@ const Page = () => {
                         <TableRow>
                           <TableCell className="flex gap-2">
                             {" "}
-                            <PenLine className="size-4 text-primary" />
+                            <UpdateUnitInformation
+                              open={open}
+                              setOpen={setOpen}
+                            />
                             <Share2 className="size-4 text-primary" />
                           </TableCell>
                           <TableCell>Whole Unit</TableCell>
@@ -152,7 +160,10 @@ const Page = () => {
                         <TableRow>
                           <TableCell className="flex gap-2">
                             {" "}
-                            <PenLine className="size-4 text-primary" />
+                            <UpdateRoomInformation
+                              open={open2}
+                              setOpen={setOpen2}
+                            />
                             <Share2 className="size-4 text-primary" />
                           </TableCell>
                           <TableCell>Whole Unit</TableCell>

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import { UnitType } from "@/types/UnitType";
+import ResponseType from "@/types/ResponseType";
+import PaginationType from "@/types/PaginationType";
 const useGetUnitsList = () => {
   return useQuery({
     queryKey: ["GetUnitsList"],
@@ -8,9 +10,9 @@ const useGetUnitsList = () => {
       const url = "/units";
       {
         return axiosInstance
-          .get<UnitType[]>(url)
+          .get<ResponseType<PaginationType<UnitType[]>>>(url)
           .then((res) => {
-            return res.data;
+            return res.data.data.data;
           })
           .catch((error) => {
             console.log(error);

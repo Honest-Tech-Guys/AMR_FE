@@ -16,6 +16,7 @@ import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
+import CreateExpenses from "./CreateExpenses";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {
@@ -155,10 +156,10 @@ const Page = () => {
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="rounded-[6px] text-white ">
+            {/* <Button className="rounded-[6px] text-white ">
               Create New Expenses
-            </Button>
-            {/* <CreateInvoice /> */}
+            </Button> */}
+            <CreateExpenses />
           </div>
         </div>
 
