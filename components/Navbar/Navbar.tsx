@@ -28,7 +28,7 @@ const Navbar = () => {
           strokeWidth={2.5}
         />
         <Avatar>
-          <AvatarImage src="/tstImage.png" alt="@shadcn" />
+          <AvatarImage src={data?.avatar_url} alt="@shadcn" />
           <AvatarFallback>
             {data?.name[0]}
             {data?.name[1]}
