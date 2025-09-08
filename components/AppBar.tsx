@@ -67,7 +67,7 @@ const menuItems = [
     title: "Tenancy",
     icon_active: <TenancyIconA />,
     icon: <TenancyIconB />,
-    items: [{ title: "Tenant", url: "/tenancy/tenant" }],
+    url: "/tenancy",
   },
   {
     title: "Booking",

@@ -34,6 +34,7 @@ const options = [
 ];
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import useGetInvoicesList from "@/lib/services/hooks/useGetInvoices";
 
 type invoice = {
   invoice_no: string;
@@ -59,15 +60,16 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const invoiceColumns: Column<invoice>[] = [
+  const { data, isLoading, error } = useGetInvoicesList();
+  const invoiceColumns: Column<Invoice>[] = [
     {
       title: "Invoice",
-      key: "invoice_no",
+      key: "invoice_number",
       sortable: true,
       className: "pl-6 py-4",
-      render: (order) => (
+      render: (invoice) => (
         <div className="pl-4 text-primary font-medium ">
-          {order.invoice_no ?? "-"}
+          {invoice.invoice_number ?? "-"}
         </div>
       ),
     },
@@ -75,7 +77,7 @@ const Page = () => {
       title: "Tenancy",
       key: "tenancy",
       sortable: true,
-      render: (user) => <div>{user.tenancy}</div>,
+      // render: (invoice) => <div>{invoice.tenancy.}</div>,
     },
     {
       title: "Status",
@@ -85,27 +87,27 @@ const Page = () => {
     {
       title: "P Status",
       key: "p_status",
-      render: (order) => <div>{order.p_status}</div>,
+      // render: (order) => <div>{order.p_status}</div>,
     },
     {
       title: "Bill To",
       key: "bill_to",
-      render: (order) => <div>{order.bill_to}</div>,
+      // render: (order) => <div>{order.bill_to}</div>,
     },
     {
       title: "Date",
       key: "date",
-      render: (order) => <div>{order.date}</div>,
+      // render: (order) => <div>{order.date}</div>,
     },
     {
       title: "Due Date",
       key: "due_date",
-      render: (order) => <div>{order.due_date}</div>,
+      // render: (order) => <div>{order.due_date}</div>,
     },
     {
       title: "Amount",
       key: "amount",
-      render: (order) => <div>{order.amount ?? "-"}</div>,
+      // render: (order) => <div>{order.amount ?? "-"}</div>,
     },
     {
       title: "Action",
@@ -181,18 +183,16 @@ const Page = () => {
     </Button>
   );
 
-  const { data, isLoading, error } = useGetPropertiesList();
-
   // Map API data to table format
   const tableData = (data || []).map((item) => ({
-    property_id: item.property_name ?? "-",
-    unit: "-", // Replace with actual unit info if available
-    room: "-", // Replace with actual room info if available
-    smart_home: "-", // Replace with actual smart home info if available
-    owner_name: "-", // Replace with actual owner name if available
-    rental: "-", // Replace with actual rental info if available
-    tenancy: "-", // Replace with actual tenancy info if available
-    status: "-", // Replace with actual status if available
+    invoice_number: item.invoice_number,
+    tenancy: item.tenancy.code, // or item.tenancy.code / item.tenancy.tenant.name if you want text
+    status: item.status,
+    p_status: "Posted",
+    bill_to: item.tenancy.tenant.name,
+    date: item.issue_date,
+    due_date: item.due_date, // ✅ fixed typo: item.due.date → item.due_date
+    amount: item.total_amount,
   }));
 
   return (
@@ -240,58 +240,13 @@ const Page = () => {
             </Button>
           </div>
         </div>
-        <Datatable<invoice>
+        <Datatable<Invoice>
           columns={invoiceColumns}
-          data={[
-            {
-              invoice_no: "INV-0001",
-              tenancy: "TEN-001",
-              status: "Paid",
-              p_status: "Posted",
-              bill_to: "John Doe",
-              date: "12/15/2024",
-              due_date: "12/30/2024",
-              amount: "1,500.00",
-              property: "Sky Residence Punching",
-            },
-            {
-              invoice_no: "INV-0002",
-              tenancy: "TEN-002",
-              status: "Pending",
-              p_status: "Draft",
-              bill_to: "Jane Smith",
-              date: "12/16/2024",
-              due_date: "01/15/2025",
-              amount: "2,200.00",
-              property: "Green Valley Apartments",
-            },
-            {
-              invoice_no: "INV-0003",
-              tenancy: "TEN-003",
-              status: "Overdue",
-              p_status: "Posted",
-              bill_to: "Mike Johnson",
-              date: "11/15/2024",
-              due_date: "12/15/2024",
-              amount: "1,800.00",
-              property: "Sunset Towers",
-            },
-            {
-              invoice_no: "INV-0004",
-              tenancy: "TEN-004",
-              status: "Paid",
-              p_status: "Posted",
-              bill_to: "Sarah Wilson",
-              date: "12/10/2024",
-              due_date: "12/25/2024",
-              amount: "950.00",
-              property: "Riverside Condos",
-            },
-          ]}
+          data={tableData}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item: invoice) => item.invoice_no}
+          rowKey={(item: Invoice) => item.invoice_number}
           isFilter={isFilter}
         />
         {error && (

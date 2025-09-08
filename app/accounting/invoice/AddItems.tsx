@@ -23,6 +23,7 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import MapWithPoints from "@/components/ImageMapper";
 import { Plus } from "lucide-react";
+import { useEffect } from "react";
 // Schema & type
 const schema = yup.object({
   item_id: yup.string().required("item is required"),
@@ -32,7 +33,10 @@ const schema = yup.object({
   remarks: yup.string().nullable(),
 });
 type schemaType = yup.InferType<typeof schema>;
-const AddItems = () => {
+type Props = {
+  setItems: React.Dispatch<React.SetStateAction<any[]>>;
+};
+const AddItems = ({ setItems }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -45,36 +49,65 @@ const AddItems = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const work_or_study = [
-    { id: "work", name: "Work" },
-    { id: "study", name: "Study" },
+  const items = [
+    { id: "electricitybill", name: "Electricity Bill" },
+    { id: "comprehensiveservicefee", name: "Comprehensive Service Fee" },
+    { id: "registrationfee", name: "Registration Fee" },
+    { id: "aircond", name: "Aircond" },
+    { id: "laundryproduct", name: "Laundry Product" },
+    { id: "insurance", name: "Insurance" },
+    { id: "waterbill", name: "Waterbill" },
+    { id: "accesscarddeposit", name: "Access Card Deposit" },
+    { id: "carsticker", name: "Car Sticker" },
+    { id: "insurancecharges", name: "Insurance Charges" },
+    { id: "moveinfee", name: "Move In Fee" },
+    { id: "securitydeposit", name: "Security Deposit" },
+    { id: "tenancyagreementfee", name: "Tenancy Agreement Fee" },
+    { id: "zerodeposit", name: "Zero Deposit" },
+    { id: "advertisementfees", name: "Advertisement Fees" },
+    { id: "cleaningfees", name: "Cleaning Fees" },
+    { id: "commission", name: "Commission" },
+    { id: "cukaiharta", name: "Cukai Harta" },
+    { id: "cukaitanah", name: "Cukai Tanah" },
+    { id: "electricity", name: "Electricity" },
+    { id: "fitupdeposit", name: "Fit Up Deposit" },
+    { id: "indahwater", name: "Indah Water" },
+    { id: "internet", name: "Internet" },
+    { id: "keydeposit", name: "Key Deposit" },
+    { id: "lateinterestcharges", name: "Late Interest Charges" },
+    { id: "maintenancefee", name: "Maintenance Fee" },
+    { id: "managementfee", name: "Management Fee" },
+    { id: "otherdeposit", name: "Other Deposit" },
+    { id: "others", name: "Others" },
+    { id: "parking", name: "Parking" },
+    { id: "penalties", name: "Penalties" },
+    { id: "rental", name: "Rental" },
+    { id: "rentaldeposit", name: "Rental Deposit" },
+    { id: "repaircharges", name: "Repair Charges" },
+    { id: "restorationdeposit", name: "Restoration Deposit" },
+    { id: "service", name: "Service" },
+    { id: "utilitydeposit", name: "Utility Deposit" },
+    { id: "waterbill", name: "Water Bill" },
   ];
-  const GenderType = [
-    { id: "1", name: "Male" },
-    { id: "2", name: "Female" },
-    { id: "3", name: "Per Not To Say" },
-  ];
-  const Rooms = [
-    { id: "1", name: "Room 1" },
-    { id: "2", name: "Room 2" },
-    { id: "3", name: "Room 3" },
-  ];
-  const Amenities = [
-    { id: "1", name: "Table" },
-    { id: "2", name: "Table lamp" },
-    { id: "3", name: "Chair" },
-    { id: "4", name: "Fan" },
-    { id: "5", name: "Balcony" },
-    { id: "6", name: "En Suit Bathroom" },
-  ];
-  const Race = [
-    { id: "1", name: "Malay" },
-    { id: "2", name: "Chinese" },
-    { id: "3", name: "Indian" },
-    { id: "4", name: "Others" },
-  ];
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    console.log("Form data:", data);
+
+  const onSubmit = (data: any) => {
+    setItems((prev) => [
+      ...prev,
+      {
+        item_name: items.find((i) => i.id === data.item_id)?.name || "",
+        quantity: Number(data.quantity),
+        unit_price: Number(data.unit_price),
+        tax_percentage: Number(data.tax),
+        remarks: data?.remarks,
+      },
+    ]);
+    reset({
+      item_id: "",
+      quantity: "",
+      unit_price: "",
+      tax: "",
+      remarks: "",
+    }); // فضي الحقول بعد الإضافة
   };
 
   return (
@@ -93,12 +126,14 @@ const AddItems = () => {
         </DialogHeader>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1  gap-4">
-              <SelectWithForm<schemaType>
-                name="item_id"
-                title="Item"
-                options={Rooms}
-              />
+            <div className="grid grid-cols-3  gap-4">
+              <div className="col-span-3">
+                <SelectWithForm<schemaType>
+                  name="item_id"
+                  title="Item"
+                  options={items}
+                />
+              </div>
               <CustomInput
                 id="quantity"
                 label="Quantity"
@@ -133,7 +168,7 @@ const AddItems = () => {
                 errors={errors.tax?.message}
               />
 
-              <div className="col-span-1 ">
+              <div className="col-span-3 ">
                 <CustomInput
                   id="remarks"
                   label="Remarks"
@@ -153,6 +188,7 @@ const AddItems = () => {
                   Cancel
                 </Button>
               </DialogClose>
+
               <Button type="submit" className="text-white">
                 Submit
               </Button>

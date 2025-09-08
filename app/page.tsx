@@ -1,3 +1,4 @@
+"use client";
 import { ChartBarLabelCustom } from "@/components/BarCharts";
 import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
 import { GeneralSection } from "@/components/Dashboard/GeneralSection";
@@ -6,6 +7,7 @@ import MyRentableSpaceSection from "@/components/Dashboard/MyRentableSpaceSectio
 import RentalCollectionChart from "@/components/Dashboard/RentalCollectionChart";
 import RentalCollectionSection from "@/components/Dashboard/RentalCollectionSection";
 import TenancyExpiryStatusSection from "@/components/Dashboard/TenancyExpiryStatusSection";
+import useGetUser from "@/lib/services/hooks/useGetUser";
 
 export default function Home() {
   return (

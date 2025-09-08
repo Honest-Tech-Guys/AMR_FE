@@ -22,17 +22,17 @@ import * as yup from "yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
   postcode: yup.string().required("Country is required"),
   city: yup.string().required("Country is required"),
   state: yup.string().required("Country is required"),
   property_name: yup.string().required("Property name is required"),
   property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
+  owner_id: yup.string().required("Owner is required"),
   owner_phone_number: yup.string().required("Owner phone number is required"),
   contact_name: yup.string().required("Contact name is required"),
   contact_phone_number: yup
@@ -47,7 +47,9 @@ const schema = yup.object({
   free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
+
 const CreateNewProperty = () => {
+  const [owners, setOwners] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
@@ -62,22 +64,39 @@ const CreateNewProperty = () => {
     formState: { errors },
   } = form;
   const { mutate, isPending } = useAddProperty();
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
+  const { data } = useGetOwnersSelection();
+  useEffect(() => {
+    if (data) {
+      const dataT = data.map((owner) => {
+        return { id: `${owner.id}`, name: owner.name };
+      });
+      setOwners(dataT as never);
+    }
+  }, [data]);
+  const cities = [
+    { id: "johor", name: "Johor" },
+    { id: "kedah", name: "Kedah" },
+    { id: "kelantan", name: "Kelantan" },
+    { id: "malacca", name: "Malacca" },
+    { id: "negeriSembilan", name: "Negeri Sembilan" },
+    { id: "pahang", name: "Pahang" },
+    { id: "perak", name: "Perak" },
+    { id: "perlis", name: "Perlis" },
+    { id: "penang", name: "Penang" },
+    { id: "selangor", name: "Selangor" },
+    { id: "terengganu", name: "Terengganu" },
+    { id: "sabah", name: "Sabah" },
+    { id: "sarawak", name: "Sarawak" },
+    { id: "kualaLumpur", name: "Kuala Lumpur" },
+    { id: "putrajaya", name: "Putrajaya" },
   ];
+
   const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
+    { id: "Apartment1", name: "Apartment" },
+    { id: "Condominium", name: "Condominium" },
+    { id: "Flat", name: "Flat" },
+    { id: "Landed", name: "Landed" },
+    { id: "Townhouse", name: "Townhouse" },
   ];
   const facilities = [
     { id: "meeting_room", label: "Meeting Room" },
@@ -94,15 +113,17 @@ const CreateNewProperty = () => {
     // Compose payload for AddPropertyInput
     const payload = {
       property_name: data.property_name,
-      attention_name: data.contact_name || null,
-      attention_phone_number: data.contact_phone_number || null,
+      owner_id: data.owner_id,
+      owner_phone: data.owner_phone_number,
+      contact_name: data.contact_name || null,
+      contact_phone: data.contact_phone_number || null,
       property_type: data.property_type,
       remarks: data.remarks || "",
       address_line_1: data.address || null,
+      country: "soso",
       city: data.city,
       state: data.state,
       postcode: data.postcode,
-      country: data.country,
       facilities: facilitiesList,
     };
     mutate(payload, {
@@ -150,7 +171,7 @@ const CreateNewProperty = () => {
                 title="Property Type"
                 options={PartnerType}
               />
-              <CustomInput
+              {/* <CustomInput
                 id="owner_name"
                 name="owner_name"
                 type="text"
@@ -159,8 +180,12 @@ const CreateNewProperty = () => {
                 onChange={(e) => setValue("owner_name", e.target.value)}
                 errors={errors.owner_name?.message}
                 placeholder="Enter Owner Name"
+              /> */}
+              <SelectWithForm<schemaType>
+                name="owner_id"
+                title="Owner"
+                options={owners}
               />
-
               <div>
                 <label className="block mb-1 text-sm font-medium">
                   Owner Phone Number
@@ -222,6 +247,22 @@ const CreateNewProperty = () => {
             <HeaderSection title="Address Information" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <SelectWithForm<schemaType>
+                name="city"
+                title="City"
+                options={cities}
+              />
+
+              <CustomInput
+                id="state"
+                name="state"
+                type="text"
+                value={watch("state")}
+                label="State"
+                onChange={(e) => setValue("state", e.target.value)}
+                errors={errors.state?.message}
+                placeholder="Enter State"
+              />
               <CustomInput
                 id="address"
                 name="address"
@@ -241,21 +282,6 @@ const CreateNewProperty = () => {
                 onChange={(e) => setValue("postcode", e.target.value)}
                 errors={errors.postcode?.message}
                 placeholder="Enter Postcode"
-              />
-              <SelectWithForm<schemaType>
-                name="country"
-                title="Country"
-                options={COUNTRIES}
-              />
-              <SelectWithForm<schemaType>
-                name="city"
-                title="City"
-                options={COUNTRIES}
-              />
-              <SelectWithForm<schemaType>
-                name="state"
-                title="State"
-                options={COUNTRIES}
               />
             </div>
             <HeaderSection title="Facilities & Amenities" />

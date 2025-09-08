@@ -21,16 +21,21 @@ import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
-import { Label } from "@/components/ui/label";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
+import useAddProperty from "@/lib/services/hooks/useAddProperties";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useState } from "react";
-
+import { Label } from "@/components/ui/label";
+import { TreeNode, TreeSelect } from "@/components/TreeSelect";
+import useGetSelection, {
+  PropertySelection,
+} from "@/lib/services/hooks/useGetSelection";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
+import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
 // Schema & type
 const schema = yup.object({
-  property_name: yup.string().required("Property name is required"),
-  tenant_type: yup.string().required("Tenant is required"),
+  property_id: yup.string().required("Property name is required"),
+  tenant: yup.string().required("Property type is required"),
   date_of_agreement: yup.string().required("Date of agreement is required"),
   rental_fee: yup.string().required("Rental fee is required"),
   tenancy_period_start_date: yup
@@ -43,10 +48,15 @@ const schema = yup.object({
     .string()
     .required("Rental payment frequency is required"),
   remarks: yup.string().nullable(),
+  //   free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
-const CreateTenancy = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface Props {
+  id: number;
+  open: boolean; // controlled open state
+  onOpenChange: (open: boolean) => void; // handler from parent
+}
+const CreateNewTenancy = ({ id, onOpenChange, open }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -59,51 +69,98 @@ const CreateTenancy = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
   const { mutate, isPending } = useCreateTenancy();
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const tenancyData = {
-      ...data,
-      remarks: data.remarks || null,
-    };
+  console.log(errors);
+  const [tenantData, setTenantData] = useState([]);
+  const { data: tenants } = useGetTenantsList();
+  useEffect(() => {
+    if (tenants) {
+      const dataT = tenants.map((t) => {
+        return { id: `${t.id}`, name: t.name };
+      });
+      setTenantData(dataT as never);
+    }
+  }, [tenants]);
+  type Result = { room_id: number } | { unit_id: number } | null;
+  const parseValue = (value: string): Result => {
+    const match = value.match(/^(\w+)-(\d+)$/);
+    if (!match) return null;
 
-    mutate(tenancyData, {
+    const [, type, id] = match;
+    const numberId = Number(id);
+
+    if (type === "room") {
+      return { room_id: numberId };
+    } else if (type === "unit") {
+      return { unit_id: numberId };
+    }
+
+    return null;
+  };
+  const onSubmit: SubmitHandler<schemaType> = (data) => {
+    // Map facilities
+
+    // Compose payload for AddPropertyInput
+    console.log(data.property_id);
+    const payload = {
+      tenant_id: data.tenant,
+      date_of_agreement: data.date_of_agreement,
+      rental_fee: data.rental_fee,
+      tenancy_period_start_date: data.tenancy_period_start_date,
+      tenancy_period_end_date: data.tenancy_period_end_date,
+      rental_payment_frequency: data.rental_payment_frequency,
+      remarks: data.remarks,
+      ...parseValue(data.property_id),
+    };
+    mutate(payload, {
       onSuccess: () => {
         toast.success("Tenancy created successfully!");
         reset();
-        setIsOpen(false);
+        onOpenChange(false);
       },
-      onError: (err: any) => {
-        toast.error(err?.message || "Failed to create tenancy.");
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create tenancy.");
       },
     });
   };
-
+  const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  function mapToTreeData(
+    properties: PropertySelection[],
+    id?: number
+  ): TreeNode[] {
+    return properties
+      .filter((property) => (id ? property.id === id : true))
+      .flatMap((property) =>
+        property.units.map((unit) => ({
+          value: `unit-${unit.id}`,
+          label: unit.block_floor_unit_number,
+          children: unit.rooms.map((room) => ({
+            value: `room-${room.id}`,
+            label: room.name,
+          })),
+        }))
+      );
+  }
+  const { data } = useGetSelection();
+  useEffect(() => {
+    if (data) {
+      setTreeData(mapToTreeData(data));
+    }
+  }, [data]);
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* <DialogTrigger asChild>
         <Button className="rounded-[6px] bg-transparent hover:bg-transparent m-0 shadow-none p-0 text-black font-normal text-start">
           Add Tenancy
         </Button>
-      </DialogTrigger>
+      </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px] z-400 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             Create New Tenancy
@@ -113,27 +170,25 @@ const CreateTenancy = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <CustomInput
-                id="property_name"
-                name="property_name"
-                type="text"
-                label="Property Name"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Property Name"
+              <div
+                className="space-y-3"
+                onClick={(e) => {
+                  // e.stopPropagation();
+                }}
+              >
+                <Label>Select Item</Label>
+                <TreeSelect
+                  control={control}
+                  name="property_id"
+                  placeholder="Choose item..."
+                  treeData={treeData}
+                />
+              </div>
+              <SelectWithForm<schemaType>
+                name="tenant"
+                title="Tenant"
+                options={tenantData}
               />
-              <CustomInput
-                id="tenant_type"
-                name="tenant_type"
-                type="text"
-                label="Tenant"
-                value={watch("tenant_type")}
-                onChange={(e) => setValue("tenant_type", e.target.value)}
-                errors={errors.tenant_type?.message}
-                placeholder="Enter Tenant"
-              />
-
               <CustomInput
                 id="date_of_agreement"
                 name="date_of_agreement"
@@ -188,13 +243,13 @@ const CreateTenancy = () => {
                     setValue("rental_payment_frequency", val)
                   }
                 >
-                  <ToggleGroupItem value="monthly" aria-label="Monthly">
+                  <ToggleGroupItem value="Monthly" aria-label="Monthly">
                     Monthly
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="daily" aria-label="Daily">
+                  <ToggleGroupItem value="Daily" aria-label="Daily">
                     Daily
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="one_time" aria-label="One Time">
+                  <ToggleGroupItem value="One Time" aria-label="One Time">
                     One Time
                   </ToggleGroupItem>
                 </ToggleGroup>
@@ -218,17 +273,17 @@ const CreateTenancy = () => {
                 />
               </div>
             </div>
-
+            {/* Toast notifications are handled by 'sonner', so no need for local success/error display here */}
             <DialogFooter className="mt-6">
               <Button
                 variant="outline"
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
               <Button type="submit" className="text-white" disabled={isPending}>
-                {isPending ? "Creating..." : "Submit"}
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>
@@ -238,4 +293,4 @@ const CreateTenancy = () => {
   );
 };
 
-export default CreateTenancy;
+export default CreateNewTenancy;

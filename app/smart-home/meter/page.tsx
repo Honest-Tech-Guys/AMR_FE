@@ -24,20 +24,14 @@ import {
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import CreateMeter from "./CreateMeter";
-
-const meterInfo = [
-  { label: "Used Unit", value: 5 },
-  { label: "Balance Unit", value: 5 },
-  { label: "Unit Price", value: "RM 0.6" },
-  { label: "Last Connected At", value: "2025-05-26 19:56:49" },
-  { label: "Is Low Balance", value: "No" },
-  { label: "Property", value: "Nadayu 801 @ Subang Murni /" },
-];
-
-const meterBadges = [{ text: "Wifi Connected" }, { text: "Power On" }];
+import useGetMetersList from "@/lib/services/hooks/useGetMeterList";
+import EditMeter from "./EditMeter";
 
 const Page = () => {
+  const { data, isLoading } = useGetMetersList();
   const [isFilter, setIsFilter] = useState(false);
+  const [openView, setOpenView] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Meter>();
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -52,84 +46,131 @@ const Page = () => {
     </Button>
   );
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div>
       <HeaderPage title="Meter" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter filters={filters} actionButton={actionButton} />
+
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
             <CreateMeter />
           </div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="border rounded-2xl p-3">
-            <label className="font-bold text-[#337AB7]">
-              19104951173 NDY E-16-11A R3
-            </label>
-            <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="font-thin text-[#337AB7] border-0 shadow-none hover:bg-transparent cursor-pointer"
-                  >
-                    Action <ChevronDown className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="start">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex gap-2">
-                      <RefreshCw />
-                      <span>Sync</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
-                      <CirclePoundSterling />
-                      <span>Top Up</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
-                      <BrushCleaning />
-                      <span>Clean Balance</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
-                      <Power />
-                      <span>Disconnect</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
-                      <ChartLine />
-                      <span>Meter Usage</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex gap-2">
-                      <QrCode />
-                      <span>Download QR</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <div className="space-y-1 mt-2">
-                {meterInfo.map((item) => (
-                  <p key={item.label}>
-                    <span className="font-medium">{item.label}:</span>{" "}
-                    {item.value}
+          {data?.map((meter) => (
+            <div key={meter.id} className="border rounded-2xl p-3">
+              {/* Title */}
+              <label
+                className="font-bold text-[#337AB7] cursor-pointer"
+                onClick={() => {
+                  setOpenView(true);
+                  setSelectedItem(meter);
+                }}
+              >
+                {meter.name}
+              </label>
+
+              <div>
+                {/* Action Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="font-thin text-[#337AB7] border-0 shadow-none hover:bg-transparent cursor-pointer"
+                    >
+                      Action <ChevronDown className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="start">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="flex gap-2">
+                        <RefreshCw />
+                        <span>Sync</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex gap-2">
+                        <CirclePoundSterling />
+                        <span>Top Up</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex gap-2">
+                        <BrushCleaning />
+                        <span>Clean Balance</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex gap-2">
+                        <Power />
+                        <span>
+                          {meter.power_status === "on"
+                            ? "Disconnect"
+                            : "Connect"}
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex gap-2">
+                        <ChartLine />
+                        <span>Meter Usage</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex gap-2">
+                        <QrCode />
+                        <span>Download QR</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Info Section */}
+                <div className="space-y-1 mt-2">
+                  <p>
+                    <span className="font-medium">Used Unit:</span>{" "}
+                    {meter.used_unit}
                   </p>
-                ))}
-              </div>
-              <div className="flex gap-3 mt-3 flex-wrap">
-                {meterBadges.map((badge) => (
-                  <Badge
-                    key={badge.text}
-                    className="bg-[#F6FFED] text-[#52C41A] rounded-[6px] border-[#B7EB8F]"
-                  >
-                    {badge.text}
-                  </Badge>
-                ))}
+                  <p>
+                    <span className="font-medium">Balance Unit:</span>{" "}
+                    {meter.balance_unit}
+                  </p>
+                  <p>
+                    <span className="font-medium">Unit Price:</span> RM{" "}
+                    {meter.unit_price_per_unit}
+                  </p>
+                  <p>
+                    <span className="font-medium">Status:</span>{" "}
+                    {meter.connection_status}
+                  </p>
+                  <p>
+                    <span className="font-medium">Property:</span>{" "}
+                    {meter.meterable?.property_name}
+                  </p>
+                </div>
+
+                {/* Badges */}
+                <div className="flex gap-3 mt-3 flex-wrap">
+                  {meter.connection_status === "online" && (
+                    <Badge className="bg-[#F6FFED] text-[#52C41A] rounded-[6px] border-[#B7EB8F]">
+                      Wifi Connected
+                    </Badge>
+                  )}
+                  {meter.power_status === "on" && (
+                    <Badge className="bg-[#E6F7FF] text-[#1890FF] rounded-[6px] border-[#91D5FF]">
+                      Power On
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
-      {/* <MapWithPoints /> */}
+      {selectedItem && (
+        <EditMeter
+          meter={selectedItem}
+          onOpenChange={setOpenView}
+          open={openView}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 export type TenantType = {
   id: number;
-  type: string;
   name: string;
+  type: string;
   email: string;
   phone_number: string;
   alt_phone_number: string;

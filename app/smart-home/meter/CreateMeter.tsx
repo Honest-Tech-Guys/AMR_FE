@@ -10,107 +10,179 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-// Schema & type
+import { TreeNode, TreeSelect } from "@/components/TreeSelect";
+import { Label } from "@/components/ui/label";
+import useGetSelection, {
+  PropertySelection,
+} from "@/lib/services/hooks/useGetSelection";
+import { useEffect, useState } from "react";
+import useAddMeter from "@/lib/services/hooks/useAddMeter";
+import { toast } from "sonner";
+// ✅ Schema based on `Meter` type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
-  property_name: yup.string().required("Property name is required"),
-  property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
-    .string()
-    .required("Contact phone number is required"),
+  property_id: yup.string().required("Meter name is required"),
+  name: yup.string().required("Meter name is required"),
+  serial_number: yup.string().required("Serial number is required"),
+  brand: yup.string().nullable(),
+  model: yup.string().nullable(),
+  unit_price_per_unit: yup.string().required("Unit price is required"),
+  minimum_topup_unit: yup
+    .number()
+    .typeError("Minimum topup unit must be a number")
+    .required("Minimum topup unit is required"),
+  minimum_topup_rm: yup.string().required("Minimum topup value is required"),
+  free_unit: yup.number().typeError("Free unit must be a number").default(0),
+  free_unit_refresh_on: yup.string().nullable(),
   remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
 });
-type schemaType = yup.InferType<typeof schema>;
+const treeDataDummy = [
+  {
+    label: "Fruits",
+    value: "fruits",
+    children: [
+      { label: "Apple", value: "apple" },
+      { label: "Banana", value: "banana" },
+      {
+        label: "Citrus",
+        value: "citrus",
+        children: [
+          { label: "Orange", value: "orange" },
+          { label: "Lemon", value: "lemon" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Vegetables",
+    value: "vegetables",
+    children: [
+      { label: "Carrot", value: "carrot" },
+      { label: "Potato", value: "potato" },
+    ],
+  },
+];
+type SchemaType = yup.InferType<typeof schema>;
+
 const CreateMeter = () => {
-  const form = useForm<schemaType>({
+  const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  function mapToTreeData(properties: PropertySelection[]): TreeNode[] {
+    return properties.map((property) => ({
+      value: `property-${property.id}`,
+      label: property.property_name,
+      children: property.units.map((unit) => ({
+        value: `unit-${unit.id}`,
+        label: unit.block_floor_unit_number,
+        children: unit.rooms.map((room) => ({
+          value: `room-${room.id}`,
+          label: room.name,
+        })),
+      })),
+    }));
+  }
+  const { data } = useGetSelection();
+  useEffect(() => {
+    if (data) {
+      setTreeData(mapToTreeData(data));
+    }
+  }, [data]);
+  const form = useForm<SchemaType>({
     mode: "onTouched",
+    // resolver: yupResolver(schema),
   });
+  const { mutate } = useAddMeter();
   const {
     setValue,
-    getValues,
     watch,
     reset,
     control,
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+  type Result = { room_id: number } | { unit_id: number } | null;
+
+  const parseValue = (value: string): Result => {
+    const match = value.match(/^(\w+)-(\d+)$/);
+    if (!match) return null;
+
+    const [, type, id] = match;
+    const numberId = Number(id);
+
+    if (type === "room") {
+      return { room_id: numberId };
+    } else if (type === "unit") {
+      return { unit_id: numberId };
+    }
+
+    return null;
+  };
+  const onSubmit: SubmitHandler<SchemaType> = (data) => {
+    const payload: any = {
+      name: data.name,
+      serial_number: data.serial_number,
+      brand: data.brand,
+      model: data.model,
+      unit_price_per_unit: data.unit_price_per_unit,
+      minimum_topup_unit: data.minimum_topup_unit,
+      minimum_topup_rm: data.minimum_topup_rm,
+      ...parseValue(data.property_id),
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Unit created successfully!");
+        reset();
+        // setIsOpen(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create unit.");
+      },
+    });
+    console.log("Meter form data:", data);
   };
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <Button className="rounded-[6px] text-white">Create New Meter</Button>
       </DialogTrigger>
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             Create New Meter
           </div>
         </DialogHeader>
+
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <Label>Select Item</Label>
+                <TreeSelect
+                  control={control}
+                  name="property_id"
+                  placeholder="Choose item..."
+                  treeData={treeData}
+                />
+              </div>
+
               <CustomInput
-                id="meter_name"
-                name="meter_name"
+                id="name"
+                name="name"
                 type="text"
                 label="Meter Name"
-                value={watch("meter_name")}
-                onChange={(e) => setValue("meter_name", e.target.value)}
-                errors={errors.meter_name?.message}
+                value={watch("name")}
+                onChange={(e) => setValue("name", e.target.value)}
+                errors={errors.name?.message}
                 placeholder="Enter Meter Name"
               />
 
@@ -124,71 +196,87 @@ const CreateMeter = () => {
                 errors={errors.serial_number?.message}
                 placeholder="Enter Serial Number"
               />
+
               <CustomInput
-                id="property_name"
-                name="property_name"
+                id="brand"
+                name="brand"
                 type="text"
-                label="Property Name"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Property Name"
+                label="Brand"
+                value={watch("brand")}
+                onChange={(e) => setValue("brand", e.target.value)}
+                errors={errors.brand?.message}
+                placeholder="Enter Brand"
               />
 
               <CustomInput
-                id="unit_price"
-                name="unit_price"
+                id="model"
+                name="model"
+                type="text"
+                label="Model"
+                value={watch("model")}
+                onChange={(e) => setValue("model", e.target.value)}
+                errors={errors.model?.message}
+                placeholder="Enter Model"
+              />
+
+              <CustomInput
+                id="unit_price_per_unit"
+                name="unit_price_per_unit"
                 type="text"
                 label="Unit Price / per unit"
-                value={watch("unit_price")}
-                onChange={(e) => setValue("unit_price", e.target.value)}
-                errors={errors.unit_price?.message}
+                value={watch("unit_price_per_unit")}
+                onChange={(e) =>
+                  setValue("unit_price_per_unit", e.target.value)
+                }
+                errors={errors.unit_price_per_unit?.message}
                 placeholder="Enter Unit Price"
               />
 
               <CustomInput
                 id="minimum_topup_unit"
                 name="minimum_topup_unit"
-                type="text"
-                value={watch("minimum_topup_unit")}
+                type="number"
                 label="Minimum Topup Unit"
-                onChange={(e) => setValue("minimum_topup_unit", e.target.value)}
-                errors={errors.minimum_topup_unit?.message}
-                placeholder="Enter Minimum Topup Unit"
-              />
-              <CustomInput
-                id="minimum_topup_value"
-                name="minimum_topup_value"
-                type="text"
-                value={watch("minimum_topup_value")}
-                label="Minimum Topup Value"
-                onChange={(e) =>
-                  setValue("minimum_topup_value", e.target.value)
-                }
-                errors={errors.minimum_topup_value?.message}
-                placeholder="Enter Minimum Topup Value"
-              />
-              <CustomInput
-                id="minimum_topup_unit"
-                name="minimum_topup_unit"
-                type="text"
                 value={watch("minimum_topup_unit")}
-                label="Free Unit"
-                onChange={(e) => setValue("minimum_topup_unit", e.target.value)}
+                onChange={(e) =>
+                  setValue("minimum_topup_unit", Number(e.target.value))
+                }
                 errors={errors.minimum_topup_unit?.message}
                 placeholder="Enter Minimum Topup Unit"
               />
+
               <CustomInput
-                id="minimum_topup_value"
-                name="minimum_topup_value"
+                id="minimum_topup_rm"
+                name="minimum_topup_rm"
                 type="text"
-                value={watch("minimum_topup_value")}
-                label="Free unit refresh on"
-                onChange={(e) =>
-                  setValue("minimum_topup_value", e.target.value)
-                }
-                errors={errors.minimum_topup_value?.message}
+                label="Minimum Topup Value (RM)"
+                value={watch("minimum_topup_rm")}
+                onChange={(e) => setValue("minimum_topup_rm", e.target.value)}
+                errors={errors.minimum_topup_rm?.message}
                 placeholder="Enter Minimum Topup Value"
+              />
+
+              <CustomInput
+                id="free_unit"
+                name="free_unit"
+                type="number"
+                label="Free Unit"
+                value={watch("free_unit")}
+                onChange={(e) => setValue("free_unit", Number(e.target.value))}
+                errors={errors.free_unit?.message}
+                placeholder="Enter Free Units"
+              />
+
+              <CustomInput
+                id="free_unit_refresh_on"
+                name="free_unit_refresh_on"
+                type="date"
+                label="Free Unit Refresh On"
+                value={watch("free_unit_refresh_on") ?? ""}
+                onChange={(e) =>
+                  setValue("free_unit_refresh_on", e.target.value)
+                }
+                errors={errors.free_unit_refresh_on?.message}
               />
 
               <div className="col-span-1 md:col-span-2">
@@ -197,9 +285,9 @@ const CreateMeter = () => {
                   label="Remarks"
                   type="textArea"
                   name="remarks"
-                  value={watch("remarks")}
+                  value={watch("remarks") ?? ""}
                   onChange={(e) => setValue("remarks", e.target.value)}
-                  placeholder="E.g describe more about the reason for change"
+                  placeholder="E.g. describe more about the reason for change"
                   className="bg-gray-100"
                   errors={errors.remarks?.message}
                 />

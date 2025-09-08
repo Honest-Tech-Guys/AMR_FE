@@ -17,6 +17,7 @@ import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
 import CreateNewRole from "./CreateRole";
+import useGetRole from "@/lib/services/hooks/useGetRole";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {
@@ -91,11 +92,11 @@ const Page = () => {
     </Button>
   );
 
-  const { data, isLoading, error } = useGetPropertiesList();
+  const { data, isLoading, error } = useGetRole();
 
   // Map API data to table format
   const tableData = (data || []).map((item) => ({
-    property_id: item.property_name ?? "-",
+    property_id: item.name ?? "-",
     unit: "-", // Replace with actual unit info if available
     room: "-", // Replace with actual room info if available
     smart_home: "-", // Replace with actual smart home info if available

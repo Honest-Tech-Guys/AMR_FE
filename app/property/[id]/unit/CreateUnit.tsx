@@ -10,7 +10,7 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -21,13 +21,32 @@ import { Input } from "@/components/ui/input";
 import useAddUnit from "@/lib/services/hooks/useAddUnit";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import AddRoomTagging from "./AddRoomTagging";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import AddRoom from "./AddRoom";
+import AddCarPark from "./AddCarpark";
+import { useParams } from "next/navigation";
+
 // Schema & type
 const schema = yup.object({
-  property_id: yup.string().required("Property name is required"),
-  unit_number: yup.string().required("Block / Floor / Unit Number is required"),
-  remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
+  tenant_management_operator: yup
+    .string()
+    .required("Tenant Management Operator is required"),
+  unit_number: yup.string().required("Unit Number is required"),
+  block: yup.string().required("Block  is required"),
+  floor: yup.string().required("Floor  is required"),
+  remarks: yup.string().optional().nullable(),
+  description: yup.string().optional().nullable(),
+  // address: yup.string().required("Address is required"),
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
@@ -38,6 +57,7 @@ const schema = yup.object({
   square_feet: yup.string().required("Square Feet is required"),
   beneficiary: yup.string().required("Beneficiary is required"),
   is_activated: yup.boolean().default(false),
+  rental_type: yup.string().required("Rental type is required"),
   service_fee: yup
     .number()
     .typeError("Service fee is required")
@@ -56,8 +76,8 @@ const schema = yup.object({
         base64: yup.string().required("File content is required"),
       })
     )
-    .min(1, "proposed attach form is required")
-    .required("proposed attach form is required"),
+    .min(1, "Floor plan image is required")
+    .required("Floor plan image is required"),
   unit_image: yup
     .array()
     .of(
@@ -68,15 +88,52 @@ const schema = yup.object({
         base64: yup.string().required("File content is required"),
       })
     )
-    .min(1, "proposed attach form is required")
-    .required("proposed attach form is required"),
-  // Add other fields as needed
+    .optional(),
+  rooms: yup
+    .array()
+    .of(
+      yup.object({
+        id: yup.string().required(),
+        name: yup.string().required("Room name is required"),
+        description: yup.string().required("Room description is required"),
+      })
+    )
+    .default([]),
+  carparks: yup
+    .array()
+    .of(
+      yup.object({
+        id: yup.string().required(),
+        location: yup.string().required("Carpark location is required"),
+        type: yup.string().required("Carpark type is required"),
+      })
+    )
+    .default([]),
 });
+
 type schemaType = yup.InferType<typeof schema>;
+
 const CreateUnit = () => {
+  const { id } = useParams();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isRoomDialogOpen, setIsRoomDialogOpen] = useState(false);
+  const [isCarparkDialogOpen, setIsCarparkDialogOpen] = useState(false);
+
   const form = useForm<schemaType>({
     mode: "onTouched",
+    defaultValues: {
+      meeting_room: false,
+      game_room: false,
+      basketball_court: false,
+      sauna: false,
+      free_text: false,
+      is_activated: false,
+      rental_type: "whole",
+      rooms: [],
+      carparks: [],
+    },
   });
+
   const {
     setValue,
     getValues,
@@ -94,42 +151,85 @@ const CreateUnit = () => {
     { id: "4", name: "Landed" },
     { id: "5", name: "Townhouse" },
   ];
-  const { mutate, isPending, isSuccess, isError } = useAddUnit();
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    // Example transformation (you'll need to adjust as per your actual data)
 
-    mutate(
-      {
-        property_id: data.property_id, // get this from context or selection
-        unit_number: data.unit_number,
-        rental_type: "whole" /* or "sublet", map from toggle */,
-        square_feet: data.square_feet,
-        business_partner_id: "1", // get this from context or selection
-        bedroom_count: data.bedroom,
-        bathroom_count: data.bathroom,
-        // floor_plan_img: data.floor_plan_image?.[0]?.base64 || null,
-        // unit_img: data.unit_image?.[0]?.base64 || null,
-        description: data.remarks || "",
-        is_active: data.is_activated ? "1" : "0",
-        beneficiary: data.beneficiary,
-        remarks: data.remarks || "",
-        service_fee_percent: String(data.service_fee),
-        profit_share_percent: String(data.profit_sharing),
-      },
-      {
-        onSuccess: () => {
-          toast.success("Unit created successfully!");
-        },
-        onError: (err) => {
-          toast.error((err as any)?.message || "Failed to create unit.");
-        },
-      }
+  const { mutate, isPending, isSuccess, isError } = useAddUnit();
+
+  // Watch the current rooms and carparks
+  const currentRooms = watch("rooms") || [];
+  const currentCarparks = watch("carparks") || [];
+
+  const addRoom = (room: { name: string; description: string }) => {
+    const newRoom = {
+      id: Date.now().toString(),
+      name: room.name,
+      description: room.description,
+    };
+    setValue("rooms", [...currentRooms, newRoom]);
+    setIsRoomDialogOpen(false);
+  };
+
+  const removeRoom = (roomId: string) => {
+    setValue(
+      "rooms",
+      currentRooms.filter((room) => room.id !== roomId)
     );
+  };
+
+  const addCarpark = (carpark: { location: string; type: string }) => {
+    const newCarpark = {
+      id: Date.now().toString(),
+      location: carpark.location,
+      type: carpark.type,
+    };
+    setValue("carparks", [...currentCarparks, newCarpark]);
+    setIsCarparkDialogOpen(false);
+  };
+
+  const removeCarpark = (carparkId: string) => {
+    setValue(
+      "carparks",
+      currentCarparks.filter((carpark) => carpark.id !== carparkId)
+    );
+  };
+
+  const onSubmit: SubmitHandler<schemaType> = (data) => {
+    const payload: any = {
+      property_id: parseInt(id as string),
+      unit_number: data.unit_number,
+      block: data.block,
+      floor: data.floor,
+      rental_type: data.rental_type,
+      square_feet: parseInt(data.square_feet),
+      bedroom_count: Number(data.bedroom),
+      bathroom_count: Number(data.bathroom),
+      floor_plan_image: data.floor_plan_image?.[0]?.base64 || null,
+      unit_image: data.unit_image?.[0]?.base64 || null,
+      description: data.description || "",
+      is_activated: parseInt(data.is_activated ? "1" : "0"),
+      beneficiary_id: parseInt(data.beneficiary),
+      remarks: data.remarks || "",
+      service_fee_percentage: data.service_fee.toString(),
+      profit_sharing_percentage: data.profit_sharing.toString(),
+    };
+    if (data.rental_type === "Sublet") {
+      payload.carpark = data.carparks;
+      payload.rooms = data.rooms;
+    }
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Unit created successfully!");
+        reset();
+        setIsOpen(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create unit.");
+      },
+    });
   };
 
   return (
     <div className="bg-white p-5 rounded-2xl">
-      <Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button className="rounded-[6px] text-white">
             <Plus /> Unit
@@ -140,56 +240,196 @@ const CreateUnit = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <HeaderSection title="Basic Information" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                {/* <div>
                   <SelectWithForm<schemaType>
                     name="property_id"
                     title="Property Name"
                     options={PartnerType}
                   />
-                </div>
+                </div> */}
                 <CustomInput
                   id="unit_number"
                   name="unit_number"
                   type="text"
-                  label="Block / Floor / Unit Number"
+                  label="Unit Number"
                   value={watch("unit_number")}
                   onChange={(e) => setValue("unit_number", e.target.value)}
                   errors={errors.unit_number?.message}
-                  placeholder="Enter Block / Floor / Unit Number"
+                  placeholder="Enter Unit Number"
+                />
+                <CustomInput
+                  id="block"
+                  name="block"
+                  type="text"
+                  label="Block"
+                  value={watch("block")}
+                  onChange={(e) => setValue("block", e.target.value)}
+                  errors={errors.block?.message}
+                  placeholder="Enter Block "
+                />
+                <CustomInput
+                  id="floor"
+                  name="floor"
+                  type="text"
+                  label="Floor"
+                  value={watch("floor")}
+                  onChange={(e) => setValue("floor", e.target.value)}
+                  errors={errors.floor?.message}
+                  placeholder="Enter Floor "
                 />
                 <div>
                   <SelectWithForm<schemaType>
-                    name="unit"
+                    name="tenant_management_operator"
                     title="Tenant management operator"
                     options={PartnerType}
                   />
                 </div>
                 <div>
                   <Label className="mb-3">Rental Type</Label>
-                  <ToggleGroup variant="outline" type="single">
-                    <ToggleGroupItem
-                      className="px-3"
-                      value="bold"
-                      aria-label="Toggle bold"
-                    >
-                      Whole Unit
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
-                      className="px-3"
-                      value="italic"
-                      aria-label="Toggle italic"
-                    >
-                      Sublet
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+                  <Controller
+                    control={control}
+                    name="rental_type"
+                    render={({ field }) => (
+                      <ToggleGroup
+                        variant="outline"
+                        type="single"
+                        value={field.value}
+                        onValueChange={(value) => {
+                          if (value) field.onChange(value);
+                        }}
+                      >
+                        <ToggleGroupItem
+                          className="px-3"
+                          value="Whole Unit"
+                          aria-label="Whole Unit"
+                        >
+                          Whole Unit
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          className="px-3"
+                          value="Sublet"
+                          aria-label="Sublet"
+                        >
+                          Sublet
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    )}
+                  />
+                  {errors.rental_type && (
+                    <span className="text-red-500 text-sm">
+                      {errors.rental_type.message}
+                    </span>
+                  )}
                 </div>
               </div>
+              {watch("rental_type") === "Sublet" && (
+                <>
+                  <div className="col-span-2 mt-6">
+                    <HeaderSection title="Rooms" />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Room Name</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentRooms.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={3}
+                              className="text-center text-gray-500"
+                            >
+                              No rooms added yet
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          currentRooms.map((room) => (
+                            <TableRow key={room.id}>
+                              <TableCell className="font-medium">
+                                {room.name}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {room.description}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeRoom(room.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                    <div className="mt-4">
+                      <AddRoom addRoom={addRoom} />
+                    </div>
+                  </div>
+                  <div className="col-span-2 mt-6">
+                    <HeaderSection title="Carparks" />
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Location</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentCarparks.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={3}
+                              className="text-center text-gray-500"
+                            >
+                              No carparks added yet
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          currentCarparks.map((carpark) => (
+                            <TableRow key={carpark.id}>
+                              <TableCell className="font-medium">
+                                {carpark.location}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {carpark.type}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeCarpark(carpark.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                    <div className="mt-4">
+                      <AddCarPark addCarpark={addCarpark} />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* { } */}
               <HeaderSection title="Floor Plan Information" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <CustomInput
                   id="bedroom"
                   name="bedroom"
-                  type="text"
+                  type="number"
                   label="Bedroom"
                   value={watch("bedroom")}
                   onChange={(e) => setValue("bedroom", e.target.value)}
@@ -199,7 +439,7 @@ const CreateUnit = () => {
                 <CustomInput
                   id="bathroom"
                   name="bathroom"
-                  type="text"
+                  type="number"
                   label="Bathroom"
                   value={watch("bathroom")}
                   onChange={(e) => setValue("bathroom", e.target.value)}
@@ -223,11 +463,10 @@ const CreateUnit = () => {
                   <Controller
                     control={control}
                     name="floor_plan_image"
-                    rules={{ required: "Company statutory form is required" }}
                     render={({ field: { onChange, value } }) => (
                       <MultiFileUpload
                         isMulti={false}
-                        field="companyStatutoryForm"
+                        field="floorPlanImage"
                         value={value}
                         onChange={onChange}
                       />
@@ -238,17 +477,16 @@ const CreateUnit = () => {
                       {errors.floor_plan_image.message}
                     </span>
                   )}
-                </div>{" "}
+                </div>
                 <div className="space-y-2 ">
                   <span className="font-semibold">Unit Image (Optional)</span>
                   <Controller
                     control={control}
                     name="unit_image"
-                    rules={{ required: "Company statutory form is required" }}
                     render={({ field: { onChange, value } }) => (
                       <MultiFileUpload
                         isMulti={false}
-                        field="companyStatutoryForm"
+                        field="unitImage"
                         value={value}
                         onChange={onChange}
                       />
@@ -262,17 +500,17 @@ const CreateUnit = () => {
                 </div>
                 <div className="col-span-1 md:col-span-2">
                   <CustomInput
-                    id="remarks"
+                    id="description"
                     label="Description"
                     type="textArea"
-                    name="remarks"
-                    value={watch("remarks")}
-                    onChange={(e) => setValue("remarks", e.target.value)}
-                    placeholder="E.g describe more about the reason for change"
+                    name="description"
+                    value={watch("description")}
+                    onChange={(e) => setValue("description", e.target.value)}
+                    placeholder="E.g describe more about the unit"
                     className="bg-gray-100 rounded-[6px]"
-                    errors={errors.remarks?.message}
+                    errors={errors.description?.message}
                   />
-                </div>{" "}
+                </div>
                 <div className="col-span-1 md:col-span-2">
                   <CustomInput
                     id="remarks"
@@ -301,14 +539,32 @@ const CreateUnit = () => {
                 />
                 <div>
                   <Label className="mb-3">Is Activated</Label>
-                  <ToggleGroup variant="outline" type="single">
-                    <ToggleGroupItem value="bold" aria-label="Toggle bold">
-                      Yes
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="italic" aria-label="Toggle italic">
-                      No
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+                  <Controller
+                    control={control}
+                    name="is_activated"
+                    render={({ field }) => (
+                      <ToggleGroup
+                        variant="outline"
+                        type="single"
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(value) => {
+                          field.onChange(value === "yes");
+                        }}
+                      >
+                        <ToggleGroupItem value="yes" aria-label="Yes">
+                          Yes
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="no" aria-label="No">
+                          No
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    )}
+                  />
+                  {errors.is_activated && (
+                    <span className="text-red-500 text-sm">
+                      {errors.is_activated.message}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <Label className="mb-3">Service Fee</Label>
@@ -358,7 +614,11 @@ const CreateUnit = () => {
                 </div>
               </div>
               <div className="mt-6 flex justify-end gap-4">
-                <Button variant="outline" type="button">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button
@@ -373,11 +633,6 @@ const CreateUnit = () => {
           </FormProvider>
         </DialogContent>
       </Dialog>
-      {/* <DialogHeader>
-        <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
-          Create New Unit
-        </div>
-      </DialogHeader> */}
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import { PropertyType } from "@/types/PropertyType";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
 const useGetPropertiesList = () => {
@@ -10,9 +9,10 @@ const useGetPropertiesList = () => {
       const url = "/properties";
       {
         return axiosInstance
-          .get<ResponseType<PaginationType<PropertyType[]>>>(url)
+          .get<PaginationType<Property[]>>(url)
           .then((res) => {
-            return res.data.data.data;
+            console.log("SS");
+            return res.data.data;
           })
           .catch((error) => {
             console.log(error);

@@ -112,7 +112,7 @@ function Datatable<T>({
     : filteredData;
 
   return (
-    <div className="w-full max-w-[1070px]">
+    <div className="w-full ">
       <div className=" overflow-hidden">
         <Table>
           <TableHeader>

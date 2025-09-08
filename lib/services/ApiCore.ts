@@ -1,5 +1,5 @@
 import axios from "axios";
-export const baseUrl = "https://syncmindsit.com/rms/api";
+export const baseUrl = "http://43.217.80.136:8015/api";
 const axiosInstance = axios.create({
   baseURL: baseUrl,
 });

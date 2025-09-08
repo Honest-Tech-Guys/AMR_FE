@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import { UnitType } from "@/types/UnitType";
 
 // The input type for updating units - includes id and omits auto-generated fields
 export type UpdateUnitInput = Partial<
-  Omit<UnitType, "id" | "created_at" | "updated_at" | "property">
+  Omit<Unit, "id" | "created_at" | "updated_at" | "property">
 > & {
   id: number; // id is required for updates
 };
@@ -16,10 +15,7 @@ const useUpdateUnit = () => {
     mutationKey: ["UpdateUnit"],
     mutationFn: async (updatedUnit: UpdateUnitInput) => {
       const { id, ...updateData } = updatedUnit;
-      const res = await axiosInstance.put<UnitType>(
-        `/update-unit/${id}`,
-        updateData
-      );
+      const res = await axiosInstance.put<Unit>(`/units/${id}`, updateData);
       return res.data;
     },
     onSuccess: (updatedUnit) => {
@@ -29,7 +25,7 @@ const useUpdateUnit = () => {
       // Optionally update the cache directly for better UX
       queryClient.setQueryData(
         ["GetUnitsList"],
-        (oldData: UnitType[] | undefined) => {
+        (oldData: Unit[] | undefined) => {
           if (!oldData) return [updatedUnit];
           return oldData.map((unit) =>
             unit.id === updatedUnit.id ? updatedUnit : unit

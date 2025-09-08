@@ -1,17 +1,27 @@
-export type PropertyType = {
+type OwnerOrCreator = {
+  id: number;
+  name: string;
+};
+
+type Property = {
   id: number;
   property_name: string;
-  attention_name: string | null;
-  attention_phone_number: string | null;
   property_type: string;
+  status: string;
+  owner_id: number;
+  created_by: number;
+  contact_name: string;
+  contact_phone: string;
   remarks: string;
-  address_line_1: string | null;
+  address_line_1: string;
   city: string;
-  state: string;
   postcode: string;
+  state: string;
   country: string;
   facilities: string[];
-  created_by: number;
   created_at: string;
   updated_at: string;
+  owner: OwnerOrCreator;
+  creator: OwnerOrCreator;
+  units: Unit[];
 };

@@ -22,31 +22,24 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { TreeNode, TreeSelect } from "@/components/TreeSelect";
+import { useEffect, useState } from "react";
+import useGetSelection, {
+  PropertySelection,
+} from "@/lib/services/hooks/useGetSelection";
+import { toast } from "sonner";
+import useAddLock from "@/lib/services/hooks/useAddLock";
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
-  property_name: yup.string().required("Property name is required"),
-  property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
+  property_id: yup.string().required("Property id is required"),
+  serial_number: yup.string().required("Serial Number is required"),
+  auto_create_passcode: yup
     .string()
-    .required("Contact phone number is required"),
-  remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
+    .required("Auto Create Passcode is required"),
 });
-type schemaType = yup.InferType<typeof schema>;
+type SchemaType = yup.InferType<typeof schema>;
 const CreateLock = () => {
-  const form = useForm<schemaType>({
+  const form = useForm<SchemaType>({
     mode: "onTouched",
   });
   const {
@@ -58,33 +51,73 @@ const CreateLock = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
+  const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  function mapToTreeData(properties: PropertySelection[]): TreeNode[] {
+    return properties.map((property) => ({
+      value: `property-${property.id}`,
+      label: property.property_name,
+      children: property.units.map((unit) => ({
+        value: `unit-${unit.id}`,
+        label: unit.block_floor_unit_number,
+        children: unit.rooms.map((room) => ({
+          value: `room-${room.id}`,
+          label: room.name,
+        })),
+      })),
+    }));
+  }
+  const { data } = useGetSelection();
+  useEffect(() => {
+    if (data) {
+      setTreeData(mapToTreeData(data));
+    }
+  }, [data]);
   const facilities = [
-    { id: "passcode", label: "Passcode" },
-    { id: "fingerprint", label: "Fingerprint" },
-    { id: "IC_card", label: "IC Card" },
-  ];
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
+    { id: "Passcode", label: "Passcode" },
+    { id: "Finger print", label: "Fingerprint" },
+    { id: "IC Card", label: "IC Card" },
+  ] as const;
+  type FacilityId = (typeof facilities)[number]["id"];
+  const { mutate } = useAddLock();
+  type Result = { room_id: number } | { unit_id: number } | null;
+
+  const parseValue = (value: string): Result => {
+    const match = value.match(/^(\w+)-(\d+)$/);
+    if (!match) return null;
+
+    const [, type, id] = match;
+    const numberId = Number(id);
+
+    if (type === "room") {
+      return { room_id: numberId };
+    } else if (type === "unit") {
+      return { unit_id: numberId };
+    }
+
+    return null;
+  };
+  const onSubmit: SubmitHandler<SchemaType> = (data) => {
+    const self_check_options = facilities
+      .filter((f) => (data as any)[f.id])
       .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    const payload: any = {
+      serial_number: data.serial_number,
+      auto_create_passcode: data.auto_create_passcode,
+      self_check_options: self_check_options,
+      ...parseValue(data.property_id),
+    };
+
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Lock created successfully!");
+        reset();
+        // setIsOpen(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create Lock");
+      },
+    });
+    console.log("Lock form data:", data);
   };
 
   return (
@@ -113,22 +146,39 @@ const CreateLock = () => {
                 errors={errors.serial_number?.message}
                 placeholder="Enter Serial Number"
               />
-              <CustomInput
-                id="property_name"
-                name="property_name"
-                type="text"
-                label="Property Name"
-                value={watch("property_name")}
-                onChange={(e) => setValue("property_name", e.target.value)}
-                errors={errors.property_name?.message}
-                placeholder="Enter Property Name"
-              />
+              <div className="space-y-2.5">
+                <Label>Select Item</Label>
+                <TreeSelect
+                  control={control}
+                  name="property_id"
+                  placeholder="Choose item..."
+                  treeData={treeData}
+                />
+              </div>
               <div>
                 <div className="flex flex-col  space-y-3">
                   <Label htmlFor="auto_create_passcode">
                     Auto Create Passcode
                   </Label>
-                  <Switch id="auto_create_passcode" />
+                  <Controller
+                    name="auto_create_passcode"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="auto_create_passcode"
+                          checked={Boolean(field.value)} // ✅ RHF value
+                          onCheckedChange={field.onChange} // ✅ RHF change handler
+                        />
+                        <label
+                          htmlFor="auto_create_passcode"
+                          className="text-sm"
+                        >
+                          Auto Create Passcode
+                        </label>
+                      </div>
+                    )}
+                  />
                 </div>
               </div>
               <div>

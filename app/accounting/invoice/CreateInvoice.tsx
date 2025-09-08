@@ -58,16 +58,7 @@ const CreateInvoice = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
+
   const PartnerType = [
     { id: "1", name: "Apartment" },
     { id: "2", name: "Condominium" },
@@ -241,6 +232,10 @@ const CreateInvoice = () => {
                   Cancel
                 </Button>
               </DialogClose>
+
+              <Button type="submit" className="text-white">
+                Save As Draft
+              </Button>
               <Button type="submit" className="text-white">
                 Submit
               </Button>

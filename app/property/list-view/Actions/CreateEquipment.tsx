@@ -42,7 +42,12 @@ const schema = yup.object({
   free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
-const CreateEquipment = () => {
+interface Props {
+  id: number;
+  open: boolean; // controlled open state
+  onOpenChange: (open: boolean) => void;
+}
+const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -80,21 +85,18 @@ const CreateEquipment = () => {
     { id: "free_text", label: "Free Text" },
   ];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    console.log("Form data:", data);
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* <DialogTrigger asChild>
         <Button className="rounded-[6px] bg-transparent hover:bg-transparent m-0 shadow-none p-0 text-black font-normal text-start">
           Add Equipment
         </Button>
-      </DialogTrigger>
+      </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[1000px] bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             Create New Equipment

@@ -33,6 +33,8 @@ import MapWithPoints from "@/components/ImageMapper";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Badge } from "@/components/ui/badge";
 import CreateLock from "./CreateLock";
+import useGetLocksList from "@/lib/services/hooks/useGetLockList";
+import EditLock from "./EditLock";
 const options = [
   {
     value: "Vacant",
@@ -63,6 +65,9 @@ interface PaginationData {
 }
 
 const Page = () => {
+  const { data } = useGetLocksList();
+  const [openView, setOpenView] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Locks>();
   const [isFilter, setIsFilter] = useState(false);
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
@@ -88,26 +93,41 @@ const Page = () => {
             <CreateLock />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gpa-5 ">
-          <div className=" border rounded-2xl p-3">
-            <label className="font-bold text-[#337AB7]">
-              19104951173 NDY E-16-11A R3
-            </label>
-            <div>
-              <p>Battery: 95</p>
-              <p>Gateway: N/H</p>
-              <p>Unit Price: RM 0.6</p>
-              <p>Property: Rania</p>
-              <p>Unit: Block p19</p>
-              <p>Room : Room 2 </p>
-              <div className="flex gap-1">
-                <User /> 5
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 ">
+          {data?.map((lock) => (
+            <div className=" border rounded-2xl p-3">
+              <label
+                className="font-bold text-[#337AB7] cursor-pointer"
+                onClick={() => {
+                  setOpenView(true);
+                  setSelectedItem(lock);
+                }}
+              >
+                {lock.serial_number}
+              </label>
+              <div>
+                <p>Battery: 95</p>
+                <p>Gateway: N/H</p>
+                <p>Unit Price: RM 0.6</p>
+                <p>Property: </p>
+                <p>Unit: Block p19</p>
+                <p>Room : Room 2 </p>
+                <div className="flex gap-1">
+                  <User /> 5
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
       {/* <MapWithPoints /> */}
+      {selectedItem && (
+        <EditLock
+          lock={selectedItem}
+          onOpenChange={setOpenView}
+          open={openView}
+        />
+      )}
     </div>
   );
 };

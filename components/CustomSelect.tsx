@@ -48,20 +48,20 @@ export function SelectWithForm<T>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="w-full">
+        <FormItem id={title} className="w-full">
           {title && <FormLabel>{title}</FormLabel>}
           <Select value={field.value} onValueChange={field.onChange} {...props}>
             <FormControl>
               <SelectTrigger
                 className={cn(
-                  "aria-[invalid=true]:border-destructive rounded-[6px] bg-gray-100 aria-[invalid=true]:ring-destructive w-full",
+                  "aria-[invalid=true]:border-destructive rounded-[6px]  bg-gray-100 aria-[invalid=true]:ring-destructive w-full",
                   className
                 )}
               >
                 <SelectValue placeholder={`Select ${title}`} />
               </SelectTrigger>
             </FormControl>
-            <SelectContent>
+            <SelectContent className="z-500">
               {options.map((item) => (
                 <SelectItem key={`${name}_${item.id}`} value={item.id}>
                   {item.name}

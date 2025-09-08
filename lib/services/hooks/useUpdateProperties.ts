@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import { PropertyType } from "@/types/PropertyType";
 
 // The input type for updating properties - includes id and omits auto-generated fields
 export type UpdatePropertyInput = Partial<
-  Omit<PropertyType, "id" | "created_at" | "updated_at" | "created_by">
+  Omit<Property, "id" | "created_at" | "updated_at" | "created_by">
 > & {
   id: number; // id is required for updates
 };
@@ -16,7 +15,7 @@ const useUpdateProperty = () => {
     mutationKey: ["UpdateProperty"],
     mutationFn: async (updatedProperty: UpdatePropertyInput) => {
       const { id, ...updateData } = updatedProperty;
-      const res = await axiosInstance.put<PropertyType>(
+      const res = await axiosInstance.put<Property>(
         `/properties/${id}`,
         updateData
       );
@@ -29,7 +28,7 @@ const useUpdateProperty = () => {
       // Optionally update the cache directly for better UX
       queryClient.setQueryData(
         ["GetProperties"],
-        (oldData: PropertyType[] | undefined) => {
+        (oldData: Property[] | undefined) => {
           if (!oldData) return [updatedProperty];
           return oldData.map((property) =>
             property.id === updatedProperty.id ? updatedProperty : property

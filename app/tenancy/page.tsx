@@ -13,54 +13,56 @@ import useGetOwnersList from "@/lib/services/hooks/useGetOwners";
 import OwnerType from "@/types/OwnerType";
 import { Separator } from "@/components/ui/separator";
 import ViewTenancy from "./ViewTenancy";
+import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
+  const { data: data } = useGetTenancyList();
   // const { data, isLoading, error } = useGetOwnersList();
-  const data = [
-    {
-      id: 1,
-      name: "John Doe",
-      type: "Individual",
-      property: "Sunshine Apartments",
-      tenancy: "12 months",
-      rental: "770",
-      tenancy_start_date: "2023-01-01",
-      tenancy_end_date: "2023-12-31",
-      smart_meter: "META B-07-01 R2",
-      balance: "46.7",
-      status: "Active",
-      top_up: "Last update 01 Jun 07:58 PM",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      type: "Company",
-      property: "Green Villas",
-      tenancy: "24 months",
-      rental: "770",
-      tenancy_start_date: "2022-06-01",
-      tenancy_end_date: "2024-05-31",
-      smart_meter: "META B-07-01 R2",
-      balance: "46.7",
-      status: "Inactive",
-      top_up: "Last update 01 Jun 07:58 PM",
-    },
-    {
-      id: 3,
-      name: "Alice Lee",
-      type: "Individual",
-      property: "Blue Condos",
-      tenancy: "6 months",
-      rental: "770",
-      tenancy_start_date: "2023-03-15",
-      tenancy_end_date: "2023-09-14",
-      smart_meter: "META B-07-01 R2",
-      balance: "46.7",
-      status: "Active",
-      top_up: "Last update 01 Jun 07:58 PM",
-    },
-  ];
+  // const data = [
+  //   {
+  //     id: 1,
+  //     name: "John Doe",
+  //     type: "Individual",
+  //     property: "Sunshine Apartments",
+  //     tenancy: "12 months",
+  //     rental: "770",
+  //     tenancy_start_date: "2023-01-01",
+  //     tenancy_end_date: "2023-12-31",
+  //     smart_meter: "META B-07-01 R2",
+  //     balance: "46.7",
+  //     status: "Active",
+  //     top_up: "Last update 01 Jun 07:58 PM",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Jane Smith",
+  //     type: "Company",
+  //     property: "Green Villas",
+  //     tenancy: "24 months",
+  //     rental: "770",
+  //     tenancy_start_date: "2022-06-01",
+  //     tenancy_end_date: "2024-05-31",
+  //     smart_meter: "META B-07-01 R2",
+  //     balance: "46.7",
+  //     status: "Inactive",
+  //     top_up: "Last update 01 Jun 07:58 PM",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Alice Lee",
+  //     type: "Individual",
+  //     property: "Blue Condos",
+  //     tenancy: "6 months",
+  //     rental: "770",
+  //     tenancy_start_date: "2023-03-15",
+  //     tenancy_end_date: "2023-09-14",
+  //     smart_meter: "META B-07-01 R2",
+  //     balance: "46.7",
+  //     status: "Active",
+  //     top_up: "Last update 01 Jun 07:58 PM",
+  //   },
+  // ];
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -119,50 +121,61 @@ const Page = () => {
                 </p>
                 <p className="text-sm text-gray-600">
                   <p className="font-medium">Tenant</p>{" "}
-                  <span className="font-bold text-lg">{tenancy.name}</span>
+                  <span className="font-bold text-lg">
+                    {tenancy.tenant.name}
+                  </span>
                 </p>
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Type:</span> {tenancy.type}
+                    <span className="font-medium">Type:</span>{" "}
+                    {(tenancy.tenantable as Unit).rental_type
+                      ? (tenancy.tenantable as Unit).rental_type
+                      : "Sublet"}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Property:</span>{" "}
-                    {tenancy.property}
+                    {(tenancy.tenantable as Unit).property?.property_name}
+                    {(tenancy.tenantable as Room).unit?.property?.property_name}
+                    \{(tenancy.tenantable as Unit).block_floor_unit_number}
+                    {(tenancy.tenantable as Room).unit?.block_floor_unit_number}
+                    {(tenancy.tenantable as Room).name ? (
+                      <>\{(tenancy.tenantable as Room).name}</>
+                    ) : null}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Tenancy:</span>{" "}
-                    {tenancy.tenancy}
+                    <span className="font-medium">Tenancy:</span> {tenancy.id}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Rental:</span> MRY
-                    {" " + tenancy.rental}
+                    {" " + tenancy.rental_fee}
                   </p>
                   <div className="flex justify-between">
                     <p className="text-sm text-gray-600">
                       <p className="font-medium">Tenancy Start Date</p>{" "}
-                      {tenancy.tenancy_start_date}
+                      {tenancy.tenancy_period_start_date}
                     </p>
                     <p className="text-sm text-gray-600 max-w-29">
                       <p className="font-medium">Tenancy End Date</p>{" "}
-                      {tenancy.tenancy_end_date}
+                      {tenancy.tenancy_period_end_date}
                     </p>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className=" flex  flex-col gap-2">
                       <p className="text-sm text-gray-600">
-                        <p className="font-medium">Smart Meter</p>{" "}
-                        {tenancy.smart_meter}
+                        <p className="font-medium">Smart Meter</p> {tenancy.id}
                       </p>
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">Balance</span>{" "}
-                        {tenancy.balance} unit
+                        {/* {tenancy.balance} */}
+                        unit
                       </p>
                       <p className="text-primary text-sm ">Sync Balance</p>
                     </div>
                     <div>
                       {" "}
                       <p className="text-sm text-gray-600 max-w-28">
-                        <p className="font-medium ">Top Up</p> {tenancy.top_up}
+                        <p className="font-medium ">Top Up</p>
+                        {/* {tenancy.top_up} */}
                       </p>
                     </div>
                   </div>

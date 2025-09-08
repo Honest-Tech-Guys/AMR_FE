@@ -34,6 +34,7 @@ import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import ViewNotification from "./ViewNotification";
+import CheckRole from "@/lib/CheckRole";
 const options = [
   {
     value: "Vacant",
@@ -112,4 +113,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default CheckRole(Page, ["admin"]);

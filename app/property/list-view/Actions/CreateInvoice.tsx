@@ -23,31 +23,41 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import AddItems from "@/app/accounting/invoice/AddItems";
+import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import useGetTenancyFieldList from "@/lib/services/hooks/useGetTenancyFieldList";
+import useCreateInvoice from "@/lib/services/hooks/useCreateInvoice";
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
   tenant: yup.string().required("Tenant is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
+  tenancy: yup.string().required("Tenancy is required"),
   property_name: yup.string().required("Property name is required"),
-  property_type: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
-    .string()
-    .required("Contact phone number is required"),
+  document_date: yup.string().required("Document Date is required"),
+
   remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
 });
+
 type schemaType = yup.InferType<typeof schema>;
-const CreateInvoice = () => {
+interface Props {
+  id: number;
+  open: boolean; // controlled open state
+  onOpenChange: (open: boolean) => void;
+}
+const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
+  const [tenancyData, setTenancyData] = useState([]);
+  const [items, setItems] = useState<any[]>([]);
+  const { data: tenancies } = useGetTenancyFieldList();
+  const { mutate } = useCreateInvoice();
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -60,46 +70,63 @@ const CreateInvoice = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
+
+  useEffect(() => {
+    if (tenancies) {
+      const dataT = tenancies.map((t: any) => ({
+        id: `${t.id}`,
+        name: t.code,
+        tenant_name: t.tenant_name,
+        full_property_name: t.full_property_name,
+      }));
+
+      setTenancyData(dataT as never);
+
+      const selectedTenancyId = watch("tenancy");
+      if (selectedTenancyId) {
+        const selectedTenancy = dataT.find(
+          (item: any) => item.id === selectedTenancyId
+        );
+
+        if (selectedTenancy) {
+          setValue("tenant", selectedTenancy.tenant_name);
+          setValue("property_name", selectedTenancy.full_property_name);
+        }
+      }
+    }
+  }, [tenancies, watch("tenancy"), setValue]);
+  const [status, setStatus] = useState<"Draft" | "Sent">("Draft");
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    const api_data = {
+      tenancy_id: data.tenancy,
+      due_date: data.document_date,
+      issue_date: data.document_date,
+      notes: data.remarks,
+      items: items,
+      status: status,
+    };
+    mutate(api_data, {
+      onSuccess: () => {
+        toast.success("Invoice created successfully!");
+        reset();
+        onOpenChange(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create Invoice");
+      },
+    });
+    console.log("Form data:", api_data);
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* <DialogTrigger asChild>
         <Button className="rounded-[6px] bg-transparent hover:bg-transparent m-0 shadow-none p-0 text-black font-normal text-start">
           Add Invoice
         </Button>
-      </DialogTrigger>
+      </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[1000px] bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             Create New Invoice
@@ -126,16 +153,6 @@ const CreateInvoice = () => {
                 </RadioGroup>
               </div>
               <CustomInput
-                id="status"
-                name="status"
-                type="text"
-                label="Status"
-                value={watch("status")}
-                onChange={(e) => setValue("status", e.target.value)}
-                errors={errors.status?.message}
-                placeholder="Enter Status"
-              />
-              <CustomInput
                 id="document_date"
                 name="document_date"
                 type="date"
@@ -146,18 +163,69 @@ const CreateInvoice = () => {
                 placeholder="Enter Document Date"
               />
               <SelectWithForm<schemaType>
+                name="tenancy"
+                title="Tenancy"
+                options={tenancyData}
+              />
+              <CustomInput
+                id="tenant"
                 name="tenant"
-                title="Tenant"
-                options={PartnerType}
+                type="text"
+                label="Tenant"
+                value={watch("tenant")}
+                onChange={(e) => setValue("tenant", e.target.value)}
+                errors={errors.tenant?.message}
+                placeholder=""
+                disabled={true}
               />
               <div className="col-span-1 md:col-span-2">
                 {" "}
-                <SelectWithForm<schemaType>
+                <CustomInput
+                  id="property_name"
                   name="property_name"
-                  title="Property Name"
-                  options={PartnerType}
+                  type="text"
+                  label="Property Name"
+                  value={watch("property_name")}
+                  onChange={(e) => setValue("property_name", e.target.value)}
+                  errors={errors.document_date?.message}
+                  placeholder=""
+                  disabled={true}
                 />
               </div>{" "}
+              <div className="col-span-2">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50 text-xs">
+                      <TableHead>Item</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Unit Price</TableHead>
+                      <TableHead>Tax</TableHead>
+                      <TableHead>Remarks</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.item_name}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.unit_price}</TableCell>
+                        <TableCell>{item.tax_percentage}</TableCell>
+                        <TableCell>{item.remarks}</TableCell>
+                        <TableCell>
+                          <Trash2
+                            className="text-red-700 cursor-pointer"
+                            onClick={() =>
+                              setItems(items.filter((_, i) => i !== index))
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <AddItems setItems={setItems} />
+              </div>
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
                   id="remarks"
@@ -179,7 +247,18 @@ const CreateInvoice = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
+              <Button
+                type="submit"
+                onClick={() => setStatus("Draft")}
+                className="text-white"
+              >
+                Save As Draft
+              </Button>
+              <Button
+                type="submit"
+                onClick={() => setStatus("Sent")}
+                className="text-white"
+              >
                 Submit
               </Button>
             </DialogFooter>
