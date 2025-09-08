@@ -35,6 +35,7 @@ import {
 import AddRoom from "./AddRoom";
 import AddCarPark from "./AddCarpark";
 import { useParams } from "next/navigation";
+import useGetBeneficiariesSelection from "@/lib/services/hooks/useGetbeneficiariesSelection";
 
 // Schema & type
 const schema = yup.object({
@@ -191,7 +192,7 @@ const CreateUnit = () => {
       currentCarparks.filter((carpark) => carpark.id !== carparkId)
     );
   };
-
+  const { data } = useGetBeneficiariesSelection();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload: any = {
       property_id: parseInt(id as string),

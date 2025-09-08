@@ -262,7 +262,7 @@ const EditProperty = ({
         </Button>
       </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[1000px]  bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             View Property
@@ -445,7 +445,7 @@ const EditProperty = ({
               </form>
             </FormProvider>
           </TabsContent>
-          <TabsContent value="units">
+          <TabsContent value="units" className="md:min-h-[70vh]">
             {" "}
             <Datatable<Unit>
               columns={unitColumns}

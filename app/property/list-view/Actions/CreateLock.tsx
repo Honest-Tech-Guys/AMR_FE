@@ -37,7 +37,9 @@ const schema = yup.object({
     .string()
     .required("Auto Create Passcode is required"),
 });
-type SchemaType = yup.InferType<typeof schema>;
+type SchemaType = yup.InferType<typeof schema> & {
+  [key: string]: any; // allow dynamic fields
+};
 interface Props {
   id: number;
   open: boolean; // controlled open state
@@ -148,7 +150,7 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
           </div>
         </DialogHeader>
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="md:min-h-[78vh]">
             <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput

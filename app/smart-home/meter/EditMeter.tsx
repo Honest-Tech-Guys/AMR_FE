@@ -77,7 +77,7 @@ const EditMeter = ({ meter, open, onOpenChange }: Props) => {
   // ✅ form setup with defaults
   const form = useForm<SchemaType>({
     mode: "onTouched",
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
     defaultValues: {
       property_id: meter.unit_id
         ? `unit-${meter.unit_id}`

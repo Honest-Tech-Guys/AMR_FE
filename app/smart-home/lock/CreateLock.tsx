@@ -37,7 +37,9 @@ const schema = yup.object({
     .string()
     .required("Auto Create Passcode is required"),
 });
-type SchemaType = yup.InferType<typeof schema>;
+type SchemaType = yup.InferType<typeof schema> & {
+  [key: string]: any; // allow dynamic fields
+};
 const CreateLock = () => {
   const form = useForm<SchemaType>({
     mode: "onTouched",

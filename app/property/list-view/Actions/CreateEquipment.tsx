@@ -23,25 +23,46 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import MultiFileUpload from "@/components/input-11";
 // Schema & type
+// Schema & type
 const schema = yup.object({
+  // Basic Info
   property_name: yup.string().required("Property name is required"),
-  sub_category: yup.string().required("Sub category is required"),
   category: yup.string().required("Category is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
+  sub_category: yup.string().required("Sub category is required"),
+  brand_name: yup.string().required("Brand name is required"),
+  model_name: yup.string().required("Model name is required"),
+  serial_number: yup.string().required("Serial number is required"),
+  price: yup.string().required("Price is required"),
+  width: yup.string().required("Width is required"),
+  height: yup.string().required("Height is required"),
+  depth: yup.string().required("Depth is required"),
+  installation_date: yup.string().required("Installation date is required"),
+  warranty_expire_date: yup
     .string()
-    .required("Contact phone number is required"),
+    .required("Warranty expire date is required"),
+
+  // Uploads
+  companyStatutoryForm1: yup
+    .mixed()
+    .required("Warranty card image is required"),
+
+  // Remarks
   remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
+
+  // Service Reminder
+  next_service_date: yup.string().required("Next service date is required"),
+  schedule_date: yup.string().required("Schedule date is required"),
+
+  // Facilities (booleans)
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
   sauna: yup.boolean().default(false),
   free_text: yup.boolean().default(false),
 });
+
 type schemaType = yup.InferType<typeof schema>;
+
 interface Props {
   id: number;
   open: boolean; // controlled open state
@@ -218,7 +239,7 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 errors={errors.warranty_expire_date?.message}
                 placeholder="Enter Warranty Expire Date"
               />
-              <div className="space-y-2 col-span-2 ">
+              {/* <div className="space-y-2 col-span-2 ">
                 <span className="font-semibold">
                   Upload Warranty Card Image
                 </span>
@@ -240,7 +261,7 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                     {errors.companyStatutoryForm.message}
                   </span>
                 )}
-              </div>
+              </div> */}
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
                   id="remarks"

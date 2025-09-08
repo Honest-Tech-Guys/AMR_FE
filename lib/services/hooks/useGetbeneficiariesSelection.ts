@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import OwnerType from "@/types/OwnerType";
 import ResponseType from "@/types/ResponseType";
-import PaginationType from "@/types/PaginationType";
-const useGetUnitsList = () => {
+
+const useGetBeneficiariesSelection = () => {
   return useQuery({
-    queryKey: ["GetUnitsList"],
+    queryKey: ["GetBeneficiariesSelection"],
     queryFn: () => {
-      const url = "/units";
+      const url = "/beneficiaries-list";
       {
         return axiosInstance
-          .get<ResponseType<PaginationType<Unit[]>>>(url)
+          .get<{ id: number; name: string }[]>(url)
           .then((res) => {
-            return res.data.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);
@@ -21,4 +22,5 @@ const useGetUnitsList = () => {
     },
   });
 };
-export default useGetUnitsList;
+
+export default useGetBeneficiariesSelection;

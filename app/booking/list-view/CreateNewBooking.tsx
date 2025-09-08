@@ -27,20 +27,44 @@ import MultiFileUpload from "@/components/input-11";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 // Schema & type
 const schema = yup.object({
-  country: yup.string().required("Country is required"),
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
+  // Basic Information
   property_name: yup.string().required("Property name is required"),
-  unit: yup.string().required("Property type is required"),
-  owner_name: yup.string().required("Owner name is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
+  unit: yup.string().required("Unit is required"),
+  room: yup.string().required("Room is required"),
+  name: yup.string().required("Name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  phone_number: yup.string().required("Phone number is required"),
+  alt_phone_number: yup.string().required(),
+  nationality: yup.string().required("Nationality is required"),
+  identity_number: yup.string().required("Identity number is required"),
+  race: yup.string().required(),
+  gender: yup.string().required(),
+
+  move_in_date: yup.string().required("Move in date is required"),
+  move_out_date: yup.string().required(),
+
+  type: yup.string().required("Type is required"),
+
+  companyStatutoryForm1: yup
+    .mixed()
+    .required("Front side document is required"),
+  companyStatutoryForm2: yup.mixed().required("Back side document is required"),
+
+  // Rental Information
+  rental: yup.string().required("Rental fee is required"),
+  rental_payment_frequency: yup
     .string()
-    .required("Contact phone number is required"),
-  remarks: yup.string().nullable(),
+    .required("Rental payment frequency is required"),
+  remarks: yup.string().required(),
+
+  // Address Information
+  country: yup.string().required("Country is required"),
+  postcode: yup.string().required("Postcode is required"),
+  city: yup.string().required("City is required"),
+  state: yup.string().required("State is required"),
   address: yup.string().required("Address is required"),
+
+  // Facilities (boolean toggles)
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
@@ -86,10 +110,7 @@ const CreateNewBooking = () => {
     { id: "free_text", label: "Free Text" },
   ];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    console.log("Form data:", data);
   };
 
   return (
@@ -293,7 +314,7 @@ const CreateNewBooking = () => {
                 </RadioGroup>
               </div>{" "}
               <div></div>
-              <div className="space-y-2 ">
+              {/* <div className="space-y-2 ">
                 <span className="font-semibold">Front Side</span>
                 <Controller
                   control={control}
@@ -334,7 +355,7 @@ const CreateNewBooking = () => {
                     {errors.companyStatutoryForm.message}
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
             <HeaderSection title="Rental Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

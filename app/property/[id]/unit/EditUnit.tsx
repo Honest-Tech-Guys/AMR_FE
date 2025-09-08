@@ -255,21 +255,21 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
 
     const updateData: UpdateUnitInput = {
       id: unit.id,
-      property_id: data.property_id,
-      block_number: data.block_number,
+      property_id: parseInt(data.property_id),
+      block: data.block_number,
       floor: data.floor,
       unit_number: data.unit_number,
-      rental_type: data.rental_type,
-      square_feet: data.square_feet,
-      business_partner_id: data.business_partner_id,
-      bedroom_count: data.bedroom_count,
-      bathroom_count: data.bathroom_count,
+      rental_type: data.rental_type as "Whole Unit",
+      square_feet: parseInt(data.square_feet),
+      // business_partner_id: data.business_partner_id,
+      bedroom_count: parseInt(data.bedroom_count),
+      bathroom_count: parseInt(data.bathroom_count),
       description: data.description,
-      is_active: data.is_active,
-      beneficiary: data.beneficiary,
+      is_activated: parseInt(data.is_active),
+      // beneficiary: data.beneficiary,
       remarks: data.remarks,
-      service_fee_percent: data.service_fee_percent,
-      profit_share_percent: data.profit_share_percent,
+      service_fee_percentage: data.service_fee_percent,
+      profit_sharing_percentage: data.profit_share_percent,
     };
 
     // Show loading toast
@@ -306,7 +306,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         </Button>
       </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[1000px]  bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             View Unit
@@ -501,7 +501,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
               </form>
             </FormProvider>
           </TabsContent>
-          <TabsContent value="rooms">
+          <TabsContent value="rooms" className="md:min-h-[80vh]">
             <Datatable<Room>
               columns={roomColumns}
               data={unit?.rooms ?? []}
@@ -512,7 +512,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
               isFilter={false}
             />
           </TabsContent>
-          <TabsContent value="carParks">
+          <TabsContent value="carParks" className="md:min-h-[80vh]">
             <Datatable<Carpark>
               columns={carParksColumns}
               data={unit?.carparks ?? []}

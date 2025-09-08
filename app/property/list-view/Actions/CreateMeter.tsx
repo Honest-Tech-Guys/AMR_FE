@@ -170,7 +170,7 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
         </DialogHeader>
 
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="md:min-h-[78vh]">
             <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">

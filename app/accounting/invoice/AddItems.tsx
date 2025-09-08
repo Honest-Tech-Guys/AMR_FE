@@ -118,7 +118,7 @@ const AddItems = ({ setItems }: Props) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:max-w-[500px] z-[300]  bg-white md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[500px] z-[500]  bg-white md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="w-full text-2xl font-bold text-center rounded-[6px] bg-white ">
             Add Item

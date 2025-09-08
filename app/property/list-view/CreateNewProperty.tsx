@@ -25,6 +25,7 @@ import useAddProperty from "@/lib/services/hooks/useAddProperties";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
+import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 // Schema & type
 const schema = yup.object({
   postcode: yup.string().required("Country is required"),
@@ -65,6 +66,7 @@ const CreateNewProperty = () => {
   } = form;
   const { mutate, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
+  const { refetch } = useGetPropertiesList();
   useEffect(() => {
     if (data) {
       const dataT = data.map((owner) => {
@@ -130,6 +132,7 @@ const CreateNewProperty = () => {
       onSuccess: () => {
         toast.success("Property created successfully!");
         reset();
+        refetch();
         setIsOpen(false);
       },
       onError: (err) => {
@@ -171,16 +174,6 @@ const CreateNewProperty = () => {
                 title="Property Type"
                 options={PartnerType}
               />
-              {/* <CustomInput
-                id="owner_name"
-                name="owner_name"
-                type="text"
-                label="Owner Name"
-                value={watch("owner_name")}
-                onChange={(e) => setValue("owner_name", e.target.value)}
-                errors={errors.owner_name?.message}
-                placeholder="Enter Owner Name"
-              /> */}
               <SelectWithForm<schemaType>
                 name="owner_id"
                 title="Owner"

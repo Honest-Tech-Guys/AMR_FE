@@ -159,7 +159,7 @@ const CreateNewTenancy = ({ id, onOpenChange, open }: Props) => {
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="md:max-w-[1000px] z-400 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+        className="md:max-w-[1000px]  z-400 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
       >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
@@ -167,9 +167,9 @@ const CreateNewTenancy = ({ id, onOpenChange, open }: Props) => {
           </div>
         </DialogHeader>
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="md:min-h-[78vh]">
             <HeaderSection title="Basic Information" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
               <div
                 className="space-y-3"
                 onClick={(e) => {

@@ -110,10 +110,7 @@ const CreateNewPayout = () => {
     { id: "free_text", label: "Free Text" },
   ];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    console.log("Form data:", data);
   };
 
   return (

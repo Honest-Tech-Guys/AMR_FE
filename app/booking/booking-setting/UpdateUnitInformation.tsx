@@ -70,14 +70,14 @@ const UpdateUnitInformation = ({ open, setOpen }: Props) => {
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Upload Image */}
             <div className="w-full grid grid-col-1 gap-5">
-              <CustomInput
+              {/* <CustomInput
                 id="image"
                 name="image"
                 type="file"
                 label="Upload Image"
                 onChange={(e) => setValue("image", e.target.files[0])}
                 //   errors={errors.image?.message}
-              />
+              /> */}
 
               {/* Enter Sq.ft */}
               <CustomInput

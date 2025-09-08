@@ -34,15 +34,16 @@ import {
 } from "@/components/ui/table";
 import { PenLine, Plus, Share2, Trash2 } from "lucide-react";
 import AddItems from "./AddItems";
+import { useEffect, useState } from "react";
+import useGetTenancyFieldList from "@/lib/services/hooks/useGetTenancyFieldList";
 // Schema & type
 const schema = yup.object({
-  status: yup.string().required(""),
-  document_date: yup.string().required(""),
-  supplier: yup.string().required(""),
-  property_name: yup.string().required(""),
-  equipment: yup.string().required(""),
+  tenant: yup.string().required("Tenant is required"),
+  tenancy: yup.string().required("Tenancy is required"),
+  property_name: yup.string().required("Property name is required"),
+  document_date: yup.string().required("Document Date is required"),
+
   remarks: yup.string().nullable(),
-  additional_notes: yup.string().nullable(),
 });
 type schemaType = yup.InferType<typeof schema>;
 const CreateInvoice = () => {
@@ -67,10 +68,36 @@ const CreateInvoice = () => {
     { id: "5", name: "Townhouse" },
   ];
 
+  const { data: tenancies } = useGetTenancyFieldList();
+  const [tenancyData, setTenancyData] = useState([]);
+  const [items, setItems] = useState<any[]>([]);
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log("Form data:", data);
   };
+  useEffect(() => {
+    if (tenancies) {
+      const dataT = tenancies.map((t: any) => ({
+        id: `${t.id}`,
+        name: t.code,
+        tenant_name: t.tenant_name,
+        full_property_name: t.full_property_name,
+      }));
 
+      setTenancyData(dataT as never);
+
+      const selectedTenancyId = watch("tenancy");
+      if (selectedTenancyId) {
+        const selectedTenancy = dataT.find(
+          (item: any) => item.id === selectedTenancyId
+        );
+
+        if (selectedTenancy) {
+          setValue("tenant", selectedTenancy.tenant_name);
+          setValue("property_name", selectedTenancy.full_property_name);
+        }
+      }
+    }
+  }, [tenancies, watch("tenancy"), setValue]);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -98,21 +125,11 @@ const CreateInvoice = () => {
                     <Label htmlFor="supplier_invoice">Supplier Invoice</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="comfortable" id="payment_voucher" />
-                    <Label htmlFor="payment_voucher">Payment Voucher</Label>
+                    <RadioGroupItem value="comfortable" id="deposit_notes" />
+                    <Label htmlFor="deposit_notes">Deposit Notes</Label>
                   </div>
                 </RadioGroup>
               </div>
-              <CustomInput
-                id="status"
-                name="status"
-                type="text"
-                label="Status"
-                value={watch("status")}
-                onChange={(e) => setValue("status", e.target.value)}
-                errors={errors.status?.message}
-                placeholder="Enter Status"
-              />
               <CustomInput
                 id="document_date"
                 name="document_date"
@@ -124,21 +141,69 @@ const CreateInvoice = () => {
                 placeholder="Enter Document Date"
               />
               <SelectWithForm<schemaType>
-                name="supplier"
-                title="Supplier"
-                options={PartnerType}
+                name="tenancy"
+                title="Tenancy"
+                options={tenancyData}
               />
-
-              <SelectWithForm<schemaType>
-                name="property_name"
-                title="Property Name"
-                options={PartnerType}
+              <CustomInput
+                id="tenant"
+                name="tenant"
+                type="text"
+                label="Tenant"
+                value={watch("tenant")}
+                onChange={(e) => setValue("tenant", e.target.value)}
+                errors={errors.tenant?.message}
+                placeholder=""
+                disabled={true}
               />
-              <SelectWithForm<schemaType>
-                name="equipment"
-                title="Equipment"
-                options={PartnerType}
-              />
+              <div className="col-span-1 md:col-span-2">
+                {" "}
+                <CustomInput
+                  id="property_name"
+                  name="property_name"
+                  type="text"
+                  label="Property Name"
+                  value={watch("property_name")}
+                  onChange={(e) => setValue("property_name", e.target.value)}
+                  errors={errors.document_date?.message}
+                  placeholder=""
+                  disabled={true}
+                />
+              </div>{" "}
+              <div className="col-span-2">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50 text-xs">
+                      <TableHead>Item</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Unit Price</TableHead>
+                      <TableHead>Tax</TableHead>
+                      <TableHead>Remarks</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.item_name}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.unit_price}</TableCell>
+                        <TableCell>{item.tax_percentage}</TableCell>
+                        <TableCell>{item.remarks}</TableCell>
+                        <TableCell>
+                          <Trash2
+                            className="text-red-700 cursor-pointer"
+                            onClick={() =>
+                              setItems(items.filter((_, i) => i !== index))
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <AddItems setItems={setItems} />
+              </div>
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
                   id="remarks"
@@ -153,79 +218,7 @@ const CreateInvoice = () => {
                 />
               </div>
             </div>
-            <div>
-              <HeaderSection title="Add Items" />
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 text-xs">
-                    <TableHead>Item</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Unit Price</TableHead>
-                    <TableHead>Tax</TableHead>
-                    <TableHead>Remarks</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>Key Deposit</TableCell>
-                    <TableCell>1</TableCell>
-                    <TableCell>100</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
 
-                    <TableCell>
-                      <Trash2 className="text-red-700" />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-              <div className="flex justify-between mt-5">
-                <div>
-                  <AddItems />
-                </div>
-                <div className="flex border-1 justify-end">
-                  <Table>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="text-primary font-medium">
-                          Sub total
-                        </TableCell>
-                        <TableCell>1,200</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="text-primary font-medium">
-                          Tax
-                        </TableCell>
-                        <TableCell>0</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="text-primary font-medium">
-                          Total
-                        </TableCell>
-                        <TableCell>1,200</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-              <div>
-                <Label className="mb-3 font-normal text-gray-400">
-                  Additional Notes - This section is to bill for the invoice
-                </Label>
-                <CustomInput
-                  id="additional_notes"
-                  // label="Remarks"
-                  type="textArea"
-                  name="additional_notes"
-                  value={watch("additional_notes")}
-                  onChange={(e) => setValue("additional_notes", e.target.value)}
-                  placeholder="E.g describe more about the reason for change"
-                  className="bg-gray-100"
-                  errors={errors.additional_notes?.message}
-                />
-              </div>
-            </div>
             <DialogFooter className="mt-6">
               <DialogClose asChild>
                 <Button variant="outline" type="button">

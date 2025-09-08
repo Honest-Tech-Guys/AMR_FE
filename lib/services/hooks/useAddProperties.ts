@@ -10,7 +10,7 @@ export type AddPropertyInput = Omit<
 const useAddProperty = () => {
   return useMutation({
     mutationKey: ["AddProperty"],
-    mutationFn: async (newProperty: AddPropertyInput) => {
+    mutationFn: async (newProperty: object) => {
       const res = await axiosInstance.post<Property>(
         "/properties",
         newProperty

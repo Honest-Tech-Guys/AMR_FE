@@ -12,7 +12,7 @@ type Tenancy = {
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
   created_by: number;
-
+  code: string;
   tenantable: Unit | Room;
 
   tenant: {

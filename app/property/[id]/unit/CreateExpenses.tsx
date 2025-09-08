@@ -194,9 +194,7 @@ const CreateExpenses = () => {
                 </TableBody>
               </Table>
               <div className="flex justify-between mt-5">
-                <div>
-                  <AddItems />
-                </div>
+                <div>{/* <AddItems /> */}</div>
                 <div className="flex border-1 justify-end">
                   <Table>
                     <TableBody>

@@ -31,7 +31,6 @@ import CreateEquipment from "./Actions/CreateEquipment";
 import MapWithPoints from "@/components/ImageMapper";
 import CreateInvoice from "./Actions/CreateInvoice";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import ViewProperty from "./ViewProperty";
 import PropertyDropdown from "../grid-view/PropertyDropDown";
 
 // Import Property type

@@ -68,6 +68,7 @@ const schema = yup.object({
   basketball_court: yup.boolean().default(false),
   sauna: yup.boolean().default(false),
   free_text: yup.boolean().default(false),
+  serial_number: yup.string().required(),
 });
 type schemaType = yup.InferType<typeof schema>;
 const ViewNotification = () => {
@@ -106,10 +107,7 @@ const ViewNotification = () => {
     { id: "IC_card", label: "IC Card" },
   ];
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    const facilitiesList = facilities
-      .filter((f) => data[f.id]) // only where checkbox is true
-      .map((f) => f.id);
-    console.log("Form data:", facilitiesList);
+    console.log("Form data:", data);
   };
 
   return (

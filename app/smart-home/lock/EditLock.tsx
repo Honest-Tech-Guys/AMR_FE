@@ -32,7 +32,9 @@ const schema = yup.object({
   serial_number: yup.string().required("Serial Number is required"),
   auto_create_passcode: yup.boolean().required(),
 });
-type SchemaType = yup.InferType<typeof schema>;
+type SchemaType = yup.InferType<typeof schema> & {
+  [key: string]: any; // allow dynamic fields
+};
 
 type EditLockProps = {
   lock: Locks | null;
@@ -45,11 +47,7 @@ const EditLock = ({ lock, open, onOpenChange }: EditLockProps) => {
     mode: "onTouched",
     defaultValues: {
       serial_number: lock?.serial_number || "",
-      property_id: lock?.unit_id
-        ? `unit-${lock.unit_id}`
-        : lock?.room_id
-        ? `room-${lock.room_id}`
-        : "",
+      property_id: "",
       auto_create_passcode: Boolean(lock?.auto_create_passcode),
     },
   });
@@ -73,11 +71,7 @@ const EditLock = ({ lock, open, onOpenChange }: EditLockProps) => {
     if (lock) {
       reset({
         serial_number: lock.serial_number,
-        property_id: lock.unit_id
-          ? `unit-${lock.unit_id}`
-          : lock.room_id
-          ? `room-${lock.room_id}`
-          : "",
+        property_id: "",
         auto_create_passcode: Boolean(lock.auto_create_passcode),
       });
     }

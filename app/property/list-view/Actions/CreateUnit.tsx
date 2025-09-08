@@ -22,7 +22,7 @@ import useAddUnit from "@/lib/services/hooks/useAddUnit";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -34,6 +34,7 @@ import {
 import { useParams } from "next/navigation";
 import AddRoom from "../../[id]/unit/AddRoom";
 import AddCarPark from "../../[id]/unit/AddCarpark";
+import useGetBeneficiariesSelection from "@/lib/services/hooks/useGetbeneficiariesSelection";
 
 // Schema & type
 const schema = yup.object({
@@ -193,7 +194,16 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       currentCarparks.filter((carpark) => carpark.id !== carparkId)
     );
   };
-
+  const [beneficiaries, setBeneficiaries] = useState([]);
+  const { data } = useGetBeneficiariesSelection();
+  useEffect(() => {
+    if (data) {
+      const dataT = data.map((beneficiary) => {
+        return { id: `${beneficiary.id}`, name: beneficiary.name };
+      });
+      setBeneficiaries(dataT as never);
+    }
+  }, [data]);
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload: any = {
       property_id: id,
@@ -539,16 +549,13 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
               </div>
               <HeaderSection title="Other Information" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CustomInput
-                  id="beneficiary"
-                  name="beneficiary"
-                  type="text"
-                  label="Beneficiary"
-                  value={watch("beneficiary")}
-                  onChange={(e) => setValue("beneficiary", e.target.value)}
-                  errors={errors.beneficiary?.message}
-                  placeholder="Enter Beneficiary"
-                />
+                <div>
+                  <SelectWithForm<schemaType>
+                    name="beneficiary"
+                    title="Beneficiary"
+                    options={beneficiaries}
+                  />
+                </div>
                 <div>
                   <Label className="mb-3">Is Activated</Label>
                   <Controller
