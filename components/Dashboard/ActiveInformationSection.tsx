@@ -1,18 +1,35 @@
+"use client";
 import RealStateIcon from "@/lib/icons/RealStateIcon";
 import RenterIcon from "@/lib/icons/RenterIcon";
 import RoomsIcon from "@/lib/icons/RoomsIcon";
 import UnitsIcons from "@/lib/icons/UnitsIcons";
 import React from "react";
 
-const ActiveInformationSection = () => {
+type ActiveInformationSectionProps = {
+  general: {
+    active_tenancies: number;
+    properties: number;
+    units: number;
+    rooms: number;
+  };
+};
+
+const ActiveInformationSection: React.FC<ActiveInformationSectionProps> = ({
+  general,
+}) => {
   const oneSlider = [
-    { label: "Active Tenancies", value: 429, icon: <RenterIcon /> },
-    { label: "Properties", value: 25, icon: <RealStateIcon /> },
-    { label: "Units", value: 60, icon: <UnitsIcons /> },
-    { label: "Rooms", value: 200, icon: <RoomsIcon /> },
+    {
+      label: "Active Tenancies",
+      value: general.active_tenancies,
+      icon: <RenterIcon />,
+    },
+    { label: "Properties", value: general.properties, icon: <RealStateIcon /> },
+    { label: "Units", value: general.units, icon: <UnitsIcons /> },
+    { label: "Rooms", value: general.rooms, icon: <RoomsIcon /> },
   ];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4  w-full   gap-5">
+    <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-5">
       {oneSlider.map((item, index) => (
         <div
           key={index}

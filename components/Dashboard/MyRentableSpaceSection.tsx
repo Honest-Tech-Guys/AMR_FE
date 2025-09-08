@@ -1,11 +1,24 @@
 import { InfoCard } from "../InfoCard";
 
-const MyRentableSpaceSection = () => {
+type RentableSpace = {
+  total: number;
+  vacant: number;
+  occupied: number;
+};
+
+type MyRentableSpaceSectionProps = {
+  rentable_space: RentableSpace;
+};
+
+const MyRentableSpaceSection = ({
+  rentable_space,
+}: MyRentableSpaceSectionProps) => {
   const items = [
-    { title: "Total", value: "654.96" },
-    { title: "Vacant", value: "3" },
-    { title: "Occupied", value: "3" },
+    { title: "Total", value: rentable_space.total.toString() },
+    { title: "Vacant", value: rentable_space.vacant.toString() },
+    { title: "Occupied", value: rentable_space.occupied.toString() },
   ];
+
   return (
     <InfoCard title="My Rentable Space" items={items} className="grid-cols-3" />
   );

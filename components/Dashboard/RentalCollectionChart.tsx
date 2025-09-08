@@ -1,19 +1,41 @@
 import React from "react";
 import { ChartPieDonutText } from "../CircleChart";
 
-const RentalCollectionChart = () => {
+type PieChartData = {
+  paid: number;
+  unpaid: number | string;
+};
+
+type RentalCollectionChartProps = {
+  rental_collection: PieChartData;
+  month: string;
+};
+
+const RentalCollectionChart = ({
+  rental_collection,
+  month,
+}: RentalCollectionChartProps) => {
   const chartData = [
-    { browser: "Paid", visitors: 275, fill: "#88BD23" },
-    { browser: "Unpaid", visitors: 200, fill: "#EFF2F5" },
+    {
+      browser: "Paid",
+      visitors: Number(rental_collection.paid),
+      fill: "#88BD23",
+    },
+    {
+      browser: "Unpaid",
+      visitors: Number(rental_collection.unpaid),
+      fill: "#EFF2F5",
+    },
   ];
+
   return (
     <div className="w-full">
       <ChartPieDonutText
         chartData={chartData}
         DetailsLink=""
-        MainLabel="Tenancy Expiry Status"
+        MainLabel="Rental Collection"
         SubLabel="Paid vs Unpaid"
-        data="May 2025"
+        data={month}
         labelCenter="Rental Collection"
       />
     </div>

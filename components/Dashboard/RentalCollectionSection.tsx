@@ -1,12 +1,32 @@
 import { InfoCard } from "../InfoCard";
 
-const RentalCollectionSection = () => {
+type RentalCollection = {
+  today: number;
+  tomorrow: number;
+  in_3_days?: number;
+  in_7_days?: number;
+};
+
+type RentalCollectionSectionProps = {
+  rental_collection: RentalCollection;
+};
+
+const RentalCollectionSection = ({
+  rental_collection,
+}: RentalCollectionSectionProps) => {
   const expiryData = [
-    { title: "Today", value: 654.96 },
-    { title: "Tomorrow", value: 3 },
-    { title: "In 3 Days", value: 3 },
-    { title: "In 7 Days", value: 3 },
+    { title: "Today", value: rental_collection.today.toString() },
+    { title: "Tomorrow", value: rental_collection.tomorrow.toString() },
+    {
+      title: "In 3 Days",
+      value: rental_collection.in_3_days?.toString() ?? "0",
+    },
+    {
+      title: "In 7 Days",
+      value: rental_collection.in_7_days?.toString() ?? "0",
+    },
   ];
+
   return (
     <InfoCard
       title="Rental Collection"

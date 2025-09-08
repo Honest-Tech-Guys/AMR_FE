@@ -1,85 +1,109 @@
 "use client";
+
 import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 import { Calendar, ChevronDown, ChevronUp, Funnel, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
+import CreateNewBooking from "./CreateNewBooking";
 import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
-import CreateNewBooking from "./CreateNewBooking";
-const options = [
-  {
-    value: "Vacant",
-    label: "Vacant (50)",
-  },
-  {
-    value: "Occupied",
-    label: "Occupied (32)",
-  },
-  {
-    value: "Deactivated ",
-    label: "Deactivated (24)",
-  },
-];
-type property = {
+import useGetBooksList from "@/lib/services/hooks/usGetBooks";
+import { Book } from "@/types/BookType";
+
+type PropertyTableRow = {
   property_id: string;
   unit: string;
   room: string;
-  smart_home: string;
   tenant_name: string;
   rental: string;
   rental_frequency: string;
   status: string;
 };
-interface PaginationData {
-  page: number;
-  per_page: number;
-}
-const invoiceColumns: Column<property>[] = [
+
+// Mapping Book[] to PropertyTableRow[]
+const mapBooksToTable = (books: Book[]): PropertyTableRow[] => {
+  return books.map((book) => {
+    let propertyName = "";
+    let unitNumber = "";
+    let roomName = "";
+
+    // Check if bookable is Property
+    if ("property_name" in book.bookable) {
+      propertyName = book.bookable.property_name;
+    }
+    // Check if bookable is Unit
+    else if ("unit_number" in book.bookable) {
+      propertyName = book.bookable.property?.property_name || "";
+      unitNumber = book.bookable.unit_number;
+    }
+    // Check if bookable is Room
+    else if ("name" in book.bookable) {
+      propertyName = book.bookable.unit?.property?.property_name || "";
+      unitNumber = book.bookable.unit?.unit_number || "";
+      roomName = book.bookable.name;
+    }
+
+    return {
+      property_id: propertyName,
+      unit: unitNumber,
+      room: roomName || "N/A",
+      tenant_name: book.tenant.name,
+      rental: book.rental_fee,
+      rental_frequency: book.rental_payment_frequency,
+      status: book.status,
+    };
+  });
+};
+
+const invoiceColumns: Column<PropertyTableRow>[] = [
   {
     title: "Property",
-    key: "Property_id",
+    key: "property_id",
     sortable: true,
     className: "pl-6 py-4",
-    render: (order) => (
-      <div className="pl-4 text-primary font-medium ">
-        {order.property_id ?? "-"}
-      </div>
+    render: (row) => (
+      <div className="pl-4 text-primary font-medium">{row.property_id}</div>
     ),
   },
   {
     title: "Unit",
     key: "unit",
     sortable: true,
-    render: (user) => <div>{user.unit}</div>,
+    render: (row) => <div>{row.unit}</div>,
   },
   {
     title: "Room",
     key: "room",
-    render: (order) => <div>{order.room}</div>,
+    render: (row) => <div>{row.room}</div>,
   },
   {
     title: "Tenant Name",
     key: "tenant_name",
-    render: (order) => <div>{order.tenant_name}</div>,
+    render: (row) => <div>{row.tenant_name}</div>,
   },
   {
     title: "Rental",
     key: "rental",
-    render: (order) => <div>{order.rental}</div>,
+    render: (row) => <div>{row.rental}</div>,
   },
   {
     title: "Rental Frequency",
     key: "rental_frequency",
-    render: (order) => <div>{order.rental_frequency}</div>,
+    render: (row) => <div>{row.rental_frequency}</div>,
   },
   {
     title: "Status",
     key: "status",
     sortable: true,
+    render: (row) => <div>{row.status}</div>,
   },
 ];
+
+interface PaginationData {
+  page: number;
+  per_page: number;
+}
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
@@ -87,6 +111,9 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
+
+  const { data, isLoading } = useGetBooksList(); // data: Book[]
+
   const filters = [
     <InputWithIcon key="booking" icon={Search} placeholder="Booking" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -106,6 +133,7 @@ const Page = () => {
       <HeaderPage title="Booking" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter filters={filters} actionButton={actionButton} />
+
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -115,9 +143,10 @@ const Page = () => {
             <CreateNewBooking />
           </div>
         </div>
+
+        {/* Filter toggle */}
         <div className="flex items-end justify-end">
-          {/* <RadioCardsDemo options={options} /> */}
-          <div className=" flex justify-end">
+          <div className="flex justify-end">
             <Button
               variant="outline"
               onClick={() => setIsFilter((prev) => !prev)}
@@ -128,13 +157,14 @@ const Page = () => {
             </Button>
           </div>
         </div>
-        <Datatable<property>
+
+        <Datatable<PropertyTableRow>
           columns={invoiceColumns}
-          data={[]}
-          isPending={false}
+          data={data ? mapBooksToTable(data) : []}
+          isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item: property) => item.property_id}
+          rowKey={(item) => item.property_id}
           isFilter={isFilter}
         />
       </div>

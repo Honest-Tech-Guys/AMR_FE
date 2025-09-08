@@ -1,12 +1,32 @@
 import React from "react";
 import { ChartPieDonutText } from "../CircleChart";
 
-const InvoiceChart = () => {
+type PaymentStatusData = {
+  paid: number | string;
+  unpaid: number | string;
+  overdue: number | string;
+};
+
+type InvoiceChartProps = {
+  payment_status: PaymentStatusData;
+  month: string;
+};
+
+const InvoiceChart = ({ payment_status, month }: InvoiceChartProps) => {
   const chartData = [
-    { browser: "Coming Due", visitors: 275, fill: "#88BD23" },
-    { browser: "Overdue", visitors: 200, fill: "#CF1322" },
-    { browser: "Paid", visitors: 200, fill: "#EFF2F5" },
+    { browser: "Paid", visitors: Number(payment_status.paid), fill: "#EFF2F5" },
+    {
+      browser: "Unpaid",
+      visitors: Number(payment_status.unpaid),
+      fill: "#88BD23",
+    },
+    {
+      browser: "Overdue",
+      visitors: Number(payment_status.overdue),
+      fill: "#CF1322",
+    },
   ];
+
   return (
     <div className="w-full">
       <ChartPieDonutText
@@ -14,7 +34,7 @@ const InvoiceChart = () => {
         DetailsLink=""
         MainLabel="Invoice"
         SubLabel="Payment Status"
-        data="May 2025"
+        data={month}
         labelCenter="Payment Status"
       />
     </div>
