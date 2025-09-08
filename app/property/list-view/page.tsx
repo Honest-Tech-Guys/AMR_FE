@@ -202,7 +202,7 @@ const Page = () => {
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="bg-black rounded-[6px] text-white hover:bg-black/70">
+            <Button className="bg-black rounded-[6px] text-white hover:bg-black/70 cursor-pointer">
               Create Bulk Property
             </Button>
             <CreateNewProperty />
@@ -214,7 +214,7 @@ const Page = () => {
             <Button
               variant="outline"
               onClick={() => setIsFilter((prev) => !prev)}
-              className="rounded-[6px] h-6 m-0"
+              className="rounded-[6px] h-6 m-0 cursor-pointer"
             >
               <Funnel className="mr-2" />
               Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}

@@ -28,8 +28,11 @@ const Navbar = () => {
           strokeWidth={2.5}
         />
         <Avatar>
-          <AvatarImage src="/testImage.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src="/tstImage.png" alt="@shadcn" />
+          <AvatarFallback>
+            {data?.name[0]}
+            {data?.name[1]}
+          </AvatarFallback>
         </Avatar>
         <span className="tracking-tight">{data?.name}</span>
       </div>

@@ -144,7 +144,7 @@ const CreateNewProperty = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-[6px] text-white">
+        <Button className="rounded-[6px] text-white cursor-pointer">
           Create New Property
         </Button>
       </DialogTrigger>

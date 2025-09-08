@@ -325,7 +325,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className=" data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
+                  className=" cursor-pointer data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
                 >
                   {tab.label}
                 </TabsTrigger>

@@ -28,7 +28,9 @@ const ViewTenancy = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-md text-white">View More</Button>
+        <Button className="rounded-md text-white cursor-pointer">
+          View More
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="md:max-w-[1000px] bg-white z-[200] md:p-10 max-h-[95vh] overflow-y-auto">
@@ -42,7 +44,7 @@ const ViewTenancy = () => {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className=" data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
+                className=" cursor-pointer data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
               >
                 {tab.label}
               </TabsTrigger>

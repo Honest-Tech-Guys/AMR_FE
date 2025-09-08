@@ -15,7 +15,7 @@ const RadioCardsDemo = ({ options }: Props) => {
         <RadioGroup.Item
           key={option.value}
           value={option.value}
-          className="py-1 px-3  border-transparent text-gray-500 data-[state=checked]:text-primary data-[state=checked]:border-b-2 data-[state=checked]:border-b-primary"
+          className="py-1 px-3 cursor-pointer  border-transparent text-gray-500 data-[state=checked]:text-primary data-[state=checked]:border-b-2 data-[state=checked]:border-b-primary"
         >
           <span className="font-semibold tracking-tight whitespace-nowrap">
             {option.label}

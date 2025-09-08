@@ -163,7 +163,7 @@ const Page = () => {
         </Dialog>
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="bg-black rounded-[6px] text-white hover:bg-black/70">
+            <Button className="bg-black rounded-[6px] text-white cursor-pointer hover:bg-black/70">
               Create Bulk Property
             </Button>
             <CreateNewProperty />

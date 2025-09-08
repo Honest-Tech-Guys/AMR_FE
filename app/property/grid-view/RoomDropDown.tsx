@@ -61,7 +61,7 @@ export default function RoomDropDown({ room }: { room: any }) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-5"
+            className="h-5 cursor-pointer"
             onClick={(e) => e.stopPropagation()} // stop accordion toggle
           >
             <EllipsisVertical className="size-4" />
