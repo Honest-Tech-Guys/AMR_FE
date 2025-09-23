@@ -124,8 +124,13 @@ function PaginationEllipsis({
 export interface PaginationData {
   page: number;
   per_page: number;
+  last_page?: number;
+  links?: {
+    active: boolean;
+    url: string | null;
+    label: string;
+  }[];
 }
-
 interface PaginationControlProps extends React.ComponentProps<"div"> {
   pagination: PaginationData;
   setPagination: React.Dispatch<React.SetStateAction<PaginationData>>;

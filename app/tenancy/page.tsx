@@ -5,7 +5,7 @@ import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 // import CreateNewOwner from "./CreateNewOwner";
@@ -14,10 +14,11 @@ import OwnerType from "@/types/OwnerType";
 import { Separator } from "@/components/ui/separator";
 import ViewTenancy from "./ViewTenancy";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
+import { PaginationData } from "@/components/ui/pagination";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
-  const { data: data } = useGetTenancyList();
+  const { data } = useGetTenancyList();
   // const { data, isLoading, error } = useGetOwnersList();
   // const data = [
   //   {
@@ -76,12 +77,85 @@ const Page = () => {
       <Search className="size-4 text-white" strokeWidth={2.5} />
     </Button>
   );
-
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    per_page: 15,
+    last_page: 1,
+    links: [],
+  });
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    page: "1",
+    per_page: "10",
+  });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
   return (
     <div>
       <HeaderPage title="Tenancy" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
+        <ResponsiveFilter
+          filters={[
+            {
+              name: "property_name",
+              placeholder: "Property Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "unit_name",
+              placeholder: "Unit Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "rental_type",
+              placeholder: "Rental Type",
+              type: "select",
+              selectItems: [
+                { label: "whole unit", value: "Whole Unit" },
+                { label: "Sublet", value: "Sublet" },
+              ],
+              icon: Search,
+            },
+            {
+              name: "Meter_and_lock",
+              placeholder: "Meter and Lock",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "date_range",
+              placeholder: "Date Range",
+              type: "date",
+              icon: Calendar,
+            },
+          ]}
+          actionButton={
+            <Button
+              // onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
+              <Search />
+            </Button>
+          }
+          formFilters={formFilters}
+          setFormFilters={setFormFilters as never}
+        />
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -103,7 +177,7 @@ const Page = () => {
 
         {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.map((tenancy) => (
+            {data?.data.map((tenancy) => (
               <div
                 key={tenancy.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"

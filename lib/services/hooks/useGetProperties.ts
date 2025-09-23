@@ -2,17 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
-const useGetPropertiesList = () => {
+const useGetPropertiesList = (params: Object) => {
   return useQuery({
-    queryKey: ["GetPropertiesList"],
+    queryKey: ["GetPropertiesList", params],
     queryFn: () => {
       const url = "/properties";
       {
         return axiosInstance
-          .get<PaginationType<Property[]>>(url)
+          .get<PaginationType<Property[]>>(url, { params })
           .then((res) => {
             console.log("SS");
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

@@ -12,7 +12,7 @@ const useGetTenancyList = () => {
           .get<PaginationType<Tenancy[]>>(url)
           .then((res) => {
             console.log("SS");
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

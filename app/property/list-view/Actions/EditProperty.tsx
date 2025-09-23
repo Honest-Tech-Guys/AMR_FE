@@ -454,7 +454,7 @@ const EditProperty = ({
               pagination={pagination}
               setPagination={setPagination}
               rowKey={(item: Unit) => item.id}
-              isFilter={false}
+              // isFilter={false}
             />
           </TabsContent>
 

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CreateNewProperty from "./CreateNewProperty";
 import {
@@ -59,40 +59,36 @@ import PropertyDropdown from "../grid-view/PropertyDropDown";
 
 const options = [
   {
+    value: "all",
+    label: "ALL",
+    count: "",
+  },
+  {
     value: "Vacant",
-    label: "Vacant (50)",
+    label: "Vacant ",
+    count: "50",
   },
   {
     value: "Occupied",
-    label: "Occupied (32)",
+    label: "Occupied ",
+    count: "50",
   },
   {
     value: "Deactivated ",
-    label: "Deactivated (24)",
+    label: "Deactivated ",
+    count: "50",
   },
 ];
 
 interface PaginationData {
   page: number;
   per_page: number;
-}
-
-interface PropertyTableData {
-  property_id: string;
-  unit: string;
-  room: string;
-  smart_home: ReactNode;
-  owner_name: string;
-  rental: string;
-  tenancy: {
-    tenantName: string;
-    period: string;
-    autoPay: boolean;
-    countdown: string;
-  };
-  status: string;
-  // Include the original PropertyType for actions
-  originalData: Property;
+  last_page?: number;
+  links?: {
+    active: boolean;
+    url: string | null;
+    label: string;
+  }[];
 }
 
 const Page = () => {
@@ -101,18 +97,20 @@ const Page = () => {
   const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
-    per_page: 10,
+    per_page: 15,
+    last_page: 1,
+    links: [],
   });
   const [openView, setOpenView] = useState(false);
   const propertyColumns: Column<Property>[] = [
     {
       title: "Property",
-      key: "Property_id",
+      key: "property_name",
       sortable: true,
       className: "pl-6 py-4",
       render: (property) => (
         <div
-          className="pl-4 text-primary font-medium cursor-pointer "
+          className="pl-4 text-primary font-medium "
           onClick={() => {
             setOpenView(!openView);
           }}
@@ -128,19 +126,19 @@ const Page = () => {
     },
     {
       title: "Type",
-      key: "type",
+      key: "property_type",
       sortable: true,
       render: (property) => <div>{property.property_type}</div>,
     },
     {
       title: "Owner",
-      key: "owner",
+      key: "owner.name",
       sortable: true,
       render: (property) => <div>{property.owner.name}</div>,
     },
     {
       title: "Address",
-      key: "address",
+      key: "city",
       render: (property) => (
         <div>
           {property.city},{property.state},{property.address_line_1}
@@ -188,17 +186,92 @@ const Page = () => {
       <Search className="size-4 text-white" strokeWidth={2.5} />
     </Button>
   );
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    status: "all",
+    page: "1",
+    per_page: "10",
+  });
 
-  const { data, isLoading, error } = useGetPropertiesList();
-
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, error } = useGetPropertiesList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+  }, [pagination.page, pagination.per_page]);
   // Map API data to table format
-  const tableData: Property[] = (data || []).map((item: Property) => item);
+  const tableData: Property[] = data?.data.map((item: Property) => item) ?? [];
 
   return (
     <div>
       <HeaderPage title="Property" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
+        <ResponsiveFilter
+          filters={[
+            {
+              name: "property_name",
+              placeholder: "Property Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "unit_name",
+              placeholder: "Unit Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "rental_type",
+              placeholder: "Rental Type",
+              type: "select",
+              selectItems: [
+                { label: "whole unit", value: "Whole Unit" },
+                { label: "Sublet", value: "Sublet" },
+              ],
+              icon: Search,
+            },
+            {
+              name: "Meter_and_lock",
+              placeholder: "Meter and Lock",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "date_range",
+              placeholder: "Date Range",
+              type: "date",
+              icon: Calendar,
+            },
+          ]}
+          actionButton={
+            <Button
+              onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
+              <Search />
+            </Button>
+          }
+          formFilters={formFilters}
+          setFormFilters={setFormFilters as never}
+        />
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -209,8 +282,14 @@ const Page = () => {
           </div>
         </div>
         <div className="flex items-end justify-between">
-          <RadioCardsDemo options={options} />
-          <div className=" flex justify-end">
+          <RadioCardsDemo
+            options={options}
+            value={(appliedFilters as { status?: string })?.status || "all"}
+            onChange={(val) =>
+              setAppliedFilters((prev) => ({ ...prev, status: val }))
+            }
+          />
+          {/* <div className=" flex justify-end">
             <Button
               variant="outline"
               onClick={() => setIsFilter((prev) => !prev)}
@@ -219,7 +298,7 @@ const Page = () => {
               <Funnel className="mr-2" />
               Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}
             </Button>
-          </div>
+          </div> */}
         </div>
         <Datatable<Property>
           columns={propertyColumns}
@@ -228,7 +307,7 @@ const Page = () => {
           pagination={pagination}
           setPagination={setPagination}
           rowKey={(item: Property) => item.id}
-          isFilter={isFilter}
+          // isFilter={isFilter}
         />
         {error && (
           <div className="text-red-500 mt-2">Error loading properties.</div>

@@ -8,15 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationControl,
-  PaginationData,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+// prettier-ignore
+import { Pagination, PaginationContent, PaginationControl, PaginationData, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -33,7 +26,7 @@ import {
   ArrowUpDown,
   Eye,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { formatDate } from "@/lib/utils";
 
 export type Column<T> = {
   title: string;
@@ -42,12 +35,12 @@ export type Column<T> = {
   render?: (item: T) => React.ReactNode;
   sortable?: boolean;
   searchable?: boolean;
+  searchType?: "text" | "date";
 };
 
 type DatatableProps<T> = {
   data: T[];
   isPending: boolean;
-  isFilter: boolean;
   pagination: PaginationData;
   setPagination: React.Dispatch<React.SetStateAction<PaginationData>>;
   columns: Column<T>[];
@@ -55,6 +48,7 @@ type DatatableProps<T> = {
   onView?: (item: T) => void;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  actions?: (item: T) => React.ReactNode;
 };
 
 function Datatable<T>({
@@ -67,7 +61,7 @@ function Datatable<T>({
   onView,
   onEdit,
   onDelete,
-  isFilter,
+  actions,
 }: DatatableProps<T>) {
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -91,20 +85,68 @@ function Datatable<T>({
     }
   };
 
+  function getNestedValue(obj: any, path: string): any {
+    const parts = path.split(".");
+    let current = obj;
+
+    for (let part of parts) {
+      const isArray = part.endsWith("[]");
+      const key = isArray ? part.slice(0, -2) : part;
+
+      if (current == null) return undefined;
+
+      if (isArray) {
+        const array = current[key];
+        if (!Array.isArray(array)) return undefined;
+
+        // return flat list of values for rest of path
+        const remainingPath = parts.slice(parts.indexOf(part) + 1).join(".");
+        return array.map((item) => getNestedValue(item, remainingPath)).flat();
+      } else {
+        current = current[key];
+      }
+    }
+
+    return current;
+  }
+
   const filteredData = data.filter((item) => {
-    return columns.every((col) => {
-      const key = col.key as keyof T;
-      const searchTerm = searchTerms[key as string];
+    return Object.entries(searchTerms).every(([key, searchTerm]) => {
       if (!searchTerm) return true;
-      const value = String(item[key] ?? "");
-      return value.includes(searchTerm);
+
+      const column = columns.find((col) => col.key === key);
+      const searchType = column?.searchType || "text";
+      const rawValue = getNestedValue(item, key);
+
+      const testValue = (v: any) => {
+        if (searchType === "date") {
+          const formatted = formatDate(v, { withTime: true });
+          return formatted.includes(searchTerm);
+        }
+        // default to text
+        return String(v).toLowerCase().includes(searchTerm.toLowerCase());
+      };
+
+      if (Array.isArray(rawValue)) {
+        return rawValue.some(testValue);
+      }
+
+      return testValue(rawValue);
     });
   });
 
   const sortedData = sortKey
     ? [...filteredData].sort((a, b) => {
-        const valA = String((a as any)[sortKey]);
-        const valB = String((b as any)[sortKey]);
+        const aVal = getNestedValue(a, sortKey);
+        const bVal = getNestedValue(b, sortKey);
+
+        const valA = Array.isArray(aVal)
+          ? String(aVal[0] ?? "")
+          : String(aVal ?? "");
+        const valB = Array.isArray(bVal)
+          ? String(bVal[0] ?? "")
+          : String(bVal ?? "");
+
         return sortOrder === "asc"
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
@@ -112,21 +154,29 @@ function Datatable<T>({
     : filteredData;
 
   return (
-    <div className="w-full ">
-      <div className=" overflow-hidden">
+    <div className="w-full">
+      <div className="rounded-md overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="p-2 bg-gray-50 text-xs">
               {columns.map((col) => (
                 <TableHead
                   key={String(col.key)}
-                  className={` text-gray-600 text-center ${
-                    col.className ?? ""
-                  }`}
+                  className={` text-gray-600 py-4`}
                 >
-                  <div className="flex flex-col items-center">
+                  <div
+                    className={`flex flex-col items-center ${
+                      col.className ?? ""
+                    }`}
+                  >
                     <div className="flex items-center gap-x-2">
-                      {col.title}
+                      <span
+                        className={`${
+                          col.className?.includes("items-start") ? "pl-2" : ""
+                        }`}
+                      >
+                        {col.title}
+                      </span>
                       {col.sortable && (
                         <span
                           className="hover:cursor-pointer"
@@ -144,34 +194,10 @@ function Datatable<T>({
                         </span>
                       )}
                     </div>
-                    <AnimatePresence>
-                      {isFilter && (
-                        <motion.div
-                          key="filter-panel"
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <Input
-                            className="mt-2 w-full h-6 placeholder:text-xs bg-white font-normal text-xs min-w-25"
-                            readOnly={isPending}
-                            placeholder={`Search ${col.title}`}
-                            value={searchTerms[String(col.key)] ?? ""}
-                            onChange={(e) =>
-                              setSearchTerms((prev) => ({
-                                ...prev,
-                                [String(col.key)]: e.target.value,
-                              }))
-                            }
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    {/* {col.searchable !== false && (
+
+                    {col.searchable !== false && col.key !== "actions" && (
                       <Input
-                        className="mt-2 w-full h-6 placeholder:text-xs bg-white font-normal text-xs min-w-25"
+                        className="mt-2 w-full bg-white font-normal text-xs min-w-30 placeholder:text-xs"
                         readOnly={isPending}
                         placeholder={`Search ${col.title}`}
                         value={searchTerms[String(col.key)] ?? ""}
@@ -182,13 +208,15 @@ function Datatable<T>({
                           }))
                         }
                       />
-                    )} */}
+                    )}
                   </div>
                 </TableHead>
               ))}
-              {/* <TableHead className="text-gray-600 text-center pr-6">
-                Actions
-              </TableHead> */}
+              {(onView || onEdit || onDelete || actions) && (
+                <TableHead className="text-gray-600 text-center pr-6">
+                  Actions
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
 
@@ -202,6 +230,7 @@ function Datatable<T>({
                     onView={onView}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    actions={actions}
                   />
                 ))
               : !isPending && (
@@ -225,11 +254,11 @@ function Datatable<T>({
           </div>
         )}
 
-        {!isPending && sortedData.length > 0 && (
+        {!isPending && (
           <Pagination className="mt-4">
             <PaginationContent className="flex justify-between w-full">
               <PaginationItem className="text-xs text-gray-600">
-                Page {pagination.page} of 10
+                Page {pagination.page} of {pagination.last_page}
               </PaginationItem>
               <PaginationItem className="flex gap-x-2">
                 <PaginationControl
@@ -237,23 +266,17 @@ function Datatable<T>({
                   setPagination={setPagination}
                 />
                 <PaginationPrevious
-                  href="#"
                   onClick={() =>
-                    setPagination((prev) => ({
-                      ...prev,
-                      page: Math.max(prev.page - 1, 1),
-                    }))
+                    setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
                   }
+                  isActive={pagination.page > 1}
                   className="bg-gray-100"
                 />
                 <PaginationNext
-                  href="#"
                   onClick={() =>
-                    setPagination((prev) => ({
-                      ...prev,
-                      page: prev.page + 1,
-                    }))
+                    setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
                   }
+                  isActive={pagination.page < (pagination.last_page ?? 1)}
                   className="bg-gray-100"
                 />
               </PaginationItem>
@@ -273,12 +296,14 @@ function Row<T>({
   onView,
   onEdit,
   onDelete,
+  actions,
 }: {
   columns: Column<T>[];
   item: T;
   onView?: (item: T) => void;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  actions?: (item: T) => React.ReactNode;
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   return (
@@ -290,57 +315,66 @@ function Row<T>({
             : String((item as any)[col.key] ?? "-")}
         </TableCell>
       ))}
-      {/* <TableCell className="text-center">
-        {onView && !onEdit && !onDelete ? (
-          <Eye
-            onClick={() => onView?.(item)}
-            className="w-full cursor-pointer text-primary h-5 pr-4"
-          />
-        ) : (
-          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-            <DropdownMenuTrigger asChild className="mr-4">
-              <Button variant="ghost" size="icon" className=" h-5">
-                <Ellipsis className="text-primary" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {onView && (
-                <DropdownMenuItem
-                  className="hover:bg-gray-100 hover:cursor-pointer"
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    setTimeout(() => onView?.(item), 0);
-                  }}
-                >
-                  View
-                </DropdownMenuItem>
-              )}
-              {onEdit && (
-                <DropdownMenuItem
-                  className="hover:bg-gray-100 hover:cursor-pointer"
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    setTimeout(() => onEdit?.(item), 0);
-                  }}
-                >
-                  Edit
-                </DropdownMenuItem>
-              )}
-              {onDelete && (
-                <DropdownMenuItem
-                  className="text-red-500 hover:cursor-pointer hover:bg-gray-100 hover:text-red-700"
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    setTimeout(() => onDelete?.(item), 0);
-                  }}
-                >
-                  Delete
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </TableCell> */}
+      {actions != null ? (
+        <TableCell className="text-center">{actions(item)}</TableCell>
+      ) : (
+        (onView || onEdit || onDelete) && (
+          <TableCell className="text-center">
+            {onView && !onEdit && !onDelete ? (
+              <Eye
+                onClick={() => onView?.(item)}
+                className="w-full cursor-pointer text-primary h-5 pr-4"
+              />
+            ) : (
+              <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={setIsDropdownOpen}
+              >
+                <DropdownMenuTrigger asChild className="mr-4">
+                  <Button variant="ghost" size="icon" className=" h-5">
+                    <Ellipsis className="text-primary" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {onView && (
+                    <DropdownMenuItem
+                      className="hover:bg-gray-100 hover:cursor-pointer"
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setTimeout(() => onView?.(item), 0);
+                      }}
+                    >
+                      View
+                    </DropdownMenuItem>
+                  )}
+                  {onEdit && (
+                    <DropdownMenuItem
+                      className="hover:bg-gray-100 hover:cursor-pointer"
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setTimeout(() => onEdit?.(item), 0);
+                      }}
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                  )}
+                  {onDelete && (
+                    <DropdownMenuItem
+                      className="text-red-500 hover:cursor-pointer hover:bg-gray-100 hover:text-red-700"
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setTimeout(() => onDelete?.(item), 0);
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </TableCell>
+        )
+      )}
     </TableRow>
   );
 }

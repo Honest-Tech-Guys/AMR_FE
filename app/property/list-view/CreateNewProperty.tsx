@@ -66,7 +66,7 @@ const CreateNewProperty = () => {
   } = form;
   const { mutate, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
-  const { refetch } = useGetPropertiesList();
+  const { refetch } = useGetPropertiesList({});
   useEffect(() => {
     if (data) {
       const dataT = data.map((owner) => {

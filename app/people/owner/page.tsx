@@ -29,12 +29,68 @@ const Page = () => {
       <Search className="size-4 text-white" strokeWidth={2.5} />
     </Button>
   );
-
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    status: "all",
+    page: "1",
+    per_page: "10",
+  });
   return (
     <div>
       <HeaderPage title="Owner" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
+        <ResponsiveFilter
+          filters={[
+            {
+              name: "property_name",
+              placeholder: "Property Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "unit_name",
+              placeholder: "Unit Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "rental_type",
+              placeholder: "Rental Type",
+              type: "select",
+              selectItems: [
+                { label: "whole unit", value: "Whole Unit" },
+                { label: "Sublet", value: "Sublet" },
+              ],
+              icon: Search,
+            },
+            {
+              name: "Meter_and_lock",
+              placeholder: "Meter and Lock",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "date_range",
+              placeholder: "Date Range",
+              type: "date",
+              icon: Calendar,
+            },
+          ]}
+          actionButton={
+            <Button
+              // onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
+              <Search />
+            </Button>
+          }
+          formFilters={formFilters}
+          setFormFilters={setFormFilters as never}
+        />
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -56,7 +112,7 @@ const Page = () => {
 
         {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.map((owner) => (
+            {data?.data.map((owner) => (
               <div
                 key={owner.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
@@ -116,7 +172,7 @@ const Page = () => {
           </div>
         )}
 
-        {!isLoading && !error && (!data || data.length === 0) && (
+        {!isLoading && !error && (!data || data.data.length === 0) && (
           <div className="text-center py-8">
             <div className="text-gray-500">No owners found.</div>
           </div>

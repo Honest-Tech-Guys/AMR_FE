@@ -82,12 +82,68 @@ const Page = () => {
       <Search className="size-4 text-white" strokeWidth={2.5} />
     </Button>
   );
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    status: "all",
+    page: "1",
+    per_page: "10",
+  });
   return (
     <div>
       <HeaderPage title="Lock" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
-        {/* Actions */}
+        <ResponsiveFilter
+          filters={[
+            {
+              name: "property_name",
+              placeholder: "Property Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "unit_name",
+              placeholder: "Unit Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "rental_type",
+              placeholder: "Rental Type",
+              type: "select",
+              selectItems: [
+                { label: "whole unit", value: "Whole Unit" },
+                { label: "Sublet", value: "Sublet" },
+              ],
+              icon: Search,
+            },
+            {
+              name: "Meter_and_lock",
+              placeholder: "Meter and Lock",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "date_range",
+              placeholder: "Date Range",
+              type: "date",
+              icon: Calendar,
+            },
+          ]}
+          actionButton={
+            <Button
+              // onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
+              <Search />
+            </Button>
+          }
+          formFilters={formFilters}
+          setFormFilters={setFormFilters as never}
+        />
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
             <CreateLock />

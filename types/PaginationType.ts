@@ -7,6 +7,7 @@ interface PaginationType<T> {
   last_page_url: string;
   next_page_url: string;
   path: string;
+  links: [];
   per_page: number;
 }
 export default PaginationType;

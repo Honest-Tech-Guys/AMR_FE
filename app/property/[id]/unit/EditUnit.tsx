@@ -509,7 +509,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
               pagination={pagination}
               setPagination={setPagination}
               rowKey={(item: Room) => item.id}
-              isFilter={false}
+              // isFilter={false}
             />
           </TabsContent>
           <TabsContent value="carParks" className="md:min-h-[80vh]">
@@ -520,7 +520,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
               pagination={pagination}
               setPagination={setPagination}
               rowKey={(item: Carpark) => item.id}
-              isFilter={false}
+              // isFilter={false}
             />
           </TabsContent>
 

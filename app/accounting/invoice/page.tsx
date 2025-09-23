@@ -223,12 +223,68 @@ const Page = () => {
       remarks: it.remarks,
     })),
   }));
-
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    status: "all",
+    page: "1",
+    per_page: "10",
+  });
   return (
     <div>
       <HeaderPage title="Invoice" />
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter filters={filters} actionButton={actionButton} />
+        <ResponsiveFilter
+          filters={[
+            {
+              name: "property_name",
+              placeholder: "Property Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "unit_name",
+              placeholder: "Unit Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "rental_type",
+              placeholder: "Rental Type",
+              type: "select",
+              selectItems: [
+                { label: "whole unit", value: "Whole Unit" },
+                { label: "Sublet", value: "Sublet" },
+              ],
+              icon: Search,
+            },
+            {
+              name: "Meter_and_lock",
+              placeholder: "Meter and Lock",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "date_range",
+              placeholder: "Date Range",
+              type: "date",
+              icon: Calendar,
+            },
+          ]}
+          actionButton={
+            <Button
+              // onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
+              <Search />
+            </Button>
+          }
+          formFilters={formFilters}
+          setFormFilters={setFormFilters as never}
+        />
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -257,18 +313,7 @@ const Page = () => {
             <h3>RM 3,300 (3)</h3>
           </div>
         </div>
-        <div className="flex items-end justify-end">
-          <div className=" flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsFilter((prev) => !prev)}
-              className="rounded-[6px] h-6 m-0"
-            >
-              <Funnel className="mr-2" />
-              Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}
-            </Button>
-          </div>
-        </div>
+
         <Datatable<Invoice>
           columns={invoiceColumns}
           data={tableData as never}
@@ -276,7 +321,7 @@ const Page = () => {
           pagination={pagination}
           setPagination={setPagination}
           rowKey={(item: Invoice) => item.invoice_number}
-          isFilter={isFilter}
+          // isFilter={isFilter}
         />
         {error && (
           <div className="text-red-500 mt-2">Error loading properties.</div>

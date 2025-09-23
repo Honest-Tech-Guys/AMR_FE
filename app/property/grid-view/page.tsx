@@ -76,14 +76,14 @@ import UnitDropdown from "./UnitDropDown";
 import RoomDropDown from "./RoomDropDown";
 import CarParksDropDown from "./CarParksDropDown";
 const Page = () => {
-  const { data } = useGetPropertiesList();
+  const { data } = useGetPropertiesList({});
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
   // Map API data to card format
   const cardData = useMemo(
     () =>
-      (data || []).map((item) => ({
+      data?.data.map((item) => ({
         property_id: item.property_name ?? "-",
         unit: item.property_type ?? "-",
         room: item.facilities?.length ? item.facilities.join(", ") : "-",
@@ -105,7 +105,7 @@ const Page = () => {
 
   // Pagination logic
   const totalPages = useMemo(() => {
-    const totalItems = cardData.length;
+    const totalItems = cardData?.length as number;
     return Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
   }, [cardData]);
 
@@ -170,7 +170,7 @@ const Page = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-5">
-          {data?.map((property) => (
+          {data?.data.map((property) => (
             <div className="border rounded-2xl p-4 hover:shadow-md transition-shadow">
               {" "}
               <Accordion

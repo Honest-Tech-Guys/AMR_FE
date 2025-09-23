@@ -158,18 +158,7 @@ const InvoiceTap = () => {
             <h3>RM 3,300 (3)</h3>
           </div>
         </div>
-        <div className="flex items-end justify-end">
-          <div className=" flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsFilter((prev) => !prev)}
-              className="rounded-[6px] h-6 m-0"
-            >
-              <Funnel className="mr-2" />
-              Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}
-            </Button>
-          </div>
-        </div>
+
         <Datatable<invoice>
           columns={invoiceColumns}
           data={[
@@ -233,7 +222,7 @@ const InvoiceTap = () => {
           pagination={pagination}
           setPagination={setPagination}
           rowKey={(item: invoice) => item.invoice_no}
-          isFilter={isFilter}
+          // isFilter={isFilter}
         />
       </div>
       {/* <MapWithPoints /> */}
