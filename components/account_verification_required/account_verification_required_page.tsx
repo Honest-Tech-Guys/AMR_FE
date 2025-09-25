@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ShieldAlert, XCircle } from "lucide-react";
+import { LoaderCircle, ShieldAlert, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
+import useResendVerificationEmail from "@/lib/services/hooks/useResendVerificationEmail";
 export default function AccountVerificationRequiredPage() {
   const [mounted, setMounted] = useState(false);
   const { logout } = useAuthStore();
+  const { mutate, isPending } = useResendVerificationEmail();
   const searchParams = useSearchParams();
   useEffect(() => {
     setMounted(true);
@@ -28,10 +30,17 @@ export default function AccountVerificationRequiredPage() {
       </p>
 
       <div className="mt-4 w-full grid grid-cols-2 gap-3">
-        <Link href="/resend-verification">
-          <Button className="w-full border   text-white">Resend Link</Button>
-        </Link>
-
+        <Button
+          className="w-full border   text-white"
+          onClick={() => mutate()}
+          disabled={isPending}
+        >
+          {isPending ? (
+            <LoaderCircle className="size-3 animate-spin " />
+          ) : (
+            "Resend Link"
+          )}
+        </Button>
         <Link href="/help">
           <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
             Contact Support

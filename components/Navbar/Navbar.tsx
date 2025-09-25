@@ -7,6 +7,7 @@ import { InputWithIcon } from "@/components/InpuWithIcon";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import useGetUser from "@/lib/services/hooks/useGetUser";
+import { NotificationPopover } from "./NotificationPopover";
 const Navbar = () => {
   const { logout } = useAuthStore();
   const { data } = useGetUser();
@@ -21,7 +22,7 @@ const Navbar = () => {
       />
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan className="size-5 text-primary" strokeWidth={2.5} />
-        <Bell className="size-5 text-primary" strokeWidth={2.5} />
+        <NotificationPopover />
         <LogOut
           onClick={logout}
           className="size-5 text-primary cursor-pointer"
