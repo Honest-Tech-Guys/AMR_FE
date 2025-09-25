@@ -81,7 +81,13 @@ const Register = ({ setStatus }: Props) => {
             </div>
             {error && (
               <div className="bg-red-200 border-red-600 text-red-600 rounded-md px-2">
-                {error.message}
+                {(error as any)?.errors &&
+                  Object.values((error as any).errors)
+                    .flat()
+                    .map((err: any, index: number) => (
+                      <div key={index}>{err}</div>
+                    ))}
+                {(error as any)?.message}
               </div>
             )}
             <div className="grid grid-cols-1  w-full   gap-3">

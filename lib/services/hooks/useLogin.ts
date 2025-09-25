@@ -8,27 +8,22 @@ const useLogin = () => {
   return useMutation({
     mutationKey: ["Login"],
     mutationFn: (AdminLogin: LoginModel) => {
-      const { email, password, rememberMe, role } = AdminLogin;
+      const { email, password, rememberMe } = AdminLogin;
       return axiosInstance
         .post("/login", {
           email: email,
           password: password,
-          role: role,
         })
         .then((res) => {
           const token = res.data.token;
-          console.log("Login response:", res.data);
-          // Store user and partner in Zustand authStore (which will persist it)
           setUser(res.data.user);
-          // Store token for axios request authorization header
           setIsAuth(true);
-          console.log(isAuth);
           const storage = rememberMe ? localStorage : sessionStorage;
           storage.setItem("token", token);
-
           return storage;
         })
         .catch((error) => {
+          console.log(error);
           // Handle different types of errors
           if (error.response && error.response.data) {
             throw error.response.data;
@@ -41,7 +36,7 @@ const useLogin = () => {
     },
     onSuccess: () => {},
     onError: (error) => {
-      console.error("Login error:", error);
+      console.error("Login error:", error.message);
     },
   });
 };

@@ -17,18 +17,8 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // if (error.response && error.response.status === 401) {
-    //   localStorage.clear();
-    //   sessionStorage.clear();
-    //   window.location.replace("/");
-    // }
-    // return Promise.reject(error);
-  }
-);
+axiosInstance.interceptors.response.use((response) => {
+  return response;
+});
 axiosInstance.defaults.withCredentials = true;
 export default axiosInstance;

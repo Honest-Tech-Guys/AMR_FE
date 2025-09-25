@@ -17,6 +17,7 @@ interface Props {
 }
 const Login = ({ setStatus }: Props) => {
   const { mutate, error, isPending } = useLogin();
+  console.log(error);
   type schemaType = Yup.InferType<typeof validationLoginSchema>;
   const form = useForm<LoginModel>({
     resolver: yupResolver(validationLoginSchema),
