@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import WelcomePage from "../components/WelcomePage/WelcomePage";
 import { usePathname } from "next/navigation";
+import AccountVerificationRequiredPage from "@/components/account_verification_required/account_verification_required_page";
 // Fonts
 // const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 // const geistMono = Geist_Mono({
@@ -37,7 +38,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuth, isAuthLoading, checkAuth } = useAuthStore();
+  const { isAuth, isAuthLoading, checkAuth, email_verified_at } =
+    useAuthStore();
 
   React.useEffect(() => {
     checkAuth();
@@ -56,10 +58,12 @@ export default function RootLayout({
                 <WelcomePage />
               )}
             </>
-          ) : (
+          ) : email_verified_at ? (
             <SidebarProvider>
               <LayoutShell>{children}</LayoutShell>
             </SidebarProvider>
+          ) : (
+            <AccountVerificationRequiredPage />
           )}
         </ReactQueryProvider>
       </body>

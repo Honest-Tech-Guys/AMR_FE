@@ -7,6 +7,7 @@ type AuthStore = {
   user_name: string;
   user_email: string;
   user_role: string;
+  email_verified_at: string | null;
   isAuth: boolean;
   isAuthLoading: boolean;
   setUser: (value: {
@@ -14,6 +15,7 @@ type AuthStore = {
     name: string;
     email: string;
     role: string;
+    email_verified_at: string | null;
   }) => void;
   setIsAuth: (value: boolean) => void;
   setAuthLoading: (value: boolean) => void;
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthStore>()(
       user_name: "",
       user_email: "",
       user_role: "",
+      email_verified_at: null,
       isAuth: false,
       isAuthLoading: true,
 
@@ -37,6 +40,7 @@ export const useAuthStore = create<AuthStore>()(
           user_name: value.name,
           user_email: value.email,
           user_role: value.role,
+          email_verified_at: value.email_verified_at,
         }),
 
       setIsAuth: (value) => {
@@ -60,6 +64,7 @@ export const useAuthStore = create<AuthStore>()(
           user_name: "",
           user_email: "",
           user_role: "",
+          email_verified_at: null,
           isAuth: false,
         });
         localStorage.clear();
