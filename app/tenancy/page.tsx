@@ -104,6 +104,20 @@ const Page = () => {
       }));
     }
   }, [data]);
+  function getStatusColor(status: string): string {
+    switch (status) {
+      case "Upcoming":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "Expiring Soon":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "inactive":
+        return "bg-gray-100 text-gray-800 border-gray-300";
+      case "Active":
+        return "bg-green-100 text-green-800 border-green-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  }
   return (
     <div>
       <HeaderPage title="Tenancy" />
@@ -186,8 +200,8 @@ const Page = () => {
                   {tenancy.name}
                 </label> */}
                 <p className="flex items-center gap-2">
-                  <Badge className="text-[#F6FFED] bg-[#52C41A] font-normal  border-[#B7EB8F]">
-                    Active
+                  <Badge className={getStatusColor(tenancy.status)}>
+                    {tenancy.status}
                   </Badge>
                   <Badge className="bg-gray-100 text-black font-normal  border-1">
                     Auto Pay Not Activated

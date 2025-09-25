@@ -14,7 +14,7 @@ type Tenancy = {
   created_by: number;
   code: string;
   tenantable: Unit | Room;
-
+  status: string;
   tenant: {
     id: number;
     name: string;
