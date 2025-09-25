@@ -1,18 +1,28 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import CustomInput from "@/components/CustomInput";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import useLogin from "@/lib/services/hooks/useLogin";
 import LoginModel from "@/types/LoginModelType";
 import { validationLoginSchema } from "./utility";
-import CarouselWithPagination from "./CarouselImages";
 import { LoaderCircle } from "lucide-react";
-const LoginPage = () => {
+import { SelectWithForm } from "@/components/CustomSelect";
+import * as Yup from "yup";
+interface Props {
+  setStatus: (s: "Login" | "Register") => void;
+}
+const Login = ({ setStatus }: Props) => {
   const { mutate, error, isPending } = useLogin();
+  type schemaType = Yup.InferType<typeof validationLoginSchema>;
+  const form = useForm<LoginModel>({
+    resolver: yupResolver(validationLoginSchema),
+    mode: "onTouched",
+    defaultValues: { role: "Agency" },
+  });
   const {
     register,
     handleSubmit,
@@ -22,28 +32,20 @@ const LoginPage = () => {
     reset,
     control,
     watch,
-  } = useForm<LoginModel>({
-    resolver: yupResolver(validationLoginSchema),
-    mode: "onTouched",
-  });
+  } = form;
+  const UserType = [
+    { id: "Agency", name: "Agency" },
+    { id: "Agent", name: "Agent" },
+    { id: "Tenant", name: "Tenant" },
+    { id: "Owner", name: "Owner" },
+  ];
   const onSubmit: SubmitHandler<LoginModel> = (data) => {
     mutate(data);
   };
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex h-screen">
-        <div className="relative w-full justify-center items-center  overflow-hidden hidden md:flex  ">
-          <img
-            src={"/LoginImg.png"}
-            className="h-[95vh] w-[40vw] rounded-3xl"
-          />
-          <div className="absolute bottom-6">
-            <div className="backdrop-blur-xs bg-black/10 p-6 rounded-lg w-[530px]">
-              <CarouselWithPagination />
-            </div>
-          </div>
-        </div>
-        <div className="w-full   ">
+    <div className="w-full   ">
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white flex flex-col gap-5 h-[80vh]  justify-center mx-10 md:mx-25">
             <div className="flex justify-center gap-5 items-center">
               <Image src="/Logo.png" alt="Logo" width={200} height={100} />
@@ -74,15 +76,20 @@ const LoginPage = () => {
                 placeholder="Enter Your Email"
               />
               <CustomInput
-                key={""}
-                id={"registration_address"}
-                name="registration_address"
+                key={"password"}
+                id={"password"}
+                name="password"
                 type="password"
                 value={watch("password")}
                 label="Password"
                 onChange={(e) => setValue("password", e.target.value)}
                 errors={errors.password?.message}
                 placeholder="Enter Your Password"
+              />
+              <SelectWithForm<schemaType>
+                name="role"
+                title=""
+                options={UserType}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -114,16 +121,22 @@ const LoginPage = () => {
               </Button>
             </div>
           </div>
-          {/* <div className=" flex justify-center space-x-2 text-lg">
-            <span>Don't have an account? </span>
-            <span className="text-primary">
-              <Link href="/register">Create an account</Link>
-            </span>
-          </div> */}
-        </div>
-      </div>
-    </form>
+          {watch("role") !== "Agency" ? (
+            <div className=" flex justify-center space-x-2 text-lg">
+              <span>Don't have an account? </span>
+              <span
+                className="text-primary cursor-pointer"
+                onClick={() => setStatus("Register")}
+              >
+                Create an account
+              </span>
+            </div>
+          ) : null}
+          {/* */}
+        </form>
+      </FormProvider>
+    </div>
   );
 };
 
-export default LoginPage;
+export default Login;

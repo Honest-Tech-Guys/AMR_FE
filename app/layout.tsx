@@ -8,8 +8,8 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import React from "react";
 import { Toaster } from "sonner";
 import "./globals.css";
-import Login from "./Login/Login";
-
+import WelcomePage from "../components/WelcomePage/WelcomePage";
+import { usePathname } from "next/navigation";
 // Fonts
 // const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 // const geistMono = Geist_Mono({
@@ -19,6 +19,9 @@ import Login from "./Login/Login";
 
 // ✅ Child layout component that can use `useSidebar` safely
 function LayoutShell({ children }: { children: React.ReactNode }) {
+  // e.g. "/dashboard"
+  // const searchParams = useSearchParams();
+
   return (
     <>
       <AppSidebar />
@@ -39,14 +42,20 @@ export default function RootLayout({
   React.useEffect(() => {
     checkAuth();
   }, []);
-
+  const pathname = usePathname();
   return (
     <html lang="en">
       <body className="antialiased">
         <ReactQueryProvider>
           <Toaster position="top-right" />
           {isAuthLoading ? null : !isAuth ? (
-            <Login />
+            <>
+              {pathname === "/verify" || pathname === "/failed_verify" ? (
+                children
+              ) : (
+                <WelcomePage />
+              )}
+            </>
           ) : (
             <SidebarProvider>
               <LayoutShell>{children}</LayoutShell>

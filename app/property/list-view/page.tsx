@@ -32,6 +32,7 @@ import MapWithPoints from "@/components/ImageMapper";
 import CreateInvoice from "./Actions/CreateInvoice";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import PropertyDropdown from "../grid-view/PropertyDropDown";
+import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
 
 // Import Property type
 // type Property = {
@@ -275,9 +276,7 @@ const Page = () => {
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="bg-black rounded-[6px] text-white hover:bg-black/70 cursor-pointer">
-              Create Bulk Property
-            </Button>
+            <CreateBulkPropertyModal />
             <CreateNewProperty />
           </div>
         </div>

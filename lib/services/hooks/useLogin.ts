@@ -8,11 +8,12 @@ const useLogin = () => {
   return useMutation({
     mutationKey: ["Login"],
     mutationFn: (AdminLogin: LoginModel) => {
-      const { email, password, rememberMe } = AdminLogin;
+      const { email, password, rememberMe, role } = AdminLogin;
       return axiosInstance
         .post("/login", {
           email: email,
           password: password,
+          role: role,
         })
         .then((res) => {
           const token = res.data.token;

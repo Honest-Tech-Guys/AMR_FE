@@ -75,6 +75,7 @@ import ViewTenancy from "@/app/tenancy/ViewTenancy";
 import UnitDropdown from "./UnitDropDown";
 import RoomDropDown from "./RoomDropDown";
 import CarParksDropDown from "./CarParksDropDown";
+import CreateBulkPropertyModal from "../list-view/CreateBulkPropertyModal";
 const Page = () => {
   const { data } = useGetPropertiesList({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -163,9 +164,7 @@ const Page = () => {
         </Dialog>
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="bg-black rounded-[6px] text-white cursor-pointer hover:bg-black/70">
-              Create Bulk Property
-            </Button>
+            <CreateBulkPropertyModal />
             <CreateNewProperty />
           </div>
         </div>
