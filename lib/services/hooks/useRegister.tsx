@@ -12,6 +12,7 @@ const useRegister = () => {
           name: name,
           email: email,
           password: password,
+          password_confirmation: password,
           role: role,
         })
         .then((res) => {

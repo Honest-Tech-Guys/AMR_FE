@@ -13,6 +13,8 @@ import { SelectWithForm } from "@/components/CustomSelect";
 import Recaptcha from "@/components/ui/recaptcha";
 import * as Yup from "yup";
 import useRegister from "@/lib/services/hooks/useRegister";
+
+import { toast } from "sonner";
 interface RegisterModel {
   name: string;
   email: string;
@@ -49,7 +51,16 @@ const Register = ({ setStatus }: Props) => {
     { id: "Owner", name: "Owner" },
   ];
   const onSubmit: SubmitHandler<RegisterModel> = (data) => {
-    mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Register successfully!");
+        reset();
+        setStatus("Login");
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to register property.");
+      },
+    });
   };
   return (
     <div className="w-full   ">
@@ -72,7 +83,7 @@ const Register = ({ setStatus }: Props) => {
                 {error.message}
               </div>
             )}
-            <div className="grid grid-cols-1  w-full   gap-5">
+            <div className="grid grid-cols-1  w-full   gap-3">
               <SelectWithForm<schemaType>
                 name="role"
                 title=""

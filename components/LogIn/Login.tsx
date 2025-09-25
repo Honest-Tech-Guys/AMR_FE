@@ -21,7 +21,6 @@ const Login = ({ setStatus }: Props) => {
   const form = useForm<LoginModel>({
     resolver: yupResolver(validationLoginSchema),
     mode: "onTouched",
-    defaultValues: { role: "Agency" },
   });
   const {
     register,
@@ -33,12 +32,7 @@ const Login = ({ setStatus }: Props) => {
     control,
     watch,
   } = form;
-  const UserType = [
-    { id: "Agency", name: "Agency" },
-    { id: "Agent", name: "Agent" },
-    { id: "Tenant", name: "Tenant" },
-    { id: "Owner", name: "Owner" },
-  ];
+
   const onSubmit: SubmitHandler<LoginModel> = (data) => {
     mutate(data);
   };
@@ -86,11 +80,6 @@ const Login = ({ setStatus }: Props) => {
                 errors={errors.password?.message}
                 placeholder="Enter Your Password"
               />
-              <SelectWithForm<schemaType>
-                name="role"
-                title=""
-                options={UserType}
-              />
             </div>
             <div className="flex items-center justify-between">
               <div className="mt-2">
@@ -121,17 +110,17 @@ const Login = ({ setStatus }: Props) => {
               </Button>
             </div>
           </div>
-          {watch("role") !== "Agency" ? (
-            <div className=" flex justify-center space-x-2 text-lg">
-              <span>Don't have an account? </span>
-              <span
-                className="text-primary cursor-pointer"
-                onClick={() => setStatus("Register")}
-              >
-                Create an account
-              </span>
-            </div>
-          ) : null}
+
+          <div className=" flex justify-center space-x-2 text-lg">
+            <span>Don't have an account? </span>
+            <span
+              className="text-primary cursor-pointer"
+              onClick={() => setStatus("Register")}
+            >
+              Create an account
+            </span>
+          </div>
+
           {/* */}
         </form>
       </FormProvider>
