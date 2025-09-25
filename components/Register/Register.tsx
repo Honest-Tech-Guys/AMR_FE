@@ -33,7 +33,7 @@ const Register = ({ setStatus }: Props) => {
   const form = useForm<RegisterModel>({
     resolver: yupResolver(validationRegisterSchema),
     mode: "onTouched",
-    defaultValues: { role: "Agent", recaptcha: "" },
+    defaultValues: { role: "Agency", recaptcha: "" },
   });
   const {
     register,
@@ -46,6 +46,7 @@ const Register = ({ setStatus }: Props) => {
     watch,
   } = form;
   const UserType = [
+    { id: "Agency", name: "Agency" },
     { id: "Agent", name: "Agent" },
     { id: "Tenant", name: "Tenant" },
     { id: "Owner", name: "Owner" },
