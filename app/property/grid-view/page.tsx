@@ -235,7 +235,7 @@ const Page = () => {
                                 <div className="flex w-full justify-between my-2">
                                   <div className="w-full flex flex-col gap-2">
                                     <p className="text-primary-foreground">
-                                      Unit - {unit.unit_number}
+                                      Unit - {unit.block_floor_unit_number}
                                     </p>
                                     <p>{unit.rental_type}</p>
                                     {unit.rental_type === "Sublet" ? (
