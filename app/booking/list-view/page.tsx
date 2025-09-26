@@ -10,6 +10,7 @@ import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import { Book } from "@/types/BookType";
+import { Badge } from "@/components/ui/badge";
 
 type PropertyTableRow = {
   property_id: string;
@@ -19,6 +20,37 @@ type PropertyTableRow = {
   rental: string;
   rental_frequency: string;
   status: string;
+};
+
+// Color function for booking statuses
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "pending":
+      return {
+        className: "bg-[#FFF7E6] text-[#D46B08] border-[#FFD591]",
+        text: "Pending",
+      };
+    case "confirmed":
+      return {
+        className: "bg-[#F6FFED] text-[#52C41A] border-[#B7EB8F]",
+        text: "Confirmed",
+      };
+    case "canceled":
+      return {
+        className: "bg-[#FFF2F0] text-[#FF4D4F] border-[#FFCCC7]",
+        text: "Canceled",
+      };
+    case "completed":
+      return {
+        className: "bg-[#E6F7FF] text-[#1890FF] border-[#91D5FF]",
+        text: "Completed",
+      };
+    default:
+      return {
+        className: "bg-gray-100 text-gray-600 border-gray-300",
+        text: status,
+      };
+  }
 };
 
 // Mapping Book[] to PropertyTableRow[]
@@ -96,7 +128,14 @@ const invoiceColumns: Column<PropertyTableRow>[] = [
     title: "Status",
     key: "status",
     sortable: true,
-    render: (row) => <div>{row.status}</div>,
+    render: (row) => {
+      const statusColor = getStatusColor(row.status);
+      return (
+        <Badge className={`rounded-[6px] ${statusColor.className}`}>
+          {statusColor.text}
+        </Badge>
+      );
+    },
   },
 ];
 
