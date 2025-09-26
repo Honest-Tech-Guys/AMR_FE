@@ -22,18 +22,6 @@ export default function Page() {
         or something went wrong.
       </p>
 
-      <div className="mt-4 w-full grid grid-cols-2 gap-3">
-        <Link href="/resend-verification">
-          <Button className="w-full border   text-white">Resend Link</Button>
-        </Link>
-
-        <Link href="/help">
-          <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
-            Contact Support
-          </Button>
-        </Link>
-      </div>
-
       <div className="mt-4 w-full">
         <Link href="/">
           <Button variant="ghost" className="w-full">

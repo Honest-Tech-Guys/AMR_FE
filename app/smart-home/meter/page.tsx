@@ -32,6 +32,17 @@ const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Meter>();
+  const [formFilters, setFormFilters] = useState({
+    property_name: "",
+    unit_name: "",
+    rental_type: "",
+    Meter_and_lock: "",
+    data_range: "",
+    status: "all",
+    page: "1",
+    per_page: "10",
+  });
+
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -49,16 +60,6 @@ const Page = () => {
   if (isLoading) {
     return <p>Loading...</p>;
   }
-  const [formFilters, setFormFilters] = useState({
-    property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: "",
-    data_range: "",
-    status: "all",
-    page: "1",
-    per_page: "10",
-  });
   return (
     <div>
       <HeaderPage title="Meter" />
