@@ -231,7 +231,7 @@ const Page = () => {
                     ) : null}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Tenancy:</span> {tenancy.id}
+                    <span className="font-medium">Tenancy:</span> {tenancy.code}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Rental:</span> MRY
