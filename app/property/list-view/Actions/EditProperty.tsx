@@ -30,6 +30,7 @@ import Datatable, { Column } from "@/components/datatable";
 import UnitDropdown from "../../grid-view/UnitDropDown";
 import { PaginationData } from "@/components/ui/pagination";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
+import { Property } from "@/types/PropertyType";
 
 // Schema & type
 const schema = yup.object({
@@ -52,12 +53,14 @@ const schema = yup.object({
 });
 const unitColumns: Column<Unit>[] = [
   {
-    title: "ID",
-    key: "id",
+    title: "Block/Floor/Unit Number",
+    key: "block_floor_unit_number",
     sortable: true,
     className: "pl-6 py-4",
     render: (unit) => (
-      <div className="pl-4 text-primary font-medium ">{unit.id ?? "-"}</div>
+      <div className="pl-4 text-primary font-medium ">
+        {unit.block_floor_unit_number ?? "-"}
+      </div>
     ),
   },
   {
