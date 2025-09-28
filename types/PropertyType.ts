@@ -1,9 +1,11 @@
+import PaginationType from "./PaginationType";
+
 type OwnerOrCreator = {
   id: number;
   name: string;
 };
 
-type Property = {
+export type Property = {
   id: number;
   property_name: string;
   property_type: string;
@@ -25,3 +27,11 @@ type Property = {
   creator: OwnerOrCreator;
   units: Unit[];
 };
+export interface PropertyApi {
+  properties: PaginationType<Property[]>;
+  counters: {
+    "Fully Occupied": number;
+    "Partially Occupied": number;
+    Vacant: number;
+  };
+}

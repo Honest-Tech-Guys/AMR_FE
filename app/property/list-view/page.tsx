@@ -33,6 +33,7 @@ import CreateInvoice from "./Actions/CreateInvoice";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import PropertyDropdown from "../grid-view/PropertyDropDown";
 import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
+import { Property } from "@/types/PropertyType";
 
 // Import Property type
 // type Property = {
@@ -58,28 +59,28 @@ import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
 //   units: any[];
 // };
 
-const options = [
-  {
-    value: "all",
-    label: "ALL",
-    count: "",
-  },
-  {
-    value: "Vacant",
-    label: "Vacant ",
-    count: "50",
-  },
-  {
-    value: "Occupied",
-    label: "Occupied ",
-    count: "50",
-  },
-  {
-    value: "Deactivated ",
-    label: "Deactivated ",
-    count: "50",
-  },
-];
+// const options = [
+//   {
+//     value: "all",
+//     label: "ALL",
+//     count: "",
+//   },
+//   {
+//     value: "Vacant",
+//     label: "Vacant ",
+//     count: "50",
+//   },
+//   {
+//     value: "Occupied",
+//     label: "Occupied ",
+//     count: "50",
+//   },
+//   {
+//     value: "Deactivated ",
+//     label: "Deactivated ",
+//     count: "50",
+//   },
+// ];
 
 interface PaginationData {
   page: number;
@@ -93,6 +94,28 @@ interface PaginationData {
 }
 
 const Page = () => {
+  const [options, setOptions] = useState([
+    {
+      value: "all",
+      label: "ALL",
+      count: "",
+    },
+    {
+      value: "Vacant",
+      label: "Vacant ",
+      count: "",
+    },
+    {
+      value: "Fully Occupied",
+      label: "Fully Occupied ",
+      count: "",
+    },
+    {
+      value: "Partially Occupied",
+      label: "Partially Occupied",
+      count: "",
+    },
+  ]);
   const router = useRouter();
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
@@ -204,11 +227,33 @@ const Page = () => {
     if (data) {
       setPagination((prev) => ({
         ...prev,
-        page: data?.current_page ?? prev.page,
-        per_page: data?.per_page ?? prev.per_page,
-        last_page: data?.last_page ?? prev.last_page,
-        links: data?.links ?? prev.links,
+        page: data?.properties.current_page ?? prev.page,
+        per_page: data?.properties.per_page ?? prev.per_page,
+        last_page: data?.properties.last_page ?? prev.last_page,
+        links: data?.properties.links ?? prev.links,
       }));
+      setOptions([
+        {
+          value: "all",
+          label: "ALL",
+          count: "",
+        },
+        {
+          value: "Vacant",
+          label: "Vacant ",
+          count: `${data.counters.Vacant}`,
+        },
+        {
+          value: "Fully Occupied",
+          label: "Fully Occupied ",
+          count: `${data.counters["Fully Occupied"]}`,
+        },
+        {
+          value: "Partially Occupied ",
+          label: "Partially Occupied ",
+          count: `${data.counters["Partially Occupied"]}`,
+        },
+      ]);
     }
   }, [data]);
   useEffect(() => {
@@ -219,7 +264,8 @@ const Page = () => {
     });
   }, [pagination.page, pagination.per_page]);
   // Map API data to table format
-  const tableData: Property[] = data?.data.map((item: Property) => item) ?? [];
+  const tableData: Property[] =
+    data?.properties.data.map((item: Property) => item) ?? [];
 
   return (
     <div>

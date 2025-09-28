@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
+import { PropertyApi } from "@/types/PropertyType";
 const useGetPropertiesList = (params: Object) => {
   return useQuery({
     queryKey: ["GetPropertiesList", params],
@@ -9,7 +10,7 @@ const useGetPropertiesList = (params: Object) => {
       const url = "/properties";
       {
         return axiosInstance
-          .get<PaginationType<Property[]>>(url, { params })
+          .get<PropertyApi>(url, { params })
           .then((res) => {
             console.log("SS");
             return res.data;

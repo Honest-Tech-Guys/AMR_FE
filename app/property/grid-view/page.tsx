@@ -84,7 +84,7 @@ const Page = () => {
   // Map API data to card format
   const cardData = useMemo(
     () =>
-      data?.data.map((item) => ({
+      data?.properties.data.map((item) => ({
         property_id: item.property_name ?? "-",
         unit: item.property_type ?? "-",
         room: item.facilities?.length ? item.facilities.join(", ") : "-",
@@ -169,7 +169,7 @@ const Page = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-5">
-          {data?.data.map((property) => (
+          {data?.properties.data.map((property) => (
             <div className="border rounded-2xl p-4 hover:shadow-md transition-shadow">
               {" "}
               <Accordion
