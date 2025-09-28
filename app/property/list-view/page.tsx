@@ -96,7 +96,7 @@ interface PaginationData {
 const Page = () => {
   const [options, setOptions] = useState([
     {
-      value: "all",
+      value: "",
       label: "ALL",
       count: "",
     },
@@ -216,7 +216,7 @@ const Page = () => {
     rental_type: "",
     Meter_and_lock: "",
     data_range: "",
-    status: "all",
+    status: "",
     page: "1",
     per_page: "10",
   });
@@ -234,7 +234,7 @@ const Page = () => {
       }));
       setOptions([
         {
-          value: "all",
+          value: "",
           label: "ALL",
           count: "",
         },
@@ -329,7 +329,7 @@ const Page = () => {
         <div className="flex items-end justify-between">
           <RadioCardsDemo
             options={options}
-            value={(appliedFilters as { status?: string })?.status || "all"}
+            value={(appliedFilters as { status?: string })?.status || ""}
             onChange={(val) =>
               setAppliedFilters((prev) => ({ ...prev, status: val }))
             }

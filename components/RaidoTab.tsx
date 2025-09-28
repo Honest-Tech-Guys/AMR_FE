@@ -26,7 +26,7 @@ const RadioCardsDemo = ({ options, value, onChange }: Props) => {
         >
           <span className="font-semibold  ">
             {option.label}
-            {option.value !== "all" ? <>({option.count})</> : null}
+            {option.value !== "" ? <>({option.count})</> : null}
           </span>
         </RadioGroup.Item>
       ))}
