@@ -53,10 +53,11 @@ const schema = yup.object({
 type schemaType = yup.InferType<typeof schema>;
 interface Props {
   id: number;
+  type: "Unit" | "Room";
   open: boolean; // controlled open state
   onOpenChange: (open: boolean) => void; // handler from parent
 }
-const CreateNewTenancy = ({ id, onOpenChange, open }: Props) => {
+const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -81,6 +82,13 @@ const CreateNewTenancy = ({ id, onOpenChange, open }: Props) => {
       setTenantData(dataT as never);
     }
   }, [tenants]);
+  useEffect(() => {
+    if (type === "Room") {
+      setValue("property_id", `room-${id}`);
+    } else {
+      setValue("property_id", `unit-${id}`);
+    }
+  }, [id]);
   type Result = { room_id: number } | { unit_id: number } | null;
   const parseValue = (value: string): Result => {
     const match = value.match(/^(\w+)-(\d+)$/);

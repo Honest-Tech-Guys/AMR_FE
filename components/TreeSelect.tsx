@@ -28,6 +28,7 @@ interface TreeSelectProps {
   name: string;
   placeholder?: string;
   treeData: TreeNode[];
+  disabled?: boolean;
 }
 
 export function TreeSelect({
@@ -35,6 +36,7 @@ export function TreeSelect({
   name,
   placeholder,
   treeData,
+  ...otherProps
 }: TreeSelectProps) {
   const { field } = useController({ name, control });
 
@@ -109,6 +111,7 @@ export function TreeSelect({
           variant="outline"
           role="combobox"
           className="w-full justify-between rounded-[6px] bg-gray-100 text-gray-500 font-normal"
+          {...otherProps}
         >
           {field.value
             ? getLabel(field.value)

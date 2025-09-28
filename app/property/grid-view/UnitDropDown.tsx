@@ -111,6 +111,7 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
       <CreateTenancy
         id={unit.id}
         open={openDialog === "createTenancy"}
+        type="Unit"
         onOpenChange={(open) => setOpenDialog(open ? "createTenancy" : null)}
       />
       <EditUnit

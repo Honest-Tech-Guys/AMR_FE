@@ -65,7 +65,7 @@ const Navbar = () => {
         />
         <Avatar>
           <AvatarImage src={data?.avatar_url} alt="@shadcn" />
-          <AvatarFallback>
+          <AvatarFallback className="bg-primary/10">
             {data?.name[0]}
             {data?.name[1]}
           </AvatarFallback>

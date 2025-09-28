@@ -47,7 +47,7 @@ export default function RootLayout({
   const pathname = usePathname();
   return (
     <html lang="en">
-      <title>Auntie Michelle Resources (M) SDN.BHD</title>
+      <title>Auntie Michelle Resources</title>
       <link rel="icon" type="image/ico" href="/Logo.png" />
       <body className="antialiased">
         <ReactQueryProvider>

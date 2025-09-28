@@ -69,7 +69,7 @@ export default function PropertyDropdown({ property }: { property: any }) {
         <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
           <MenuItem dialogKey="editProperty">Edit Property</MenuItem>
           <MenuItem dialogKey="createUnit">Create Unit</MenuItem>
-          <MenuItem dialogKey="createTenancy">Create Tenancy</MenuItem>
+          {/* <MenuItem dialogKey="createTenancy">Create Tenancy</MenuItem> */}
           <MenuItem dialogKey="createMeter">Create Meter</MenuItem>
           <MenuItem dialogKey="createLock">Create Lock</MenuItem>
           <MenuItem dialogKey="createInvoice">Create Invoice</MenuItem>
@@ -88,11 +88,11 @@ export default function PropertyDropdown({ property }: { property: any }) {
         open={openDialog === "createUnit"}
         onOpenChange={(open) => setOpenDialog(open ? "createUnit" : null)}
       />
-      <CreateTenancy
+      {/* <CreateTenancy
         id={property.id}
         open={openDialog === "createTenancy"}
         onOpenChange={(open) => setOpenDialog(open ? "createTenancy" : null)}
-      />
+      /> */}
       <CreateMeter
         id={property.id}
         open={openDialog === "createMeter"}

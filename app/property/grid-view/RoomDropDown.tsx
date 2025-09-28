@@ -97,6 +97,7 @@ export default function RoomDropDown({ room }: { room: any }) {
       <CreateTenancy
         id={room.id}
         open={openDialog === "createTenancy"}
+        type="Room"
         onOpenChange={(open) => setOpenDialog(open ? "createTenancy" : null)}
       />
       {/* <EditRoom
