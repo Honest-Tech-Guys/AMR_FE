@@ -1,4 +1,6 @@
-type NotificationType = {
+import PaginationType from "./PaginationType";
+
+export type NotificationType = {
   id: string;
   type: string;
   notifiable_type: string;
@@ -13,3 +15,7 @@ type NotificationType = {
   created_at: string;
   updated_at: string;
 };
+export interface NotificationsAPI {
+  notifications: PaginationType<NotificationType[]>;
+  unread_count: number;
+}

@@ -381,14 +381,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
             <DialogTitle className="truncate">
               {previewDocument?.name}
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={closePreview}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </DialogHeader>
           <div className="w-full h-[70vh] border rounded-lg overflow-hidden">
             {previewDocument && previewDocument.blobUrl && (

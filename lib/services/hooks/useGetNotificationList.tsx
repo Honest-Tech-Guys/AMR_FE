@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
+import { NotificationsAPI } from "@/types/NotificationType";
 const useGetNotificationList = () => {
   return useQuery({
     queryKey: ["useGetNotificationList"],
@@ -9,9 +10,9 @@ const useGetNotificationList = () => {
       const url = "/notifications";
       {
         return axiosInstance
-          .get<PaginationType<NotificationType[]>>(url)
+          .get<NotificationsAPI>(url)
           .then((res) => {
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

@@ -133,23 +133,18 @@ const Page = () => {
       sortable: true,
       className: "pl-6 py-4",
       render: (property) => (
-        <div
-          className="pl-4 text-primary font-medium "
-          onClick={() => {
-            setOpenView(!openView);
-          }}
-        >
-          {property.property_name}
+        <div key={property.id}>
+          <div
+            className="pl-4 text-primary font-medium cursor-pointer"
+            onClick={() => setOpenView(true)}
+          >
+            {property.property_name}
+          </div>
           <EditProperty
             onOpenChange={setOpenView}
             open={openView}
             property={property}
           />
-          {/* <EditProperty
-            property={property}
-            open={openView}
-            onOpenChange={setOpenView}
-          /> */}
         </div>
       ),
     },

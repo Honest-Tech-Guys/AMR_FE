@@ -71,13 +71,15 @@ export function NotificationPopover() {
           className="relative bg-primary/10 hover:bg-primary/40 border-none rounded-full"
         >
           <Bell className="size-4 text-primary" />
-          <span className="absolute -top-1 -right-1 size-3 p-2 bg-primary rounded-full text-xs text-white flex items-center justify-center">
-            {data?.length}
-          </span>
+          {(data?.unread_count as number) > 0 && (
+            <span className="absolute -top-1 -right-1 size-3 p-2 bg-primary rounded-full text-xs text-white flex items-center justify-center">
+              {data?.unread_count}
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-full md:w-2xl z-50 p-2"
+        className="w-full md:w-sm z-50 p-2"
         align="end"
         sideOffset={8}
       >
@@ -85,7 +87,7 @@ export function NotificationPopover() {
           <h3 className="font-semibold text-gray-900 text-sm">Notifications</h3>
         </div>
         <div className="max-h-80 overflow-y-auto">
-          <NotificationList notifications={data ?? []} />
+          <NotificationList notifications={data?.notifications.data ?? []} />
         </div>
         <div className=" flex p-4 pb-2  border-gray-100 gap-5">
           <button
