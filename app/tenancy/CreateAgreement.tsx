@@ -20,6 +20,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { FileData } from "@/types/FileData";
+import useCreateAgreement from "@/lib/services/hooks/useCreateAgreement";
+import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 export interface RentalAgreement {
   agreement_date: string;
   landlord_name: string;
@@ -44,7 +46,7 @@ export interface RentalAgreement {
   advanced_rental_amount: string;
   house_rules_remarks: string;
   terms_conditions_remarks: string;
-  attachments: FileData[];
+  attachments: FileList;
 }
 
 // Schema & type
@@ -101,6 +103,30 @@ const schema = yup.object({
     .optional(),
 });
 
+// Convert base64 back to a File
+function base64ToFile(fileData: FileData): File {
+  const arr = fileData.base64.split(",");
+  const mime = arr[0].match(/:(.*?);/)?.[1] || fileData.type;
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], fileData.name, { type: mime });
+}
+
+// Convert FileData[] → FileList
+export function fileDataToFileList(fileDataList: FileData[]): FileList {
+  const dataTransfer = new DataTransfer();
+  fileDataList.forEach((fd) => {
+    dataTransfer.items.add(base64ToFile(fd));
+  });
+  return dataTransfer.files;
+}
+
 type schemaType = yup.InferType<typeof schema>;
 
 interface Props {
@@ -149,7 +175,8 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
     formState: { errors },
   } = form;
 
-  const [isPending, setIsPending] = useState(false);
+  const { mutate, isPending } = useCreateAgreement(id);
+  const { refetch } = useGetTenancyList();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload: RentalAgreement = {
       agreement_date: data.agreement_date,
@@ -175,20 +202,20 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
       advanced_rental_amount: data.advanced_rental_amount,
       house_rules_remarks: data.house_rules_remarks || "",
       terms_conditions_remarks: data.terms_conditions_remarks || "",
-      attachments: (data.attachments || []) as FileData[],
+      //   attachments: (data.attachments || []) as FileData[],
+      attachments: fileDataToFileList((data.attachments || []) as FileData[]),
     };
-
-    // TODO: Replace with actual API call for rental agreement
-    setIsPending(true);
-    console.log("Rental Agreement Data:", payload);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsPending(false);
-      toast.success("Rental agreement created successfully!");
-      reset();
-      onOpenChange(false);
-    }, 1000);
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Rental agreement created successfully!");
+        reset();
+        refetch();
+        onOpenChange(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create agreement");
+      },
+    });
   };
 
   return (
@@ -248,7 +275,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                 <CustomInput
                   id="rental_amount"
                   name="rental_amount"
-                  type="text"
+                  type="number"
                   label="Rental Amount"
                   value={watch("rental_amount")}
                   onChange={(e) => setValue("rental_amount", e.target.value)}
@@ -514,11 +541,17 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                 </div>
                 <div>
                   <Label className="mb-2">Attachments</Label>
-                  <MultiFileUpload
-                    field="attachments"
-                    value={watch("attachments")}
-                    onChange={(files) => setValue("attachments", files)}
-                    isMulti={true}
+                  <Controller
+                    control={control}
+                    name="attachments"
+                    render={({ field: { onChange, value } }) => (
+                      <MultiFileUpload
+                        isMulti={true}
+                        field="attachments"
+                        value={value}
+                        onChange={onChange}
+                      />
+                    )}
                   />
                   {errors.attachments && (
                     <p className="text-sm text-red-500 mt-1">
