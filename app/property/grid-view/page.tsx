@@ -404,7 +404,19 @@ const Page = () => {
                                                   </FormProvider>
                                                 </CardContent>
                                                 <CardFooter className="flex-col gap-2">
-                                                  <ViewTenancy />
+                                                  {unit
+                                                    .last_active_tenancy[0] ? (
+                                                    <ViewTenancy
+                                                      tenancy={
+                                                        unit
+                                                          .last_active_tenancy[0]
+                                                      }
+                                                    />
+                                                  ) : (
+                                                    <Button className="text-white">
+                                                      Move in
+                                                    </Button>
+                                                  )}
                                                 </CardFooter>
                                               </Card>
                                             );
@@ -512,7 +524,19 @@ const Page = () => {
                                                   </FormProvider>
                                                 </CardContent>
                                                 <CardFooter className="flex-col gap-2">
-                                                  <ViewTenancy />
+                                                  {unit
+                                                    .last_active_tenancy[0] ? (
+                                                    <ViewTenancy
+                                                      tenancy={
+                                                        unit
+                                                          .last_active_tenancy[0]
+                                                      }
+                                                    />
+                                                  ) : (
+                                                    <Button className="text-white">
+                                                      Move in
+                                                    </Button>
+                                                  )}
                                                 </CardFooter>
                                               </Card>
                                             );
@@ -588,7 +612,15 @@ const Page = () => {
                                     </FormProvider>
                                   </CardContent>
                                   <CardFooter className="flex-col gap-2">
-                                    <ViewTenancy />
+                                    {unit.last_active_tenancy[0] ? (
+                                      <ViewTenancy
+                                        tenancy={unit.last_active_tenancy[0]}
+                                      />
+                                    ) : (
+                                      <Button className="text-white">
+                                        Move in
+                                      </Button>
+                                    )}
                                   </CardFooter>
                                 </Card>
                               )}

@@ -1,4 +1,8 @@
-type Unit = {
+import { Property } from "./PropertyType";
+import { Room } from "./RoomType";
+import { Tenancy } from "./TenancyType";
+
+export type Unit = {
   id: number;
   property_id: number;
   beneficiary_id: number;
@@ -18,6 +22,7 @@ type Unit = {
   is_activated: number;
   service_fee_percentage: string;
   profit_sharing_percentage: string;
+  last_active_tenancy: Tenancy[];
   created_at: string;
   updated_at: string;
   meters: Meter[];

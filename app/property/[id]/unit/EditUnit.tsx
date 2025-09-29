@@ -31,6 +31,8 @@ import getMeterAndLock from "@/components/General/GetMeterAndLock";
 import CarParksDropDown from "../../grid-view/CarParksDropDown";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Room } from "@/types/RoomType";
+import { Unit } from "@/types/UnitType";
 
 // Schema & type
 const schema = yup.object({

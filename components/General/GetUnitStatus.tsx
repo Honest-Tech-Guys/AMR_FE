@@ -1,3 +1,5 @@
+import { Room } from "@/types/RoomType";
+
 export function getUnitStatus(item: Room[] | Carpark[]) {
   if (item.length === 0) {
     return "No Rooms";

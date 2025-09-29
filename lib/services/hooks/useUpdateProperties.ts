@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import { Property } from "@/types/PropertyType";
 
 // The input type for updating properties - includes id and omits auto-generated fields
 export type UpdatePropertyInput = Partial<

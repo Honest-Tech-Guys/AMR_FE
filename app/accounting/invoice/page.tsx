@@ -35,6 +35,7 @@ const options = [
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import useGetInvoicesList from "@/lib/services/hooks/useGetInvoices";
+import { Invoice } from "@/types/InvoiceType";
 
 type invoice = {
   invoice_no: string;
@@ -214,7 +215,7 @@ const Page = () => {
     amount: item.total_amount,
 
     // items (ممكن تكون array)
-    items: item.items.map((it) => ({
+    items: item.items.map((it: any) => ({
       id: it.id,
       item_name: it.item_name,
       quantity: it.quantity,

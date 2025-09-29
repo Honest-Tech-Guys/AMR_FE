@@ -140,6 +140,11 @@ const Page = () => {
           }}
         >
           {property.property_name}
+          <EditProperty
+            onOpenChange={setOpenView}
+            open={openView}
+            property={property}
+          />
           {/* <EditProperty
             property={property}
             open={openView}

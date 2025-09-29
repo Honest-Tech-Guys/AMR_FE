@@ -1,4 +1,7 @@
+import { Property } from "./PropertyType";
+import { Room } from "./RoomType";
 import { TenantType } from "./TenantType";
+import { Unit } from "./UnitType";
 type Creator = {
   id: number;
   name: string;
@@ -23,5 +26,5 @@ export type Book = {
   updated_at: string;
   tenant: TenantType;
   creator: Creator;
-  bookable: Property | Unit | Room;
+  bookable: Unit | Room;
 };

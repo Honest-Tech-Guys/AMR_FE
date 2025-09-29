@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
+import { Invoice } from "@/types/InvoiceType";
 const useGetInvoicesList = () => {
   return useQuery({
     queryKey: ["GetInvoicesList"],

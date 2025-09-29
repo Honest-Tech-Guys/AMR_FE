@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
+import { Unit } from "@/types/UnitType";
+import { Room } from "@/types/RoomType";
+import { Tenancy } from "@/types/TenancyType";
+import { daysBetween, formatDate } from "@/lib/utils";
+import CreateAgreement from "../CreateAgreement";
+import { useState } from "react";
 const schema = yup.object({
   country: yup.string().required("Country is required"),
   postcode: yup.string().required("Country is required"),
@@ -29,7 +35,10 @@ const schema = yup.object({
   free_text: yup.boolean().default(false),
 });
 type schemaType = yup.InferType<typeof schema>;
-const BasicTap = () => {
+interface Props {
+  tenancy: Tenancy;
+}
+const BasicTap = ({ tenancy }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -46,7 +55,7 @@ const BasicTap = () => {
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log("Form data:", data);
   };
-
+  const [open, setOpen] = useState(false);
   return (
     <div>
       <FormProvider {...form}>
@@ -63,7 +72,7 @@ const BasicTap = () => {
                 <div>
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Code</span>
-                    <span>AuntieMichelle-T25000212</span>
+                    <span>{tenancy.code}</span>
                   </div>
                   <Separator />
                 </div>
@@ -71,9 +80,7 @@ const BasicTap = () => {
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Tenant Name:</span>
                     <div className="flex flex-col items-end">
-                      <p className="text-primary">
-                        Leong Wei Loon - META B-07-01 (R2)
-                      </p>
+                      <p className="text-primary">{tenancy.tenant.name}</p>
                       <p>+60165134578</p>
                       weiloon3991@gmail.com
                     </div>
@@ -84,9 +91,16 @@ const BasicTap = () => {
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Period:</span>
                     <div className="flex flex-col items-end">
-                      <p className="text-primary">01 Jun 2025 - 31 May 2026</p>
+                      <p className="text-primary">
+                        {tenancy.tenancy_period_start_date} -{" "}
+                        {tenancy.tenancy_period_end_date}
+                      </p>
                       <Badge className="bg-black text-white rounded-[6px]">
-                        363 days
+                        {daysBetween(
+                          tenancy.tenancy_period_start_date,
+                          tenancy.tenancy_period_end_date
+                        )}{" "}
+                        days
                       </Badge>
                     </div>
                   </div>
@@ -95,38 +109,83 @@ const BasicTap = () => {
                 <div>
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Rental Fees:</span>
-                    <span>MYR 770 / Monthly</span>
+                    <span>
+                      MYR {tenancy.rental_fee} /{" "}
+                      {tenancy.rental_payment_frequency}
+                    </span>
                   </div>
                   <Separator />
                 </div>
-                <div>
+                {/* <div>
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Property:</span>
-                    <span>Meta Residence @ Seri Kembangan</span>
+                    <span>{tenancy.full_property_name}</span>
                   </div>
                   <Separator />
-                </div>
-                <div>
-                  <div className="flex w-full items-center p-3 justify-between">
-                    <span>Unit:</span>
-                    <span>B-07-01</span>
+                </div> */}
+                {"unit" in tenancy.tenantable ? (
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Property:</span>
+                      <span>
+                        {
+                          (tenancy.tenantable as Room).unit.property
+                            .property_name
+                        }
+                      </span>
+                    </div>
+                    <Separator />
                   </div>
-                  <Separator />
-                </div>
-                <div>
-                  <div className="flex w-full items-center p-3 justify-between">
-                    <span>Room:</span>
-                    <span>Room 2</span>
+                ) : (
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Property:</span>
+                      <span>
+                        {(tenancy.tenantable as Unit).property.property_name}
+                      </span>
+                    </div>
+                    <Separator />
                   </div>
-                  <Separator />
-                </div>
+                )}
+                {"unit" in tenancy.tenantable ? (
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Unit:</span>
+                      <span>
+                        {
+                          (tenancy.tenantable as Room).unit
+                            .block_floor_unit_number
+                        }
+                      </span>
+                    </div>
+                    <Separator />
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Unit:</span>
+                      <span>
+                        {(tenancy.tenantable as Unit).block_floor_unit_number}
+                      </span>
+                    </div>
+                    <Separator />
+                  </div>
+                )}
+
+                {"unit" in tenancy.tenantable ? (
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Room:</span>
+                      <span>{(tenancy.tenantable as Room).name}</span>
+                    </div>
+                    <Separator />
+                  </div>
+                ) : null}
+
                 <div>
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Address:</span>
-                    <span>
-                      Room 2, B-07-01, Jalan Atmosphere Utama 2,, Seri
-                      Kembangan, 43400, Selangor, Malaysia
-                    </span>
+                    {/* <span>{(tenancy.tenantable as Unit).property.city}</span> */}
                   </div>
                   <Separator />
                 </div>
@@ -142,7 +201,7 @@ const BasicTap = () => {
                 <div>
                   <div className="flex w-full items-center p-3 justify-between">
                     <span>Created At:</span>
-                    <span>2025-06-01 10:13:03</span>
+                    <span>{formatDate(tenancy.created_at)}</span>
                   </div>
                 </div>
               </div>
@@ -192,21 +251,48 @@ const BasicTap = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-col gap-5 w-[35%]">
-              <div className="border-1 w-full">
+            <div className="flex flex-col gap-5 w-[40%]">
+              <div className="border-1 w-full ">
                 {" "}
-                <div className="flex w-full items-center p-3 justify-between border-b-1">
+                <div className="flex w-full items-center p-3 py-4.5 justify-between border-b-1">
                   <span>E-Agreement</span>
                 </div>
-                <div className="flex flex-col gap-3 py-5 items-center">
-                  <span className="text-xs">
-                    You do not have any E-agreement
-                  </span>
-                  <Button className="text-white">
-                    <Plus />
-                    New Agreement
-                  </Button>
-                </div>
+                {tenancy.agreement ? (
+                  <div className="flex flex-col gap-3 p-3 ">
+                    <span className="text-primary underline text-sm">
+                      {tenancy.agreement.id}
+                    </span>
+                    <span className="text-sm">
+                      Created Date :{formatDate(tenancy.agreement.created_at)}
+                    </span>
+                    <span className="text-sm">
+                      Agreement Period :{tenancy.agreement.start_date}
+                      {"-"}
+                      {tenancy.agreement.end_date}
+                    </span>
+                    <span className="text-sm">
+                      Landlord :{tenancy.agreement.landlord_name}
+                    </span>
+                    <span className="text-sm">
+                      Tenant :{tenancy.agreement.tenant_name}
+                    </span>
+                    {/* <span className="text-xs">
+                      Status :{tenancy.agreement}
+                    </span> */}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3 py-5 items-center">
+                    <span className="text-xs">
+                      You do not have any E-agreement
+                    </span>
+
+                    <CreateAgreement
+                      id={tenancy.id}
+                      open={open}
+                      onOpenChange={setOpen}
+                    />
+                  </div>
+                )}
               </div>
               <div className="border-1 w-full">
                 {" "}

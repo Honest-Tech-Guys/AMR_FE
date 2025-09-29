@@ -1,4 +1,6 @@
-type Room = {
+import { Unit } from "./UnitType";
+
+export type Room = {
   id: number;
   name: string;
   unit_id: number;

@@ -118,7 +118,7 @@ const Page = () => {
   const { data, isLoading, error } = useGetPropertiesList({});
 
   // Map API data to table format
-  const tableData = data?.data.map((item) => ({
+  const tableData = data?.properties.data.map((item) => ({
     property_id: item.property_name ?? "-",
     unit: "-", // Replace with actual unit info if available
     room: "-", // Replace with actual room info if available

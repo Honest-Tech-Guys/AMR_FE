@@ -91,7 +91,7 @@ export default function DateRangePicker({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-full max-w-[600px] p-0">
+      <PopoverContent className="w-full z-1000 max-w-[600px] p-0">
         {/* Scrollable container */}
         <div className="max-h-[90vh] overflow-y-scroll p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

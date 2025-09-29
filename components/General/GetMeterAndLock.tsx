@@ -1,3 +1,5 @@
+import { Room } from "@/types/RoomType";
+import { Unit } from "@/types/UnitType";
 import { Gauge, Lock } from "lucide-react";
 import React from "react";
 

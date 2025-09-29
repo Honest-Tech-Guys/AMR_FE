@@ -62,11 +62,12 @@ export default function CarParksDropDown({ carpark }: { carpark: any }) {
 
       {/* Dialogs outside dropdown */}
 
-      <CreateTenancy
+      {/* <CreateTenancy
+        type="Room"
         id={carpark.id}
         open={openDialog === "createTenancy"}
         onOpenChange={(open) => setOpenDialog(open ? "createTenancy" : null)}
-      />
+      /> */}
 
       {/* For placeholders like SmartHome & RenameRoom, you can replace with actual components later */}
     </>

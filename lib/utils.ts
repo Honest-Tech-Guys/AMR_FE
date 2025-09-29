@@ -32,3 +32,14 @@ export const formatDate = (
 
   return `${datePart} ${timePart}`;
 };
+export function daysBetween(startDate: string, endDate: string): number {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  // difference in milliseconds
+  const diffTime = end.getTime() - start.getTime();
+
+  // convert ms to days
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}

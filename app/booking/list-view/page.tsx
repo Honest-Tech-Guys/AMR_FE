@@ -62,7 +62,7 @@ const mapBooksToTable = (books: Book[]): PropertyTableRow[] => {
 
     // Check if bookable is Property
     if ("property_name" in book.bookable) {
-      propertyName = book.bookable.property_name;
+      propertyName = book.bookable.property_name as string;
     }
     // Check if bookable is Unit
     else if ("unit_number" in book.bookable) {

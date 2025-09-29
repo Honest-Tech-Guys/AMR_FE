@@ -14,6 +14,7 @@ import InvoiceTap from "./Tabs/Invoice";
 import SmartHomeTap from "./Tabs/SmartHome";
 import DocumentsTap from "./Tabs/Documents";
 import AuditLogsTap from "./Tabs/AuditLogs";
+import { Tenancy } from "@/types/TenancyType";
 
 const tabItems = [
   { label: "Basic", value: "basic" },
@@ -23,8 +24,10 @@ const tabItems = [
   { label: "Documents", value: "documents" },
   { label: "Audit Logs", value: "audit_logs" },
 ];
-
-const ViewTenancy = () => {
+interface Props {
+  tenancy: Tenancy;
+}
+const ViewTenancy = ({ tenancy }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -51,19 +54,19 @@ const ViewTenancy = () => {
             ))}
           </TabsList>
           <TabsContent value="basic">
-            <BasicTap />
+            <BasicTap tenancy={tenancy} />
           </TabsContent>
           <TabsContent value="payment_schedule">
             <PaymentScheduleTap />
           </TabsContent>
           <TabsContent value="invoice">
-            <InvoiceTap />
+            <InvoiceTap tenancy={tenancy} />
           </TabsContent>
           <TabsContent value="smart_home">
             <SmartHomeTap />
           </TabsContent>
           <TabsContent value="documents">
-            <DocumentsTap />
+            <DocumentsTap tenancy={tenancy} />
           </TabsContent>
           <TabsContent value="audit_logs">
             <AuditLogsTap />

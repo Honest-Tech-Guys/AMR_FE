@@ -1,4 +1,6 @@
-type Invoice = {
+import { Tenancy } from "./TenancyType";
+
+export type Invoice = {
   id: number;
   tenancy_id: number;
   invoice_number: string;

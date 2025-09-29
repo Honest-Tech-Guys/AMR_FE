@@ -15,55 +15,13 @@ import { Separator } from "@/components/ui/separator";
 import ViewTenancy from "./ViewTenancy";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { PaginationData } from "@/components/ui/pagination";
+import { Unit } from "@/types/UnitType";
+import { Room } from "@/types/RoomType";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const { data } = useGetTenancyList();
-  // const { data, isLoading, error } = useGetOwnersList();
-  // const data = [
-  //   {
-  //     id: 1,
-  //     name: "John Doe",
-  //     type: "Individual",
-  //     property: "Sunshine Apartments",
-  //     tenancy: "12 months",
-  //     rental: "770",
-  //     tenancy_start_date: "2023-01-01",
-  //     tenancy_end_date: "2023-12-31",
-  //     smart_meter: "META B-07-01 R2",
-  //     balance: "46.7",
-  //     status: "Active",
-  //     top_up: "Last update 01 Jun 07:58 PM",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Jane Smith",
-  //     type: "Company",
-  //     property: "Green Villas",
-  //     tenancy: "24 months",
-  //     rental: "770",
-  //     tenancy_start_date: "2022-06-01",
-  //     tenancy_end_date: "2024-05-31",
-  //     smart_meter: "META B-07-01 R2",
-  //     balance: "46.7",
-  //     status: "Inactive",
-  //     top_up: "Last update 01 Jun 07:58 PM",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Alice Lee",
-  //     type: "Individual",
-  //     property: "Blue Condos",
-  //     tenancy: "6 months",
-  //     rental: "770",
-  //     tenancy_start_date: "2023-03-15",
-  //     tenancy_end_date: "2023-09-14",
-  //     smart_meter: "META B-07-01 R2",
-  //     balance: "46.7",
-  //     status: "Active",
-  //     top_up: "Last update 01 Jun 07:58 PM",
-  //   },
-  // ];
+
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -216,9 +174,9 @@ const Page = () => {
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Type:</span>{" "}
-                    {(tenancy.tenantable as Unit).rental_type
-                      ? (tenancy.tenantable as Unit).rental_type
-                      : "Sublet"}
+                    {"unit" in tenancy.tenantable
+                      ? "Sublet"
+                      : (tenancy.tenantable as Unit).rental_type}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Property:</span>{" "}
@@ -270,7 +228,7 @@ const Page = () => {
                 </div>
                 <Separator className="my-5" />
                 <div className="flex justify-center text-sm font-normal text-primary">
-                  <ViewTenancy />
+                  <ViewTenancy tenancy={tenancy} />
                 </div>
               </div>
             ))}

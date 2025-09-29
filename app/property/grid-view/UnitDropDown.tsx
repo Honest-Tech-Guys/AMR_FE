@@ -16,6 +16,7 @@ import EditUnit from "../[id]/unit/EditUnit";
 import CreateMeter from "../list-view/Actions/CreateMeter";
 import CreateLock from "../list-view/Actions/CreateLock";
 import CreateTenancy from "../list-view/Actions/CreateTenancy";
+import { Unit } from "@/types/UnitType";
 
 // Import dialogs for units
 

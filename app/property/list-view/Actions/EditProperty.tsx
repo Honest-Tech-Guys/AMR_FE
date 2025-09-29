@@ -31,6 +31,7 @@ import UnitDropdown from "../../grid-view/UnitDropDown";
 import { PaginationData } from "@/components/ui/pagination";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import { Property } from "@/types/PropertyType";
+import { Unit } from "@/types/UnitType";
 
 // Schema & type
 const schema = yup.object({

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import { Unit } from "@/types/UnitType";
 
 // The input type for updating units - includes id and omits auto-generated fields
 export type UpdateUnitInput = Partial<

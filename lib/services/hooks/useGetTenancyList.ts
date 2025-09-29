@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
+import { Tenancy } from "@/types/TenancyType";
 const useGetTenancyList = () => {
   return useQuery({
     queryKey: ["GetTenancyList"],
