@@ -307,102 +307,46 @@ const DocumentsTap = ({ tenancy }: Props) => {
               files
             </Badge>
           </div>
-
-          {tenancy.documents.filter((doc) => doc.type === "Private").length >
-          0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tenancy.documents
-                .filter((doc) => doc.type === "Private")
-                .map((document) => {
-                  console.log(document);
-                  return (
-                    <div
-                      key={document.id}
-                      className="hover:shadow-md transition-shadow"
-                    >
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl">
-                              {getFileIcon(document.file_name, document.type)}
-                            </span>
-                            <div>
-                              <h4
-                                className="font-medium text-sm truncate"
-                                title={document.name}
-                              >
-                                {document.name}
-                              </h4>
-                              <p className="text-xs text-gray-500">
-                                {formatFileSize(document.file_size)}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            {isPdfFile(document.file_name, document.type) && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handlePreview(document)}
-                                className="h-8 w-8 p-0"
-                                title="Preview PDF"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleDelete(document.id)}
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="space-y-1 text-xs text-gray-500">
-                          <p>Uploaded: {formatDate(document.created_at)}</p>
-                          <p className="truncate">File: {document.file_name}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-          ) : (
-            <DragAndDropFiles
-              label=""
-              description="Drag & drop or click to upload"
-              value={watch("privateFiles") || []}
-              onChange={(files) => setValue("privateFiles", files)}
-              isMulti={true}
-            />
-          )}
-        </div>
-
-        {/* Shared Documents Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Shared Documents</h3>
-            <Badge variant="secondary">
-              {tenancy.documents.filter((doc) => doc.type === "Shared").length}{" "}
-              files
-            </Badge>
-          </div>
-
-          {tenancy.documents.filter((doc) => doc.type === "Shared").length >
-          0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {tenancy.documents
-                .filter((doc) => doc.type === "Shared")
-                .map((document) => (
-                  <Card
+          <DragAndDropFiles
+            label=""
+            description={
+              isPending ? "...Uploading" : "Drag & drop or click to upload"
+            }
+            value={[]}
+            onChange={(files) => {
+              mutate(
+                {
+                  type: "Private",
+                  document: fileDataToFileList(files as unknown as FileData[]),
+                },
+                {
+                  onSuccess: () => {
+                    toast.success("Private Files successfully!");
+                    reset();
+                    refetch();
+                  },
+                  onError: (err) => {
+                    toast.error(
+                      (err as any)?.message || "Failed to Upload Private Files"
+                    );
+                  },
+                }
+              );
+            }}
+            isMulti={true}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tenancy.documents
+              .filter((doc) => doc.type === "Private")
+              .map((document) => {
+                console.log(document);
+                return (
+                  <div
                     key={document.id}
-                    className="hover:shadow-md transition-shadow"
+                    className=" hover:shadow-md transition-shadow"
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
+                    <div className="p-4">
+                      <div className="w-full gap-3 flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-2xl">
                             {getFileIcon(document.file_name, document.type)}
@@ -419,6 +363,9 @@ const DocumentsTap = ({ tenancy }: Props) => {
                             </p>
                           </div>
                         </div>
+                        <div className=" flex space-y-1 text-xs text-gray-500">
+                          <p>Uploaded: {formatDate(document.created_at)}</p>
+                        </div>
                         <div className="flex gap-1">
                           {isPdfFile(document.file_name, document.type) && (
                             <Button
@@ -431,7 +378,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
                               <Eye className="h-4 w-4" />
                             </Button>
                           )}
-
                           <Button
                             size="sm"
                             variant="ghost"
@@ -443,31 +389,107 @@ const DocumentsTap = ({ tenancy }: Props) => {
                           </Button>
                         </div>
                       </div>
-                      <div className="space-y-1 text-xs text-gray-500">
-                        <p>Uploaded: {formatDate(document.created_at)}</p>
-                        <p className="truncate">File: {document.file_name}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          ) : (
-            <DragAndDropFiles
-              label=""
-              description="Drag & drop or click to upload"
-              value={watch("sharedFiles") || []}
-              onChange={(files) => setValue("sharedFiles", files)}
-              isMulti={true}
-            />
-          )}
-        </div>
-        {watch("privateFiles") || watch("sharedFiles") ? (
-          <div className="mt-6 flex justify-end gap-4">
-            <Button type="submit" className="text-white" disabled={isPending}>
-              {isPending ? "Updating..." : "Update"}
-            </Button>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
-        ) : null}
+        </div>
+
+        {/* Shared Documents Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Shared Documents</h3>
+            <Badge variant="secondary">
+              {tenancy.documents.filter((doc) => doc.type === "Shared").length}{" "}
+              files
+            </Badge>
+          </div>
+          <DragAndDropFiles
+            label=""
+            description={
+              isPending ? "...Uploading" : "Drag & drop or click to upload"
+            }
+            value={[]}
+            onChange={(files) => {
+              mutate(
+                {
+                  type: "Shared",
+                  document: fileDataToFileList(files as unknown as FileData[]),
+                },
+                {
+                  onSuccess: () => {
+                    toast.success("Upload Shared Files successfully!");
+                    reset();
+                    refetch();
+                  },
+                  onError: (err) => {
+                    toast.error(
+                      (err as any)?.message || "Failed to Upload Shared Files"
+                    );
+                  },
+                }
+              );
+            }}
+            isMulti={true}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tenancy.documents
+              .filter((doc) => doc.type === "Shared")
+              .map((document) => (
+                <div
+                  key={document.id}
+                  className=" hover:shadow-md transition-shadow"
+                >
+                  <div className="p-4">
+                    <div className="w-full gap-3 flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">
+                          {getFileIcon(document.file_name, document.type)}
+                        </span>
+                        <div>
+                          <h4
+                            className="font-medium text-sm truncate"
+                            title={document.name}
+                          >
+                            {document.name}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(document.file_size)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className=" flex space-y-1 text-xs text-gray-500">
+                        <p>Uploaded: {formatDate(document.created_at)}</p>
+                      </div>
+                      <div className="flex gap-1">
+                        {isPdfFile(document.file_name, document.type) && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handlePreview(document)}
+                            className="h-8 w-8 p-0"
+                            title="Preview PDF"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(document.id)}
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
       </form>
     </div>
   );
