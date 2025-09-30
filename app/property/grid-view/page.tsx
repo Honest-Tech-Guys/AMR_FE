@@ -342,63 +342,74 @@ const Page = () => {
                                                             room
                                                           )}
                                                         </div>
-                                                        <div className="grid gap-2">
-                                                          <SelectWithForm<FormValues>
-                                                            name="status"
-                                                            title="Status"
-                                                            options={statusType}
-                                                          />
-                                                        </div>
-                                                        <div>
-                                                          <p>
-                                                            Sharvindan A/L
-                                                            Silvam - META
-                                                            B-26-07
-                                                          </p>
-                                                          <p className="text-primary">
-                                                            (R1)
-                                                            AuntieMichelle-T24000331
-                                                            MYR
-                                                          </p>
-                                                          <p>550/Monthly</p>
-                                                        </div>
-                                                        <div className="flex justify-between">
-                                                          <p className="text-sm text-gray-600">
-                                                            <p className="font-medium">
-                                                              Tenancy Start Date
-                                                            </p>{" "}
-                                                            {/* {tenancy.tenancy_start_date} */}
-                                                            01/12/2024
-                                                          </p>
-                                                          <p className="text-sm text-gray-600 max-w-29">
-                                                            <p className="font-medium">
-                                                              Tenancy End Date
-                                                            </p>{" "}
-                                                            {/* {tenancy.tenancy_end_date} */}
-                                                            30/11/2025
-                                                          </p>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                          <div className=" flex  flex-col gap-2">
-                                                            <p className="text-sm text-gray-600">
-                                                              <p className="font-medium">
-                                                                Auto Pay
-                                                              </p>{" "}
-                                                              {/* {tenancy.smart_meter} */}
-                                                              Disabled
-                                                            </p>
-                                                          </div>
-                                                          <div>
+                                                        {unit
+                                                          .last_active_tenancy[0] ? (
+                                                          <>
                                                             {" "}
-                                                            <p className="text-sm text-gray-600 max-w-28">
-                                                              <p className="font-medium ">
-                                                                Total Overdue
+                                                            <div className="grid gap-2">
+                                                              <SelectWithForm<FormValues>
+                                                                name="status"
+                                                                title="Status"
+                                                                options={
+                                                                  statusType
+                                                                }
+                                                              />
+                                                            </div>
+                                                            <div>
+                                                              <p>
+                                                                Sharvindan A/L
+                                                                Silvam - META
+                                                                B-26-07
                                                               </p>
-                                                              {/* {tenancy.top_up} */}
-                                                              MYR 0
-                                                            </p>
-                                                          </div>
-                                                        </div>
+                                                              <p className="text-primary">
+                                                                (R1)
+                                                                AuntieMichelle-T24000331
+                                                                MYR
+                                                              </p>
+                                                              <p>550/Monthly</p>
+                                                            </div>
+                                                            <div className="flex justify-between">
+                                                              <p className="text-sm text-gray-600">
+                                                                <p className="font-medium">
+                                                                  Tenancy Start
+                                                                  Date
+                                                                </p>{" "}
+                                                                {/* {tenancy.tenancy_start_date} */}
+                                                                01/12/2024
+                                                              </p>
+                                                              <p className="text-sm text-gray-600 max-w-29">
+                                                                <p className="font-medium">
+                                                                  Tenancy End
+                                                                  Date
+                                                                </p>{" "}
+                                                                {/* {tenancy.tenancy_end_date} */}
+                                                                30/11/2025
+                                                              </p>
+                                                            </div>
+                                                            <div className="flex justify-between items-center">
+                                                              <div className=" flex  flex-col gap-2">
+                                                                <p className="text-sm text-gray-600">
+                                                                  <p className="font-medium">
+                                                                    Auto Pay
+                                                                  </p>{" "}
+                                                                  {/* {tenancy.smart_meter} */}
+                                                                  Disabled
+                                                                </p>
+                                                              </div>
+                                                              <div>
+                                                                {" "}
+                                                                <p className="text-sm text-gray-600 max-w-28">
+                                                                  <p className="font-medium ">
+                                                                    Total
+                                                                    Overdue
+                                                                  </p>
+                                                                  {/* {tenancy.top_up} */}
+                                                                  MYR 0
+                                                                </p>
+                                                              </div>
+                                                            </div>
+                                                          </>
+                                                        ) : null}
                                                       </div>
                                                     </form>
                                                   </FormProvider>

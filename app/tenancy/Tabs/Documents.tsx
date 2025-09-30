@@ -22,31 +22,29 @@ import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import MultiFileUpload from "@/components/input-11";
+import MultiFileUpload, { toBase64 } from "@/components/input-11";
 import { FileData } from "@/types/FileData";
+import DragAndDropFiles from "@/components/input-12";
+import useCreateTenancyDocument from "@/lib/services/hooks/useCreateTenancyDocument";
+import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
+import { fileDataToFileList } from "../CreateAgreement";
 
 interface Props {
   tenancy: Tenancy;
 }
 
 interface DocumentFormData {
-  name: string;
-  description?: string;
-  type: "Private" | "Shared";
-  files: FileData[];
+  privateFiles?: FileData[];
+  sharedFiles?: FileData[];
 }
 
 const schema = yup.object({
-  name: yup.string().required("Document name is required"),
-  description: yup.string().optional(),
-  type: yup
-    .string()
-    .oneOf(["Private", "Shared"])
-    .required("Document type is required"),
-  files: yup
-    .array()
-    .min(1, "At least one file is required")
-    .required("Files are required"),
+  // type: yup
+  //   .string()
+  //   .oneOf(["Private", "Shared"])
+  //   .required("Document type is required"),
+  privateFiles: yup.array().min(1, "At least one file is required").optional(),
+  sharedFiles: yup.array().min(1, "At least one file is required").optional(),
 });
 
 const DocumentsTap = ({ tenancy }: Props) => {
@@ -61,13 +59,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const form = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      description: "",
-      type: "Private" as const,
-      files: [],
-    },
+    // resolver: yupResolver(schema),
   });
 
   const {
@@ -78,24 +70,29 @@ const DocumentsTap = ({ tenancy }: Props) => {
     setValue,
     formState: { errors },
   } = form;
-
+  const { mutate, isPending } = useCreateTenancyDocument(tenancy.id);
+  const { refetch } = useGetTenancyList();
   const onSubmit = async (data: DocumentFormData) => {
-    setIsUploading(true);
-    try {
-      // TODO: Implement actual API call to upload documents
-      console.log("Uploading documents:", data);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      toast.success(`${data.files.length} document(s) uploaded successfully!`);
-      reset();
-      setIsAddDialogOpen(false);
-    } catch (error) {
-      toast.error("Failed to upload documents");
-    } finally {
-      setIsUploading(false);
-    }
+    const private_documents = data.privateFiles
+      ? fileDataToFileList((data.privateFiles || []) as FileData[])
+      : undefined;
+    const shared_documents = data.sharedFiles
+      ? fileDataToFileList((data.sharedFiles || []) as FileData[])
+      : undefined;
+    const payload = {
+      private_documents: private_documents,
+      shared_documents: shared_documents,
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Rental agreement created successfully!");
+        reset();
+        refetch();
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create agreement");
+      },
+    });
   };
 
   // Helper function to get authentication token
@@ -126,7 +123,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
           Accept: "application/pdf, application/octet-stream, */*",
         },
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -262,118 +258,9 @@ const DocumentsTap = ({ tenancy }: Props) => {
     const fileExtension = fileName.toLowerCase().split(".").pop();
     return fileExtension === "pdf" || type.includes("pdf");
   };
-
+  console.log(errors);
   return (
     <div className="space-y-6">
-      {/* Add Document Button */}
-      <div className="flex justify-end">
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="text-white">
-              <Plus />
-              Add Document
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="md:max-w-[600px] z-200">
-            <DialogHeader>
-              <DialogTitle>Add New Document</DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={handleSubmit(onSubmit as any)}
-              className="space-y-4"
-            >
-              <div>
-                <Label className="mb-2">Document Type</Label>
-                <Controller
-                  control={control}
-                  name="type"
-                  render={({ field }) => (
-                    <RadioGroup
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setDocumentType(value as "Private" | "Shared");
-                      }}
-                      className="flex gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Private" id="Private" />
-                        <Label htmlFor="Private">Private Document</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Shared" id="Shared" />
-                        <Label htmlFor="Shared">Shared Document</Label>
-                      </div>
-                    </RadioGroup>
-                  )}
-                />
-                {errors.type && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.type.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="name">Document Name</Label>
-                <Input
-                  id="name"
-                  {...form.register("name")}
-                  placeholder="Enter document name"
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description (Optional)</Label>
-                <Textarea
-                  id="description"
-                  {...form.register("description")}
-                  placeholder="Enter document description"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label className="mb-2">Upload Files</Label>
-                <MultiFileUpload
-                  field="files"
-                  value={watch("files")}
-                  onChange={(files) => setValue("files", files)}
-                  isMulti={true}
-                />
-                {errors.files && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.files.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsAddDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="text-white"
-                  disabled={isUploading}
-                >
-                  {isUploading ? "Uploading..." : "Upload Documents"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
       {/* PDF Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] z-200 overflow-hidden">
@@ -382,7 +269,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
               {previewDocument?.name}
             </DialogTitle>
           </DialogHeader>
-          <div className="w-full h-[70vh] border rounded-lg overflow-hidden">
+          <div className="w-full h-[80vh] border rounded-lg overflow-hidden">
             {previewDocument && previewDocument.blobUrl && (
               <iframe
                 src={previewDocument.blobUrl}
@@ -408,37 +295,108 @@ const DocumentsTap = ({ tenancy }: Props) => {
               </div>
             )}
           </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleDownload(previewDocument)}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
-            <Button onClick={closePreview}>Close</Button>
-          </div>
         </DialogContent>
       </Dialog>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Private Documents Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Private Documents</h3>
+            <Badge variant="secondary">
+              {tenancy.documents.filter((doc) => doc.type === "Private").length}{" "}
+              files
+            </Badge>
+          </div>
 
-      {/* Private Documents Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Private Documents</h3>
-          <Badge variant="secondary">
-            {tenancy.documents.filter((doc) => doc.type === "Private").length}{" "}
-            files
-          </Badge>
+          {tenancy.documents.filter((doc) => doc.type === "Private").length >
+          0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tenancy.documents
+                .filter((doc) => doc.type === "Private")
+                .map((document) => {
+                  console.log(document);
+                  return (
+                    <Card
+                      key={document.id}
+                      className="hover:shadow-md transition-shadow"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">
+                              {getFileIcon(document.file_name, document.type)}
+                            </span>
+                            <div>
+                              <h4
+                                className="font-medium text-sm truncate"
+                                title={document.name}
+                              >
+                                {document.name}
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                {formatFileSize(document.file_size)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            {isPdfFile(document.file_name, document.type) && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handlePreview(document)}
+                                className="h-8 w-8 p-0"
+                                title="Preview PDF"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(document.id)}
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-1 text-xs text-gray-500">
+                          <p>Uploaded: {formatDate(document.created_at)}</p>
+                          <p className="truncate">File: {document.file_name}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+            </div>
+          ) : (
+            <DragAndDropFiles
+              label=""
+              description="Drag & drop or click to upload"
+              value={watch("privateFiles") || []}
+              onChange={(files) => setValue("privateFiles", files)}
+              isMulti={true}
+            />
+          )}
         </div>
 
-        {tenancy.documents.filter((doc) => doc.type === "Private").length >
-        0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tenancy.documents
-              .filter((doc) => doc.type === "Private")
-              .map((document) => {
-                console.log(document);
-                return (
+        {/* Shared Documents Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Shared Documents</h3>
+            <Badge variant="secondary">
+              {tenancy.documents.filter((doc) => doc.type === "Shared").length}{" "}
+              files
+            </Badge>
+          </div>
+
+          {tenancy.documents.filter((doc) => doc.type === "Shared").length >
+          0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tenancy.documents
+                .filter((doc) => doc.type === "Shared")
+                .map((document) => (
                   <Card
                     key={document.id}
                     className="hover:shadow-md transition-shadow"
@@ -473,15 +431,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
                               <Eye className="h-4 w-4" />
                             </Button>
                           )}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDownload(document)}
-                            className="h-8 w-8 p-0"
-                            title="Download"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
+
                           <Button
                             size="sm"
                             variant="ghost"
@@ -499,111 +449,26 @@ const DocumentsTap = ({ tenancy }: Props) => {
                       </div>
                     </CardContent>
                   </Card>
-                );
-              })}
-          </div>
-        ) : (
-          <div className="flex flex-col bg-gray-50 border-2 border-dashed border-gray-300 gap-3 py-8 items-center rounded-lg">
-            <Upload className="h-8 w-8 text-gray-400" />
-            <span className="text-sm text-gray-500">
-              No Private documents uploaded yet
-            </span>
-            <span className="text-xs text-gray-400">
-              Click "Add Document" to upload Private files
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Shared Documents Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Shared Documents</h3>
-          <Badge variant="secondary">
-            {tenancy.documents.filter((doc) => doc.type === "Shared").length}{" "}
-            files
-          </Badge>
+                ))}
+            </div>
+          ) : (
+            <DragAndDropFiles
+              label=""
+              description="Drag & drop or click to upload"
+              value={watch("sharedFiles") || []}
+              onChange={(files) => setValue("sharedFiles", files)}
+              isMulti={true}
+            />
+          )}
         </div>
-
-        {tenancy.documents.filter((doc) => doc.type === "Shared").length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tenancy.documents
-              .filter((doc) => doc.type === "Shared")
-              .map((document) => (
-                <Card
-                  key={document.id}
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">
-                          {getFileIcon(document.file_name, document.type)}
-                        </span>
-                        <div>
-                          <h4
-                            className="font-medium text-sm truncate"
-                            title={document.name}
-                          >
-                            {document.name}
-                          </h4>
-                          <p className="text-xs text-gray-500">
-                            {formatFileSize(document.file_size)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        {isPdfFile(document.file_name, document.type) && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handlePreview(document)}
-                            className="h-8 w-8 p-0"
-                            title="Preview PDF"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDownload(document)}
-                          className="h-8 w-8 p-0"
-                          title="Download"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDelete(document.id)}
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-1 text-xs text-gray-500">
-                      <p>Uploaded: {formatDate(document.created_at)}</p>
-                      <p className="truncate">File: {document.file_name}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        {watch("privateFiles") || watch("sharedFiles") ? (
+          <div className="mt-6 flex justify-end gap-4">
+            <Button type="submit" className="text-white" disabled={isPending}>
+              {isPending ? "Updating..." : "Update"}
+            </Button>
           </div>
-        ) : (
-          <div className="flex flex-col bg-gray-50 border-2 border-dashed border-gray-300 gap-3 py-8 items-center rounded-lg">
-            <Upload className="h-8 w-8 text-gray-400" />
-            <span className="text-sm text-gray-500">
-              No Shared documents uploaded yet
-            </span>
-            <span className="text-xs text-gray-400">
-              Click "Add Document" to upload Shared files
-            </span>
-          </div>
-        )}
-      </div>
+        ) : null}
+      </form>
     </div>
   );
 };

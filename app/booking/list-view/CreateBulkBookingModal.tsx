@@ -35,8 +35,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Trash2 } from "lucide-react";
-import CreateBulk from "./CreateBulk";
 import useCreateBulkProperty from "@/lib/services/hooks/useCreateBulkProperty";
+import CreateBulk from "./CreateBulk";
+import useCreateBulkBooking from "@/lib/services/hooks/useCreateBulkBooking";
 // Schema & type
 
 const CreateBulkPropertyModal = () => {
@@ -45,44 +46,41 @@ const CreateBulkPropertyModal = () => {
     mode: "onTouched",
   });
 
-  const { mutate, isPending } = useCreateBulkProperty();
+  const { mutate, isPending } = useCreateBulkBooking();
   const { refetch } = useGetPropertiesList({});
   type Payload = {
-    property_name: string;
-    owner_id: string;
-    owner_name: string;
-    owner_phone: string;
-    contact_name: string | null;
-    contact_phone: string | null;
-    property_type: string;
-    remarks: string;
-    address_line_1: string | null;
-    country: string;
-    city: string;
-    state: string;
-    postcode: string;
-    facilities: string[];
+    tenant_id: string;
+    tenant_name: string;
+    move_in_date: string;
+    move_out_date: string;
+    rental_fee: string;
+    rental_payment_frequency: string;
+    identity_type: string;
+    remarks?: string;
+    property_id?: string;
+    unit_id?: string;
+    room_id?: string;
   };
-  const [Properties, setProperties] = useState<Payload[]>([]);
+  const [Bookings, setBookings] = useState<Payload[]>([]);
   const onSubmit = () => {
-    mutate(Properties, {
+    mutate(Bookings, {
       onSuccess: () => {
-        toast.success(`properties created successfully!`);
+        toast.success(`bookings created successfully!`);
         refetch();
-        setProperties([]);
+        setBookings([]);
         setIsOpen(false);
       },
       onError: (err) => {
-        toast.error("Failed to create all properties");
+        toast.error("Failed to create all bookings");
       },
     });
   };
-
+  console.log(Bookings);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="bg-black rounded-[6px] text-white hover:bg-black/70 cursor-pointer">
-          Create Bulk Property
+          Create Bulk Booking
         </Button>
       </DialogTrigger>
 
@@ -95,45 +93,32 @@ const CreateBulkPropertyModal = () => {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 text-xs">
-              <TableHead>Property Name</TableHead>
-              <TableHead>Property Type</TableHead>
-              <TableHead>Owner Name</TableHead>
-              <TableHead>Contact Name</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Facilities</TableHead>
+              <TableHead>Property</TableHead>
+              <TableHead>Unit</TableHead>
+              <TableHead>Room</TableHead>
+              <TableHead>Tenant Name</TableHead>
+              <TableHead>Rental fee</TableHead>
+              <TableHead>Rental Frequency</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Properties.map((property) => (
-              <TableRow key={property.property_name}>
-                <TableCell>{property.property_name}</TableCell>
-                <TableCell>{property.property_type}</TableCell>
-                <TableCell>{property.owner_name}</TableCell>
-                <TableCell>{property.contact_name}</TableCell>
-                <TableCell>
-                  {property.city},{property.state},{property.address_line_1}
-                </TableCell>
-                <TableCell>
-                  {property.facilities
-                    ?.map((f: string) =>
-                      f
-                        .split("_")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")
-                    )
-                    .join(", ")}
-                </TableCell>
+            {Bookings.map((Booking, index) => (
+              <TableRow key={index}>
+                <TableCell>{Booking.property_id ?? "-"}</TableCell>
+                <TableCell>{Booking.unit_id ?? "-"}</TableCell>
+                <TableCell>{Booking.room_id ?? "-"}</TableCell>
+                <TableCell>{Booking.tenant_name}</TableCell>
+                <TableCell>{Booking.rental_fee}</TableCell>
+                <TableCell>{Booking.rental_payment_frequency}</TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() =>
-                      setProperties((prev) =>
+                      setBookings((prev) =>
                         prev.filter(
-                          (_, index) => index !== Properties.indexOf(property)
+                          (_, index) => index !== Bookings.indexOf(Booking)
                         )
                       )
                     }
@@ -145,7 +130,7 @@ const CreateBulkPropertyModal = () => {
             ))}
           </TableBody>
         </Table>
-        <CreateBulk payload={Properties} setPayload={setProperties} />
+        <CreateBulk payload={Bookings} setPayload={setBookings} />
 
         <FormProvider {...form}>
           <form

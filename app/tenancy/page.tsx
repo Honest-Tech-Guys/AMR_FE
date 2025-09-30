@@ -208,7 +208,8 @@ const Page = () => {
                   <div className="flex justify-between items-center">
                     <div className=" flex  flex-col gap-2">
                       <p className="text-sm text-gray-600">
-                        <p className="font-medium">Smart Meter</p> {tenancy.id}
+                        <p className="font-medium">Smart Meter</p>{" "}
+                        {tenancy.meters ? "" : "no smart meter"}
                       </p>
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">Balance</span>{" "}

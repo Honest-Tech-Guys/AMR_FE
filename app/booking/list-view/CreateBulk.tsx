@@ -18,23 +18,20 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 
-import { toast } from "sonner";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import MultiFileUpload from "@/components/input-11";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { TreeNode, TreeSelect } from "@/components/TreeSelect";
-import { useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useGetSelection, {
   PropertySelection,
 } from "@/lib/services/hooks/useGetSelection";
 import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
-import useCreateBooking from "@/lib/services/hooks/useCreateBooking";
+import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -74,7 +71,21 @@ const schema = yup.object({
     .optional(),
 });
 type schemaType = yup.InferType<typeof schema>;
-const CreateNewBooking = () => {
+type Payload = {
+  tenant_id: string;
+  tenant_name: string;
+  move_in_date: string;
+  move_out_date: string;
+  rental_fee: string;
+  rental_payment_frequency: string;
+  identity_type: string;
+  remarks?: string;
+};
+interface Props {
+  payload: Payload[];
+  setPayload: React.Dispatch<React.SetStateAction<Payload[]>>;
+}
+const CreateBulk = ({ setPayload }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
     // resolver: yupResolver(schema),
@@ -89,7 +100,9 @@ const CreateNewBooking = () => {
     formState: { errors },
   } = form;
 
-  const [tenantData, setTenantData] = useState([]);
+  const [tenantData, setTenantData] = useState<{ id: string; name: string }[]>(
+    []
+  );
   const [isOpen, setIsOpen] = useState(false);
   const { data: tenants } = useGetTenantsList();
   useEffect(() => {
@@ -122,16 +135,20 @@ const CreateNewBooking = () => {
       setTreeData(mapToTreeData(data));
     }
   }, [data]);
-  const { mutate, isPending } = useCreateBooking();
-  type Result = { room_id: number } | { unit_id: number } | null;
+  type Result =
+    | { room_id: number }
+    | { unit_id: number }
+    | { property_id: number }
+    | null;
   const parseValue = (value: string): Result => {
     const match = value.match(/^(\w+)-(\d+)$/);
     if (!match) return null;
 
     const [, type, id] = match;
     const numberId = Number(id);
-
-    if (type === "room") {
+    if (type === "property") {
+      return { property_id: numberId };
+    } else if (type === "room") {
       return { room_id: numberId };
     } else if (type === "unit") {
       return { unit_id: numberId };
@@ -139,9 +156,18 @@ const CreateNewBooking = () => {
 
     return null;
   };
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
+  const onSubmit: SubmitHandler<schemaType> = (data, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const selectedTenant = tenantData.find(
+      (tenant) => tenant.id === data.tenant
+    );
+
     const payload = {
       tenant_id: data.tenant,
+      tenant_name: selectedTenant ? selectedTenant.name : "",
       move_in_date: data.move_in_date,
       move_out_date: data.move_out_date,
       rental_fee: data.rental,
@@ -150,23 +176,21 @@ const CreateNewBooking = () => {
       remarks: data.remarks,
       ...parseValue(data.property_id),
     };
-    mutate(payload, {
-      onSuccess: () => {
-        toast.success("Booking created successfully!");
-        reset();
-        refetch();
-        setIsOpen(false);
-      },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create Booking.");
-      },
-    });
+    setPayload((prev) => [...prev, payload]);
+    reset();
+    setIsOpen(false);
     console.log("Form data:", data);
   };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-[6px] text-white">Create New Booking</Button>
+        <Button
+          className="bg-black rounded-[6px] max-w-15 text-white hover:bg-black/70 cursor-pointer"
+          type="button"
+        >
+          <Plus />
+          Add
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="md:max-w-[1000px] bg-white md:p-10 max-h-[95vh] overflow-y-auto">
@@ -346,8 +370,8 @@ const CreateNewBooking = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white" disabled={isPending}>
-                {isPending ? "Submitting..." : "Submit"}
+              <Button type="submit" className="text-white">
+                Add
               </Button>
             </DialogFooter>
           </form>
@@ -357,4 +381,4 @@ const CreateNewBooking = () => {
   );
 };
 
-export default CreateNewBooking;
+export default CreateBulk;

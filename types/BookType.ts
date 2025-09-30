@@ -1,4 +1,3 @@
-import { Property } from "./PropertyType";
 import { Room } from "./RoomType";
 import { TenantType } from "./TenantType";
 import { Unit } from "./UnitType";

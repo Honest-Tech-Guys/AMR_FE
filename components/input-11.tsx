@@ -53,9 +53,13 @@ export default function MultiFileUpload({
         }))
       );
       console.log(base64Files);
-      setFiles([...files, ...base64Files]);
-      onChange?.([...files, ...base64Files]); // <-- important for react-hook-form
-      // setData({ [field]: [...files, ...base64Files] });
+      if (!isMulti) {
+        setFiles([...base64Files]);
+        onChange?.([...base64Files]);
+      } else {
+        setFiles([...files, ...base64Files]);
+        onChange?.([...files, ...base64Files]);
+      }
     }
   };
 
@@ -144,7 +148,7 @@ export default function MultiFileUpload({
   );
 }
 
-const toBase64 = (file: File): Promise<string> =>
+export const toBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);

@@ -178,6 +178,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
   const { mutate, isPending } = useCreateAgreement(id);
   const { refetch } = useGetTenancyList();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
+    console.log(data.attachments);
     const payload: RentalAgreement = {
       agreement_date: data.agreement_date,
       landlord_name: data.landlord_name,

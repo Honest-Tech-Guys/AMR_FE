@@ -11,6 +11,9 @@ import { useState } from "react";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import { Book } from "@/types/BookType";
 import { Badge } from "@/components/ui/badge";
+import { Unit } from "@/types/UnitType";
+import { Room } from "@/types/RoomType";
+import CreateBulkPropertyModal from "./CreateBulkBookingModal";
 
 type PropertyTableRow = {
   property_id: string;
@@ -88,41 +91,54 @@ const mapBooksToTable = (books: Book[]): PropertyTableRow[] => {
   });
 };
 
-const invoiceColumns: Column<PropertyTableRow>[] = [
+const invoiceColumns: Column<Book>[] = [
   {
     title: "Property",
-    key: "property_id",
+    key: "bookable.unit.property.property_name",
     sortable: true,
     className: "pl-6 py-4",
     render: (row) => (
-      <div className="pl-4 text-primary font-medium">{row.property_id}</div>
+      <div className="pl-4 text-primary font-medium">
+        {"unit" in row.bookable
+          ? (row.bookable as Room).unit.property.property_name
+          : (row.bookable as Unit).property.property_name}
+      </div>
     ),
   },
   {
     title: "Unit",
     key: "unit",
     sortable: true,
-    render: (row) => <div>{row.unit}</div>,
+    render: (row) => (
+      <div>
+        {" "}
+        {"unit" in row.bookable
+          ? (row.bookable as Room).unit.block_floor_unit_number
+          : (row.bookable as Unit).block_floor_unit_number}
+      </div>
+    ),
   },
   {
     title: "Room",
     key: "room",
-    render: (row) => <div>{row.room}</div>,
+    render: (row) => (
+      <div> {"unit" in row.bookable ? (row.bookable as Room).name : "-"}</div>
+    ),
   },
   {
     title: "Tenant Name",
     key: "tenant_name",
-    render: (row) => <div>{row.tenant_name}</div>,
+    render: (row) => <div>{row.tenant.name}</div>,
   },
   {
     title: "Rental",
     key: "rental",
-    render: (row) => <div>{row.rental}</div>,
+    render: (row) => <div>{row.rental_fee}</div>,
   },
   {
     title: "Rental Frequency",
     key: "rental_frequency",
-    render: (row) => <div>{row.rental_frequency}</div>,
+    render: (row) => <div>{row.rental_payment_frequency}</div>,
   },
   {
     title: "Status",
@@ -231,9 +247,7 @@ const Page = () => {
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            <Button className="bg-black rounded-[6px] text-white hover:bg-black/70">
-              Create Bulk Booking
-            </Button>
+            <CreateBulkPropertyModal />
             <CreateNewBooking />
           </div>
         </div>
@@ -252,13 +266,13 @@ const Page = () => {
           </div>
         </div>
 
-        <Datatable<PropertyTableRow>
+        <Datatable<Book>
           columns={invoiceColumns}
-          data={data ? mapBooksToTable(data) : []}
+          data={data ?? []}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
-          rowKey={(item) => item.property_id}
+          rowKey={(item) => item.id}
           // isFilter={isFilter}
         />
       </div>
