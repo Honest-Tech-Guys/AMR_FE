@@ -316,11 +316,11 @@ const DocumentsTap = ({ tenancy }: Props) => {
                 .map((document) => {
                   console.log(document);
                   return (
-                    <Card
+                    <div
                       key={document.id}
                       className="hover:shadow-md transition-shadow"
                     >
-                      <CardContent className="p-4">
+                      <div className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <span className="text-2xl">
@@ -365,8 +365,8 @@ const DocumentsTap = ({ tenancy }: Props) => {
                           <p>Uploaded: {formatDate(document.created_at)}</p>
                           <p className="truncate">File: {document.file_name}</p>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   );
                 })}
             </div>

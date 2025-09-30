@@ -1,39 +1,35 @@
 "use client";
 
-import {
-  useForm,
-  FormProvider,
-  useFieldArray,
-  Controller,
-} from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import CustomInput from "@/components/CustomInput";
+import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
   DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import CustomInput from "@/components/CustomInput";
-import HeaderSection from "@/components/HeaderSection";
-import { Separator } from "@radix-ui/react-separator";
-import useGetPermissionsList from "@/lib/services/hooks/useGetPermissionsList";
-import { useEffect, useState } from "react";
-import useCreateRole from "@/lib/services/hooks/useCreateRole";
 import useGetRole from "@/lib/services/hooks/useGetRole";
+import useUpdateRole from "@/lib/services/hooks/useUpdateRole";
+import useGetPermissionsList from "@/lib/services/hooks/useGetPermissionsList";
+import Role from "@/types/RoleType";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as yup from "yup";
+import { Eye } from "lucide-react";
 interface Permission {
   id: number;
   name: string;
@@ -71,25 +67,37 @@ const schema = yup.object({
     .required("Permissions are required")
     .min(1, "At least one module must be present"),
 });
-
-const CreateNewRole = () => {
-  const { data: permissionsData, isLoading } = useGetPermissionsList();
+interface Props {
+  role: Role;
+}
+const EditRole = ({ role }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  // Build default values from API
+
+  // Merge API permissions with role's current permissions
   const defaultPermissions: ModulePermissions[] =
-    permissionsData?.map((mod: any) => ({
-      module: mod.module,
-      permissions: mod.permissions.map((perm: any) => ({
-        id: perm.id,
-        name: perm.name,
-        value: false,
-      })),
-    })) || [];
+    role.permissions?.map((mod: any) => {
+      const roleModule = role.permissions?.find(
+        (rmod: any) => rmod.module === mod.module
+      );
+      return {
+        module: mod.module,
+        permissions: mod.permissions.map((perm: any) => {
+          //   const hasPermission = roleModule?.permissions.some(
+          //     (rperm: any) => rperm.id === perm.id
+          //   );
+          return {
+            id: perm.id,
+            name: perm.name,
+            value: perm.value,
+          };
+        }),
+      };
+    }) || [];
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
+      name: role.name || "",
       permissions: defaultPermissions,
     },
   });
@@ -103,16 +111,16 @@ const CreateNewRole = () => {
     reset,
   } = methods;
 
-  // Reset form when permissionsData changes
+  // Reset form when permissionsData or role changes
   useEffect(() => {
-    if (permissionsData) {
+    if (role) {
       reset({
-        name: "",
+        name: role.name || "",
         permissions: defaultPermissions,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [permissionsData]);
+  }, [role]);
 
   // Toggle all permissions
   const toggleAllPermissions = (value: boolean) => {
@@ -122,30 +130,33 @@ const CreateNewRole = () => {
     }));
     methods.setValue("permissions", updatedPermissions);
   };
-  const { mutate, isPending } = useCreateRole();
+  const { mutate, isPending } = useUpdateRole();
   const { refetch } = useGetRole();
   const onSubmit = (data: FormValues) => {
-    mutate(data, {
-      onSuccess: () => {
-        toast.success("user created successfully!");
-        reset();
-        refetch();
-        setIsOpen(false);
-      },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create user.");
-      },
-    });
+    mutate(
+      { ...data, id: role.id },
+      {
+        onSuccess: () => {
+          toast.success("Role updated successfully!");
+          reset();
+          refetch();
+          setIsOpen(false);
+        },
+        onError: (err) => {
+          toast.error((err as any)?.message || "Failed to update role.");
+        },
+      }
+    );
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-[6px] text-white">Create New Role</Button>
+        <Eye />
       </DialogTrigger>
       <DialogContent className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <div className="text-2xl font-bold">Create New Role</div>
+          <div className="text-2xl font-bold">Edit Role</div>
         </DialogHeader>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -187,8 +198,8 @@ const CreateNewRole = () => {
                 <TableRow className="bg-gray-50 text-xs">
                   <TableHead>Module</TableHead>
                   {/* Dynamically render permission columns */}
-                  {permissionsData &&
-                    permissionsData[0]?.permissions.map((perm: any) => (
+                  {role.permissions &&
+                    role.permissions[0]?.permissions.map((perm: any) => (
                       <TableHead key={perm.id} className="capitalize">
                         {perm.name.split(" ")[0]}
                       </TableHead>
@@ -236,4 +247,4 @@ const CreateNewRole = () => {
   );
 };
 
-export default CreateNewRole;
+export default EditRole;

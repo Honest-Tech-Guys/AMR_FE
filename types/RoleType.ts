@@ -1,8 +1,15 @@
-interface Role {
+type Permission = {
+  id: number;
   name: string;
-  pivot: {
-    model_type: string;
-    model_id: number;
-    role_id: number;
-  };
+  value: boolean;
+};
+
+type ModulePermissions = {
+  module: string;
+  permissions: Permission[];
+};
+export default interface Role {
+  name: string;
+  id: number;
+  permissions: ModulePermissions[];
 }

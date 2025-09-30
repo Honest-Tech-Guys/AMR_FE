@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import User from "@/types/UserType";
 const useGetUser = () => {
   return useQuery({
     queryKey: ["GetUser"],

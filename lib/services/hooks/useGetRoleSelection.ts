@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import Role from "@/types/RoleType";
+import OwnerType from "@/types/OwnerType";
 import ResponseType from "@/types/ResponseType";
-const useGetRole = () => {
+import User from "@/types/UserType";
+
+const useGetRoleSelection = () => {
   return useQuery({
-    queryKey: ["GetRole"],
+    queryKey: ["GetRoleSelection"],
     queryFn: () => {
-      const url = "/roles";
+      const url = "/roles/selection-list";
       {
         return axiosInstance
-          .get<ResponseType<Role[]>>(url)
+          .get<ResponseType<User[]>>(url)
           .then((res) => {
             return res.data.data;
           })
@@ -21,4 +23,5 @@ const useGetRole = () => {
     },
   });
 };
-export default useGetRole;
+
+export default useGetRoleSelection;

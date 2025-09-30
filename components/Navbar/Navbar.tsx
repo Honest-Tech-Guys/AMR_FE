@@ -8,6 +8,15 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import useGetUser from "@/lib/services/hooks/useGetUser";
 import { NotificationPopover } from "./NotificationPopover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import UpdateProfile from "./updateProfile";
+
 const Navbar = () => {
   const { logout } = useAuthStore();
   const { data } = useGetUser();
@@ -42,6 +51,25 @@ const Navbar = () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
+  const [openDialog, setOpenDialog] = useState<"editProfile" | null>(null);
+  const MenuItem = ({
+    children,
+    dialogKey,
+  }: {
+    children: React.ReactNode;
+    dialogKey: typeof openDialog;
+  }) => (
+    <DropdownMenuItem
+      className="hover:bg-gray-100 hover:cursor-pointer"
+      onSelect={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setOpenDialog(dialogKey);
+      }}
+    >
+      {children}
+    </DropdownMenuItem>
+  );
   return (
     <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-4">
       <SidebarTrigger className="-ml-1" />
@@ -58,19 +86,41 @@ const Navbar = () => {
           strokeWidth={2.5}
         />
         <NotificationPopover />
-        <LogOut
-          onClick={logout}
-          className="size-5 text-primary cursor-pointer"
-          strokeWidth={2.5}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="cursor-pointer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Avatar>
+                <AvatarImage src={data?.avatar_url} alt="@shadcn" />
+                <AvatarFallback className="bg-primary/10">
+                  {data?.name[0]}
+                  {data?.name[1]}
+                </AvatarFallback>
+              </Avatar>
+              <span className="tracking-tight">{data?.name}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+            <MenuItem dialogKey="editProfile">Edit Profile</MenuItem>
+            <MenuItem dialogKey="editProfile">
+              <div onClick={logout} className="flex ">
+                <LogOut
+                  className="size-5 text-primary cursor-pointer"
+                  strokeWidth={2.5}
+                />{" "}
+                Logout
+              </div>
+            </MenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <UpdateProfile
+          open={openDialog === "editProfile"}
+          onOpenChange={(open) => setOpenDialog(open ? "editProfile" : null)}
         />
-        <Avatar>
-          <AvatarImage src={data?.avatar_url} alt="@shadcn" />
-          <AvatarFallback className="bg-primary/10">
-            {data?.name[0]}
-            {data?.name[1]}
-          </AvatarFallback>
-        </Avatar>
-        <span className="tracking-tight">{data?.name}</span>
       </div>
     </header>
   );

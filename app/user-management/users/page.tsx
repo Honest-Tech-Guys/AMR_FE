@@ -17,6 +17,8 @@ import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
 import CreateNewUser from "./CreateNewUser";
+import useGetUserList from "@/lib/services/hooks/useGetUserList";
+import type User from "@/types/UserType";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {
@@ -32,16 +34,6 @@ const options = [
     label: "Deactivated (24)",
   },
 ];
-type user = {
-  user_no: string;
-  property: string;
-  user_id: string;
-  user_name: string;
-  email: string;
-  contract_no: string;
-  role: string;
-  status: string;
-};
 interface PaginationData {
   page: number;
   per_page: number;
@@ -54,53 +46,55 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const UserColumns: Column<user>[] = [
+  const UserColumns: Column<User>[] = [
     {
-      title: "No",
-      key: "user_no",
+      title: "ID",
+      key: "id",
       sortable: true,
       className: "pl-6 py-4",
-      render: (order) => (
-        <div className="pl-4 text-primary font-medium ">
-          {order.user_no ?? "-"}
+      render: (user) => (
+        <div className="pl-4 text-primary font-medium ">{user.id}</div>
+      ),
+    },
+    {
+      title: "Name",
+      key: "name",
+      render: (user) => <div>{user.name}</div>,
+    },
+    {
+      title: "Email",
+      key: "email",
+      render: (user) => <div>{user.email}</div>,
+    },
+    {
+      title: "Roles",
+      key: "roles",
+      render: (user) => (
+        <div>
+          {user.roles && user.roles.length > 0
+            ? user.roles.map((role) => role.name).join(", ")
+            : "-"}
         </div>
       ),
     },
     {
-      title: "Property",
-      key: "property",
-      sortable: true,
-      render: (user) => <div>{user.property}</div>,
-    },
-    {
-      title: "User ID",
-      key: "user_id",
-      render: (order) => <div>{order.user_id}</div>,
-    },
-    {
-      title: "User Name",
-      key: "user_name",
-      render: (order) => <div>{order.user_name}</div>,
-    },
-    {
-      title: "Email Address",
-      key: "email",
-      render: (order) => <div>{order.email}</div>,
-    },
-    {
-      title: "Contract NO",
-      key: "contract_no",
-      render: (order) => <div>{order.contract_no ?? "-"}</div>,
-    },
-    {
-      title: "Role",
-      key: "role",
-      render: (order) => <div>{order.role ?? "-"}</div>,
-    },
-    {
       title: "Status",
-      key: "status",
+      key: "email_verified_at",
+      render: (user) => (
+        <div>{user.email_verified_at ? "Active" : "Inactive"}</div>
+      ),
       sortable: true,
+    },
+    {
+      title: "Created At",
+      key: "created_at",
+      render: (user) => (
+        <div>
+          {user.created_at
+            ? new Date(user.created_at).toLocaleDateString()
+            : "-"}
+        </div>
+      ),
     },
   ];
   const filters = [
@@ -115,19 +109,16 @@ const Page = () => {
     </Button>
   );
 
-  const { data, isLoading, error } = useGetPropertiesList({});
-
+  // const { data, isLoading, error } = useGetPropertiesList({});
+  const { data, isPending, error } = useGetUserList();
   // Map API data to table format
-  const tableData = data?.properties.data.map((item) => ({
-    property_id: item.property_name ?? "-",
-    unit: "-", // Replace with actual unit info if available
-    room: "-", // Replace with actual room info if available
-    smart_home: "-", // Replace with actual smart home info if available
-    owner_name: "-", // Replace with actual owner name if available
-    rental: "-", // Replace with actual rental info if available
-    tenancy: "-", // Replace with actual tenancy info if available
-    status: "-", // Replace with actual status if available
-  }));
+  const users: User[] = data?.data || [];
+  const paginationData = {
+    page: data?.current_page || 1,
+    per_page: data?.per_page || 10,
+    last_page: data?.last_page || 1,
+  };
+
   const [formFilters, setFormFilters] = useState({
     property_name: "",
     unit_name: "",
@@ -198,39 +189,18 @@ const Page = () => {
           </div>
         </div>
 
-        <Datatable<user>
+        <Datatable<User>
           columns={UserColumns}
-          data={[
-            {
-              user_no: "001",
-              property: "Sky Residence",
-              user_id: "U1001",
-              user_name: "John Doe",
-              email: "john.doe@example.com",
-              contract_no: "C-2023-001",
-              role: "Admin",
-              status: "Active",
-            },
-            {
-              user_no: "002",
-              property: "Green Valley",
-              user_id: "U1002",
-              user_name: "Jane Smith",
-              email: "jane.smith@example.com",
-              contract_no: "C-2023-002",
-              role: "Owner",
-              status: "Inactive",
-            },
-          ]}
-          isPending={isLoading}
-          pagination={pagination}
+          data={users}
+          isPending={isPending}
+          pagination={{
+            ...pagination,
+            last_page: paginationData.last_page,
+          }}
           setPagination={setPagination}
-          rowKey={(item: user) => item.user_no}
-          // isFilter={isFilter}
+          rowKey={(item: User) => item.id}
         />
-        {error && (
-          <div className="text-red-500 mt-2">Error loading properties.</div>
-        )}
+        {error && <div className="text-red-500 mt-2">Error loading users.</div>}
       </div>
       {/* <MapWithPoints /> */}
     </div>

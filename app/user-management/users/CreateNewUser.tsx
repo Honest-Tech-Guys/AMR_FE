@@ -10,10 +10,22 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
 import * as yup from "yup";
 import HeaderSection from "@/components/HeaderSection";
-
+import useGetRoleSelection from "@/lib/services/hooks/useGetRoleSelection";
+import { useEffect, useState } from "react";
+import { SelectWithForm } from "@/components/CustomSelect";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import useCreateNewUser from "@/lib/services/hooks/useCreateNewUser";
+import useGetUnitsList from "@/lib/services/hooks/useGetUnit";
+import { toast } from "sonner";
 // Schema & type
 const schema = yup.object({
   username: yup.string().required("User name is required"),
@@ -23,7 +35,7 @@ const schema = yup.object({
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-  role: yup.string().required("Role is required"),
+  role_id: yup.string().required("Role is required"),
   status: yup.string().required("Status is required"),
   remarks: yup.string().nullable(),
 });
@@ -31,6 +43,7 @@ const schema = yup.object({
 type schemaType = yup.InferType<typeof schema>;
 
 const CreateNewUser = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -38,15 +51,47 @@ const CreateNewUser = () => {
     setValue,
     watch,
     handleSubmit,
+    reset,
+    control,
     formState: { errors },
   } = form;
 
+  const [roles, setRoles] = useState([]);
+  const { data } = useGetRoleSelection();
+  useEffect(() => {
+    if (data) {
+      const dataT = data.map((role) => {
+        return { id: `${role.id}`, name: role.name };
+      });
+      setRoles(dataT as never);
+    }
+  }, [data]);
+  const { mutate, isPending } = useCreateNewUser();
+  const { refetch } = useGetUnitsList();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
+    const payload = {
+      name: data.username,
+      email: data.email,
+      password: data.password,
+      password_confirmation: data.confirm_password,
+      role_id: 1,
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("user created successfully!");
+        reset();
+        refetch();
+        setIsOpen(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create user.");
+      },
+    });
     console.log("Form data:", data);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">Create New User</Button>
       </DialogTrigger>
@@ -103,27 +148,31 @@ const CreateNewUser = () => {
                 placeholder="Re-enter password"
               />
 
-              <CustomInput
-                id="role"
-                name="role"
-                type="text"
-                label="Role"
-                value={watch("role")}
-                onChange={(e) => setValue("role", e.target.value)}
-                errors={errors.role?.message}
-                placeholder="Enter role"
-              />
+              {/* <SelectWithForm<schemaType>
+                name="role_id"
+                title="Role"
+                options={roles}
+              /> */}
 
-              <CustomInput
-                id="status"
-                name="status"
-                type="text"
-                label="Status"
-                value={watch("status")}
-                onChange={(e) => setValue("status", e.target.value)}
-                errors={errors.status?.message}
-                placeholder="Enter status"
-              />
+              <div className="flex flex-col  space-y-3">
+                <Label htmlFor="auto_create_passcode">Active</Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="auto_create_passcode"
+                        checked={Boolean(field.value)} // ✅ RHF value
+                        onCheckedChange={field.onChange} // ✅ RHF change handler
+                      />
+                      {/* <label htmlFor="auto_create_passcode" className="text-sm">
+                        Auto Create Passcode
+                      </label> */}
+                    </div>
+                  )}
+                />
+              </div>
 
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
@@ -146,8 +195,8 @@ const CreateNewUser = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button type="submit" className="text-white" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>
