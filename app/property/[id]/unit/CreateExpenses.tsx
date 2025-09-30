@@ -233,7 +233,7 @@ const CreateExpenses = () => {
                   className="bg-gray-100"
                   errors={errors.additional_notes?.message}
                 /> */}
-                <DragAndDropFiles
+                {/* <DragAndDropFiles
                   description={
                     <div className="text-center mb-3">
                       <p className="text-md">
@@ -248,7 +248,7 @@ const CreateExpenses = () => {
                       <Search /> <span>Browser File</span>
                     </div>
                   }
-                />
+                /> */}
               </div>
             </div>
             <DialogFooter className="mt-6">
