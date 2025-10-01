@@ -1,3 +1,5 @@
+import { FileData } from "./FileData";
+
 export interface AgreementType {
   id: number;
   tenancy_id: number;
@@ -24,7 +26,7 @@ export interface AgreementType {
   advanced_rental_amount: string; // e.g. "0.00"
   house_rules_remarks: string | null;
   terms_conditions_remarks: string | null;
-  attachments: string[]; // file paths
+  attachments: FileData[]; // file paths
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
 }

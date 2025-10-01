@@ -36,7 +36,7 @@ const ViewTenancy = ({ tenancy }: Props) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:max-w-[1000px] bg-white z-[200] md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="md:max-w-[1000px] bg-white z-[200] md:p-10 h-[95vh] overflow-y-auto">
         <DialogHeader>
           <h2 className="text-2xl font-bold">View Tenancy</h2>
         </DialogHeader>

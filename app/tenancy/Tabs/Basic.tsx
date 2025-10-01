@@ -13,6 +13,7 @@ import { Tenancy } from "@/types/TenancyType";
 import { daysBetween, formatDate } from "@/lib/utils";
 import CreateAgreement from "../CreateAgreement";
 import { useState } from "react";
+import EditAgreement from "../VeiwAgreement";
 const schema = yup.object({
   country: yup.string().required("Country is required"),
   postcode: yup.string().required("Country is required"),
@@ -56,6 +57,7 @@ const BasicTap = ({ tenancy }: Props) => {
     console.log("Form data:", data);
   };
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   return (
     <div>
       <FormProvider {...form}>
@@ -259,7 +261,12 @@ const BasicTap = ({ tenancy }: Props) => {
                 </div>
                 {tenancy.agreement ? (
                   <div className="flex flex-col gap-3 p-3 ">
-                    <span className="text-primary underline text-sm">
+                    <span
+                      className="text-primary underline text-sm cursor-pointer"
+                      onClick={() => {
+                        setOpenEdit(true);
+                      }}
+                    >
                       {tenancy.agreement.id}
                     </span>
                     <span className="text-sm">
@@ -313,6 +320,14 @@ const BasicTap = ({ tenancy }: Props) => {
           </div>
         </form>
       </FormProvider>
+      {tenancy.agreement ? (
+        <EditAgreement
+          id={tenancy.id}
+          initialData={tenancy.agreement}
+          open={openEdit}
+          onOpenChange={setOpenEdit}
+        />
+      ) : null}
     </div>
   );
 };

@@ -50,7 +50,7 @@ export interface RentalAgreement {
 }
 
 // Schema & type
-const schema = yup.object({
+export const schema = yup.object({
   agreement_date: yup.string().required("Agreement Date is required"),
   landlord_name: yup.string().required("Landlord Name is required"),
   landlord_phone: yup.string().required("Landlord Phone is required"),

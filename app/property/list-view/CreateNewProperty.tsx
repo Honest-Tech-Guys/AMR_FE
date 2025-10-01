@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { useAuthStore } from "@/lib/stores/authStore";
 // Schema & type
 const schema = yup.object({
   postcode: yup.string().required("Country is required"),
@@ -67,6 +68,7 @@ const CreateNewProperty = () => {
   const { mutate, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
   const { refetch } = useGetPropertiesList({});
+  const { user_role } = useAuthStore();
   useEffect(() => {
     if (data) {
       const dataT = data.map((owner) => {
@@ -174,28 +176,37 @@ const CreateNewProperty = () => {
                 title="Property Type"
                 options={PartnerType}
               />
-              <SelectWithForm<schemaType>
-                name="owner_id"
-                title="Owner"
-                options={owners}
-              />
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Owner Phone Number
-                </label>
-                <Controller
-                  control={control}
-                  name="owner_phone_number"
-                  render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Owner Number" />
-                  )}
-                />
-                {errors.owner_phone_number && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.owner_phone_number.message}
-                  </p>
-                )}
-              </div>
+              {user_role !== "Admin" ? (
+                <>
+                  {" "}
+                  <SelectWithForm<schemaType>
+                    name="owner_id"
+                    title="Owner"
+                    options={owners}
+                  />
+                  <div>
+                    <label className="block mb-1 text-sm font-medium">
+                      Owner Phone Number
+                    </label>
+                    <Controller
+                      control={control}
+                      name="owner_phone_number"
+                      render={({ field }) => (
+                        <PhoneInput
+                          {...field}
+                          placeholder="Enter Owner Number"
+                        />
+                      )}
+                    />
+                    {errors.owner_phone_number && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.owner_phone_number.message}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : null}
+
               <CustomInput
                 id="contact_name"
                 name="contact_name"

@@ -14,7 +14,7 @@ type AuthStore = {
     id: number;
     name: string;
     email: string;
-    role: string;
+    roles: { name: string }[];
     email_verified_at: string | null;
   }) => void;
   setIsAuth: (value: boolean) => void;
@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthStore>()(
           user_id: value.id,
           user_name: value.name,
           user_email: value.email,
-          user_role: value.role,
+          user_role: value.roles[0].name,
           email_verified_at: value.email_verified_at,
         }),
 
