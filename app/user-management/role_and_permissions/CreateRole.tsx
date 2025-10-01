@@ -189,7 +189,10 @@ const CreateNewRole = () => {
                   {/* Dynamically render permission columns */}
                   {permissionsData &&
                     permissionsData[0]?.permissions.map((perm: any) => (
-                      <TableHead key={perm.id} className="capitalize">
+                      <TableHead
+                        key={perm.id}
+                        className="capitalize  text-center"
+                      >
                         {perm.name.split(" ")[0]}
                       </TableHead>
                     ))}

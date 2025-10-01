@@ -115,13 +115,18 @@ const Page = () => {
       label: "Partially Occupied",
       count: "",
     },
+    {
+      value: "Deactivated",
+      label: "Deactivated",
+      count: "",
+    },
   ]);
   const router = useRouter();
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
-    per_page: 15,
+    per_page: 10,
     last_page: 1,
     links: [],
   });
@@ -252,6 +257,11 @@ const Page = () => {
           value: "Partially Occupied ",
           label: "Partially Occupied ",
           count: `${data.counters["Partially Occupied"]}`,
+        },
+        {
+          value: "Deactivated",
+          label: "Deactivated",
+          count: `${data.counters["Deactivated"]}`,
         },
       ]);
     }

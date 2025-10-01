@@ -34,5 +34,6 @@ export interface PropertyApi {
     "Fully Occupied": number;
     "Partially Occupied": number;
     Vacant: number;
+    Deactivated: number;
   };
 }

@@ -200,7 +200,10 @@ const EditRole = ({ role }: Props) => {
                   {/* Dynamically render permission columns */}
                   {role.permissions &&
                     role.permissions[0]?.permissions.map((perm: any) => (
-                      <TableHead key={perm.id} className="capitalize">
+                      <TableHead
+                        key={perm.id}
+                        className="capitalize text-center"
+                      >
                         {perm.name.split(" ")[0]}
                       </TableHead>
                     ))}
@@ -211,7 +214,7 @@ const EditRole = ({ role }: Props) => {
                   <TableRow key={mod.module}>
                     <TableCell>{mod.module}</TableCell>
                     {mod.permissions.map((perm, permIdx) => (
-                      <TableCell key={perm.id} className="text-center">
+                      <TableCell key={perm.id} className=" text-center">
                         <Controller
                           control={control}
                           name={
