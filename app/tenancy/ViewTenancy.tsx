@@ -69,7 +69,7 @@ const ViewTenancy = ({ tenancy }: Props) => {
             <DocumentsTap tenancy={tenancy} />
           </TabsContent>
           <TabsContent value="audit_logs">
-            <AuditLogsTap />
+            <AuditLogsTap tenancy={tenancy} />
           </TabsContent>
 
           {/* Placeholder for other tab contents if needed later */}

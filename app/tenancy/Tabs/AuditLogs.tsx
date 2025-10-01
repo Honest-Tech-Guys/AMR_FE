@@ -6,9 +6,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import useGetTenancyLogs from "@/lib/services/hooks/useGetTenancyLogs";
+import { formatDate } from "@/lib/utils";
+import { Tenancy } from "@/types/TenancyType";
 import React from "react";
-
-const AuditLogsTap = () => {
+interface Props {
+  tenancy: Tenancy;
+}
+const AuditLogsTap = ({ tenancy }: Props) => {
+  const { data } = useGetTenancyLogs(tenancy.id);
   return (
     <Table>
       <TableHeader>
@@ -20,12 +26,16 @@ const AuditLogsTap = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell>System </TableCell>
-          <TableCell>Meter Power On (Paid Invoice)</TableCell>
-          <TableCell>Meter [19104951074-META B-07-01 R2] power on.</TableCell>
-          <TableCell>01 Jun 10:34 AM</TableCell>
-        </TableRow>
+        {data?.map((log) => (
+          <TableRow>
+            <TableCell>{log.causer.name} </TableCell>
+            <TableCell>{log.event}</TableCell>
+            <TableCell>{log.description}</TableCell>
+            <TableCell>
+              {formatDate(log.created_at, { withTime: true })}
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );
