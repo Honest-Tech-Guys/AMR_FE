@@ -18,6 +18,7 @@ import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
 import { Tenancy } from "@/types/TenancyType";
 import { formatDate } from "@/lib/utils";
+import useGetSummaryInvoiceList from "@/lib/services/hooks/useGetSummaryInvoiceList";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {
@@ -59,6 +60,7 @@ const InvoiceTap = ({ tenancy }: Props) => {
     per_page: 10,
   });
   const [invoices, setInvoices] = useState<invoice[]>([]);
+  const { data } = useGetSummaryInvoiceList(tenancy.id);
   useEffect(() => {
     if (tenancy) {
       const transformedInvoices: invoice[] = tenancy.invoices.map(

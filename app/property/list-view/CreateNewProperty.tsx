@@ -176,7 +176,7 @@ const CreateNewProperty = () => {
                 title="Property Type"
                 options={PartnerType}
               />
-              {user_role !== "Admin" ? (
+              {user_role !== "Owner" ? (
                 <>
                   {" "}
                   <SelectWithForm<schemaType>

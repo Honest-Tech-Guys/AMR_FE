@@ -45,114 +45,122 @@ import NotificationIconB from "@/lib/icons/NotificationIconB";
 import ReportIconA from "@/lib/icons/ReportIconA";
 import ReportIconB from "@/lib/icons/ReportIconB";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 // Menu configuration
-const menuItems = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon_active: <DashboardIconA />,
-    icon: <DashboardIconB />,
-  },
-  {
-    title: "Property",
-    icon_active: <PropertyIconA />,
-    icon: <PropertyIconB />,
-    items: [
-      { title: "List View", url: "/property/list-view" },
-      { title: "Grid View", url: "/property/grid-view" },
-    ],
-  },
-  {
-    title: "Tenancy",
-    icon_active: <TenancyIconA />,
-    icon: <TenancyIconB />,
-    url: "/tenancy",
-  },
-  {
-    title: "Booking",
-    icon_active: <BookingIconA />,
-    icon: <BookingIconB />,
-    items: [
-      { title: "List View", url: "/booking/list-view" },
-      { title: "Grid View", url: "/booking/grid-view" },
-      { title: "Property Setting", url: "/booking/property-setting" },
-      { title: "Booking Setting", url: "/booking/booking-setting" },
-    ],
-  },
-  {
-    title: "Smart Home",
-    icon_active: <SmartHomeIconA />,
-    icon: <SmartHomeIconB />,
-    items: [
-      { title: "Meter", url: "/smart-home/meter" },
-      { title: "Lock", url: "/smart-home/lock" },
-    ],
-  },
-  {
-    title: "Payout",
-    icon_active: <PayoutIconA />,
-    icon: <PayoutIconB />,
-    items: [
-      { title: "Pending", url: "/payout/pending" },
-      { title: "Generated", url: "/payout/generated" },
-    ],
-  },
-  {
-    title: "People",
-    icon_active: <PeopleIconA />,
-    icon: <PeopleIconB />,
-    items: [
-      { title: "Tenant", url: "/people/tenant" },
-      { title: "Owner", url: "/people/owner" },
-    ],
-  },
-  {
-    title: "User Management",
-    icon_active: <UserCog className="text-primary-foreground" />,
-    icon: <UserCog className="text-gray-400" />,
-    items: [
-      { title: "Users", url: "/user-management/users" },
-      {
-        title: "Role & Permissions",
-        url: "/user-management/role_and_permissions",
-      },
-    ],
-  },
-  {
-    title: "Accounting",
-    icon_active: <AccountigIconA />,
-    icon: <AccountingIconB />,
-    items: [
-      { title: "Invoice", url: "/accounting/invoice" },
-      { title: "Expenses", url: "/accounting/expenses" },
-      { title: "Settlement", url: "/accounting/settlement" },
-      { title: "Daily Report", url: "/accounting/daily-report" },
-      { title: "Auto Collection", url: "/accounting/auto-collection" },
-    ],
-  },
-  {
-    title: "Notifications",
-    url: "/notifications",
-    icon_active: <NotificationIconA />,
-    icon: <NotificationIconB />,
-  },
-  {
-    title: "Reports",
-    icon_active: <ReportIconA />,
-    icon: <ReportIconB />,
-    items: [
-      { title: "Tenancy Status", url: "/reports/tenancy-status" },
-      { title: "Property Status", url: "/reports/property-status" },
-      { title: "Transactions", url: "/reports/transactions" },
-      { title: "Tenant Statement", url: "/reports/tenant-statement" },
-      { title: "Owner Statement", url: "/reports/owner-statement" },
-      { title: "Meter Transaction", url: "/reports/meter-transaction" },
-    ],
-  },
-];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user_role } = useAuthStore();
+  const menuItems = [
+    {
+      title: "Dashboard",
+      url: "/",
+      icon_active: <DashboardIconA />,
+      icon: <DashboardIconB />,
+    },
+    {
+      title: "Property",
+      icon_active: <PropertyIconA />,
+      icon: <PropertyIconB />,
+      items: [
+        { title: "List View", url: "/property/list-view" },
+        { title: "Grid View", url: "/property/grid-view" },
+      ],
+    },
+    {
+      title: "Tenancy",
+      icon_active: <TenancyIconA />,
+      icon: <TenancyIconB />,
+      url: "/tenancy",
+    },
+    {
+      title: "Booking",
+      icon_active: <BookingIconA />,
+      icon: <BookingIconB />,
+      items: [
+        { title: "List View", url: "/booking/list-view" },
+        { title: "Grid View", url: "/booking/grid-view" },
+        { title: "Property Setting", url: "/booking/property-setting" },
+        { title: "Booking Setting", url: "/booking/booking-setting" },
+      ],
+    },
+    {
+      title: "Smart Home",
+      icon_active: <SmartHomeIconA />,
+      icon: <SmartHomeIconB />,
+      items: [
+        { title: "Meter", url: "/smart-home/meter" },
+        { title: "Lock", url: "/smart-home/lock" },
+      ],
+    },
+    {
+      title: "Payout",
+      icon_active: <PayoutIconA />,
+      icon: <PayoutIconB />,
+      items: [
+        { title: "Pending", url: "/payout/pending" },
+        { title: "Generated", url: "/payout/generated" },
+      ],
+    },
+    {
+      title: "People",
+      icon_active: <PeopleIconA />,
+      icon: <PeopleIconB />,
+      items: [
+        { title: "Tenant", url: "/people/tenant" },
+        ...(user_role === "Owner"
+          ? []
+          : [{ title: "Owner", url: "/people/owner" }]),
+      ],
+    },
+    ...(user_role === "Admin"
+      ? [
+          {
+            title: "User Management",
+            icon_active: <UserCog className="text-primary-foreground" />,
+            icon: <UserCog className="text-gray-400" />,
+            items: [
+              { title: "Users", url: "/user-management/users" },
+              {
+                title: "Role & Permissions",
+                url: "/user-management/role_and_permissions",
+              },
+            ],
+          },
+        ]
+      : []),
+    {
+      title: "Accounting",
+      icon_active: <AccountigIconA />,
+      icon: <AccountingIconB />,
+      items: [
+        { title: "Invoice", url: "/accounting/invoice" },
+        { title: "Expenses", url: "/accounting/expenses" },
+        { title: "Settlement", url: "/accounting/settlement" },
+        { title: "Daily Report", url: "/accounting/daily-report" },
+        { title: "Auto Collection", url: "/accounting/auto-collection" },
+      ],
+    },
+    {
+      title: "Notifications",
+      url: "/notifications",
+      icon_active: <NotificationIconA />,
+      icon: <NotificationIconB />,
+    },
+    {
+      title: "Reports",
+      icon_active: <ReportIconA />,
+      icon: <ReportIconB />,
+      items: [
+        { title: "Tenancy Status", url: "/reports/tenancy-status" },
+        { title: "Property Status", url: "/reports/property-status" },
+        { title: "Transactions", url: "/reports/transactions" },
+        { title: "Tenant Statement", url: "/reports/tenant-statement" },
+        { title: "Owner Statement", url: "/reports/owner-statement" },
+        { title: "Meter Transaction", url: "/reports/meter-transaction" },
+      ],
+    },
+  ];
   const pathname = usePathname();
 
   return (
