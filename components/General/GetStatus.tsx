@@ -7,6 +7,9 @@ const roomStatusConfig: Record<"Vacant" | "Occupied", { color: string }> = {
 };
 
 export const getStatus = (value: "Vacant" | "Occupied") => {
+  if (!value) {
+    return;
+  }
   const { color } = roomStatusConfig[value];
 
   return (

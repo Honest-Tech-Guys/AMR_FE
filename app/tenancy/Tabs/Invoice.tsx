@@ -162,7 +162,7 @@ const InvoiceTap = ({ tenancy }: Props) => {
   // Map API data to table format
 
   return (
-    <div>
+    <div className="min-h-[70vh]">
       <div className="w-full  rounded-[6px] p-3 bg-white">
         <span className="font-semibold">Invoice Summary</span>
         <Separator className="mt-3" />

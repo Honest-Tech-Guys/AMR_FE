@@ -13,7 +13,7 @@ import React, { useState } from "react";
 const SmartHomeTap = () => {
   const [enabled, setEnabled] = useState(false);
   return (
-    <div>
+    <div className="min-h-[70vh]">
       {" "}
       <div className="border-1 w-full">
         <div className="flex w-full items-center p-3 justify-between border-b-1">

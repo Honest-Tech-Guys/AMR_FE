@@ -27,7 +27,7 @@ import { FileData } from "@/types/FileData";
 import DragAndDropFiles from "@/components/input-12";
 import useCreateTenancyDocument from "@/lib/services/hooks/useCreateTenancyDocument";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
-import { fileDataToFileList } from "../CreateAgreement";
+import { fileDataToFileList } from "../Agreement/CreateAgreement";
 
 interface Props {
   tenancy: Tenancy;
@@ -260,7 +260,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
   };
   console.log(errors);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-[70vh]">
       {/* PDF Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] z-200 overflow-hidden">

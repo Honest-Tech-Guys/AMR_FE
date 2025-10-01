@@ -7,6 +7,7 @@ export type Unit = {
   property_id: number;
   beneficiary_id: number;
   block: string;
+  status: string;
   floor: string;
   unit_number: string;
   block_floor_unit_number: string;

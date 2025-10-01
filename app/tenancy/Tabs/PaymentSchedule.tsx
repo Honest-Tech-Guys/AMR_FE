@@ -13,7 +13,7 @@ import React from "react";
 
 const PaymentScheduleTap = () => {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 min-h-[70vh]">
       {" "}
       <div className="border-1 w-full">
         <div className="flex w-full items-center p-3 justify-between border-b-1">

@@ -11,9 +11,9 @@ import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
 import { Tenancy } from "@/types/TenancyType";
 import { daysBetween, formatDate } from "@/lib/utils";
-import CreateAgreement from "../CreateAgreement";
+import CreateAgreement from "../Agreement/CreateAgreement";
 import { useState } from "react";
-import EditAgreement from "../VeiwAgreement";
+import ViewAgreement from "../Agreement/VeiwAgreement";
 const schema = yup.object({
   country: yup.string().required("Country is required"),
   postcode: yup.string().required("Country is required"),
@@ -59,7 +59,7 @@ const BasicTap = ({ tenancy }: Props) => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   return (
-    <div>
+    <div className="min-h-[70vh]">
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex w-full gap-5">
@@ -321,11 +321,11 @@ const BasicTap = ({ tenancy }: Props) => {
         </form>
       </FormProvider>
       {tenancy.agreement ? (
-        <EditAgreement
+        <ViewAgreement
+          open={openEdit}
+          onChangeOpen={setOpenEdit}
           id={tenancy.id}
           initialData={tenancy.agreement}
-          open={openEdit}
-          onOpenChange={setOpenEdit}
         />
       ) : null}
     </div>
