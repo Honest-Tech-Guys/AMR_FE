@@ -317,7 +317,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
               mutate(
                 {
                   type: "Private",
-                  document: fileDataToFileList(files as unknown as FileData[]),
+                  documents: fileDataToFileList(files as unknown as FileData[]),
                 },
                 {
                   onSuccess: () => {
@@ -335,7 +335,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
             }}
             isMulti={true}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {tenancy.documents
               .filter((doc) => doc.type === "Private")
               .map((document) => {
@@ -415,7 +415,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
               mutate(
                 {
                   type: "Shared",
-                  document: fileDataToFileList(files as unknown as FileData[]),
+                  documents: fileDataToFileList(files as unknown as FileData[]),
                 },
                 {
                   onSuccess: () => {
