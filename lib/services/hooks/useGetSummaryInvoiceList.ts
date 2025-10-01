@@ -9,8 +9,8 @@ type SummaryItem = {
 };
 
 type PaymentSummary = {
-  total_collected: SummaryItem;
-  total_pending: SummaryItem;
+  total_invoice: SummaryItem;
+  total_coming_due: SummaryItem;
   total_overdue: SummaryItem;
   total_paid: SummaryItem;
 };

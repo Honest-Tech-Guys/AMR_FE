@@ -169,19 +169,28 @@ const InvoiceTap = ({ tenancy }: Props) => {
         <div className="grid w-full grid-cols-2 md:grid-cols-4 my-5">
           <div>
             <h2 className="text-xs text-gray-500">Total invoice</h2>
-            <h3>RM 3,300 (3)</h3>
+            <h3>
+              RM {data?.total_invoice.amount} ({data?.total_invoice.count})
+            </h3>
           </div>
           <div>
             <h2 className="text-xs text-gray-500">Total Coming Due</h2>
-            <h3>RM 3,300 (3)</h3>
+            <h3>
+              RM {data?.total_coming_due.amount} ({data?.total_coming_due.count}
+              )
+            </h3>
           </div>
           <div>
             <h2 className="text-xs text-gray-500">Total Overdue</h2>
-            <h3>RM 3,300 (3)</h3>
+            <h3>
+              RM {data?.total_overdue.amount} ({data?.total_overdue.count})
+            </h3>
           </div>
           <div>
             <h2 className="text-xs text-gray-500">Total Paid</h2>
-            <h3>RM 3,300 (3)</h3>
+            <h3>
+              RM {data?.total_paid.amount} ({data?.total_paid.count})
+            </h3>
           </div>
         </div>
         <div className="md:max-w-[890px]">
