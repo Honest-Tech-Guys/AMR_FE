@@ -100,7 +100,9 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
 
       {/* Dialogs outside dropdown */}
       <AddRoomTagging
-        id={unit.id}
+        // id={unit.id}
+        rooms={unit.rooms}
+        url={unit.floor_plan_image_url}
         open={openDialog === "addRoomTagging"}
         onOpenChange={(open) => setOpenDialog(open ? "addRoomTagging" : null)}
       />

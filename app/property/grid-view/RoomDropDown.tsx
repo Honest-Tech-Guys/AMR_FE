@@ -84,11 +84,11 @@ export default function RoomDropDown({ room }: { room: any }) {
       </DropdownMenu>
 
       {/* Dialogs outside dropdown */}
-      <AddRoomTagging
+      {/* <AddRoomTagging
         id={room.id}
         open={openDialog === "addRoomTagging"}
         onOpenChange={(open) => setOpenDialog(open ? "addRoomTagging" : null)}
-      />
+      /> */}
       <AddRoomDetails
         id={room.id}
         open={openDialog === "addRoomDetails"}

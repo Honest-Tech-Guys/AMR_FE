@@ -98,7 +98,7 @@ const CreateNewTenant = () => {
   ];
   const { mutate, isPending } = useAddTenant();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    mutate(data, {
+    mutate(data as never, {
       onSuccess: () => {
         toast.success("Tenant created successfully!");
         reset();
@@ -133,11 +133,11 @@ const CreateNewTenant = () => {
                 className="flex items-center gap-3"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="individual" id="type-individual" />
+                  <RadioGroupItem value="Individual" id="type-individual" />
                   <Label htmlFor="type-individual">Individual</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="company" id="type-company" />
+                  <RadioGroupItem value="Company" id="type-company" />
                   <Label htmlFor="type-company">Company</Label>
                 </div>
               </RadioGroup>
@@ -153,7 +153,7 @@ const CreateNewTenant = () => {
                 id="name"
                 name="name"
                 type="text"
-                label="name"
+                label="Name"
                 value={watch("name")}
                 onChange={(e) => setValue("name", e.target.value)}
                 errors={errors.name?.message}
@@ -163,7 +163,7 @@ const CreateNewTenant = () => {
                 id="email"
                 name="email"
                 type="email"
-                label="email"
+                label="Email"
                 value={watch("email")}
                 onChange={(e) => setValue("email", e.target.value)}
                 errors={errors.email?.message}
@@ -347,7 +347,7 @@ const CreateNewTenant = () => {
                 id="emergency_name"
                 name="emergency_name"
                 type="text"
-                label="name"
+                label="Name"
                 value={watch("emergency_name")}
                 onChange={(e) => setValue("emergency_name", e.target.value)}
                 errors={errors.emergency_name?.message}
@@ -386,7 +386,7 @@ const CreateNewTenant = () => {
                 id="emergency_email"
                 name="emergency_email"
                 type="email"
-                label="email"
+                label="Email"
                 value={watch("emergency_email")}
                 onChange={(e) => setValue("emergency_email", e.target.value)}
                 errors={errors.emergency_email?.message}

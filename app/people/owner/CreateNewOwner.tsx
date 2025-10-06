@@ -100,7 +100,7 @@ const CreateNewOwner = () => {
   ];
   const { mutate, isPending } = useCreateOwner();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    mutate(data, {
+    mutate(data as never, {
       onSuccess: () => {
         toast.success("Owner created successfully!");
         reset();
@@ -134,11 +134,11 @@ const CreateNewOwner = () => {
                 className="flex items-center gap-3"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="individual" id="type-individual" />
+                  <RadioGroupItem value="Individual" id="type-individual" />
                   <Label htmlFor="type-individual">Individual</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="company" id="type-company" />
+                  <RadioGroupItem value="Company" id="type-company" />
                   <Label htmlFor="type-company">Company</Label>
                 </div>
               </RadioGroup>

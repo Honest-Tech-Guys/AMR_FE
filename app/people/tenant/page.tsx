@@ -9,13 +9,14 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import CreateNewTenant from "./CreateNewTenant";
-import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
-import { TenantType } from "@/types/TenantType";
+
+import useGetTenantList from "@/lib/services/hooks/useGetTenantsList";
+import EditTenant from "./EditTenant";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
-  const { data, isLoading, error } = useGetTenantsList();
-
+  const { data, isLoading, error } = useGetTenantList();
+  const [open, setOpen] = useState(false);
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -116,45 +117,55 @@ const Page = () => {
                 key={tenant.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
-                <label className="font-bold text-[#337AB7] text-lg">
+                <label
+                  className="font-bold text-[#337AB7] text-lg"
+                  onClick={() => setOpen(true)}
+                >
                   {tenant.name}
                 </label>
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Entity:</span> {tenant.type}
+                    <span className="font-medium">Entity:</span>{" "}
+                    {tenant?.tenant_profile?.type}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Phone:</span>{" "}
-                    {tenant.phone_number}
+                    {tenant?.tenant_profile?.alt_phone_number}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Email:</span> {tenant.email}
+                    <span className="font-medium">Email:</span> {tenant?.email}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Nationality:</span>{" "}
-                    {tenant.nationality}
+                    {tenant?.tenant_profile?.nationality}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Gender:</span> {tenant.gender}
+                    <span className="font-medium">Gender:</span>{" "}
+                    {tenant?.tenant_profile?.gender}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Race:</span> {tenant.race}
+                    <span className="font-medium">Race:</span>{" "}
+                    {tenant?.tenant_profile?.race}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Identity:</span>{" "}
-                    {tenant.identity_type} - {tenant.identity_number}
+                    {tenant?.tenant_profile?.type} -{" "}
+                    {tenant?.tenant_profile?.nric_number}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Address:</span>{" "}
-                    {tenant.address_line_1}, {tenant.city}, {tenant.state}
+                    {tenant?.tenant_profile?.address_line_1},{" "}
+                    {tenant?.tenant_profile?.city},{" "}
+                    {tenant?.tenant_profile?.state}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Contact:</span>{" "}
-                    {tenant.emergency_name} ({tenant.emergency_relationship})
+                    {tenant?.tenant_profile?.emergency_contact_name} (
+                    {tenant?.tenant_profile?.emergency_contact_relationship})
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Phone:</span>{" "}
-                    {tenant.emergency_phone}
+                    {tenant?.tenant_profile?.emergency_contact_phone}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">iCoins:</span> -
@@ -166,6 +177,7 @@ const Page = () => {
                     </Badge>
                   </p>
                 </div>
+                <EditTenant tenant={tenant} isOpen={open} setIsOpen={setOpen} />
               </div>
             ))}
           </div>

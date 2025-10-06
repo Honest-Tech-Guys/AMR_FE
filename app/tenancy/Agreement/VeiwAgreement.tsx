@@ -66,10 +66,11 @@ const ViewAgreement = ({ id, initialData, onChangeOpen, open }: Props) => {
     }
   };
   const handlePreview = async (document: any) => {
+    console.log("kokokok");
     setIsPreviewLoading(true);
 
     try {
-      const response = await createAuthenticatedFetch(document.url);
+      const response = await createAuthenticatedFetch(document);
       if (!response) {
         toast.error("Failed to load PDF. Please check your authentication.");
         return;
@@ -105,6 +106,12 @@ const ViewAgreement = ({ id, initialData, onChangeOpen, open }: Props) => {
                 key={tab.value}
                 value={tab.value}
                 className=" cursor-pointer data-[state=active]:bg-primary rounded-[6px] data-[state=active]:text-white"
+                onClick={() => {
+                  if (tab.value === "pdf") {
+                    // console.log(initialData.attachment_urls[0]);
+                    handlePreview(initialData.attachment_urls[0]);
+                  }
+                }}
               >
                 {tab.label}
               </TabsTrigger>
@@ -113,12 +120,7 @@ const ViewAgreement = ({ id, initialData, onChangeOpen, open }: Props) => {
           <TabsContent value="basic">
             <BasicTap id={id} initialData={initialData} />
           </TabsContent>
-          <TabsContent
-            value="pdf"
-            onClick={() => {
-              handlePreview(initialData.attachments[0]);
-            }}
-          >
+          <TabsContent value="pdf">
             <PDF
               isPreviewLoading={isPreviewLoading}
               previewDocument={previewDocument}

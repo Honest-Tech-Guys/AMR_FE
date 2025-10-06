@@ -95,7 +95,7 @@ const CreateNewTenant = () => {
   ];
   const { mutate, isPending } = useAddTenant();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    mutate(data, {
+    mutate(data as never, {
       onSuccess: () => {
         toast.success("Tenant created successfully!");
         reset();

@@ -12,7 +12,11 @@ const useAddTenant = () => {
   return useMutation({
     mutationKey: ["AddTenant"],
     mutationFn: async (newTenant: AddTenantInput) => {
-      const res = await axiosInstance.post<TenantType>("/tenants", newTenant);
+      const res = await axiosInstance.post<TenantType>("/tenants", {
+        name: newTenant.name,
+        email: newTenant.email,
+        tenant_profile: newTenant,
+      });
       return res.data;
     },
     onError: (error) => {

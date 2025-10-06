@@ -18,8 +18,10 @@ interface Point {
 }
 
 const COLORS = ["red", "green", "#32a8a8", "#f57c02", "purple"];
-
-export default function MapWithPoints() {
+interface Props {
+  url: string;
+}
+export default function MapWithPoints({ url }: Props) {
   const [points, setPoints] = useState<Point[]>([]);
   const [activePointIndex, setActivePointIndex] = useState<number | null>(null);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
@@ -82,7 +84,7 @@ export default function MapWithPoints() {
     };
     setPoints(updated);
   };
-
+  console.log(url);
   return (
     <div
       ref={containerRef}
@@ -92,7 +94,7 @@ export default function MapWithPoints() {
       onMouseUp={handleMouseUp}
     >
       <img
-        src="/houseMap.png"
+        src={url}
         alt="Apartment Map"
         className="w-full h-full cursor-pointer object-cover"
       />

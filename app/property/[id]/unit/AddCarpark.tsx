@@ -93,7 +93,16 @@ const AddCarPark = ({ addCarpark }: AddCarparkProps) => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
+              <Button
+                type="button"
+                onClick={() => {
+                  addCarpark({
+                    location: watch("location"),
+                    type: watch("type"),
+                  });
+                }}
+                className="text-white"
+              >
                 Add
               </Button>
             </DialogFooter>

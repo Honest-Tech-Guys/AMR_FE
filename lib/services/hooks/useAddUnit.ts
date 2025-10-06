@@ -21,7 +21,11 @@ const useAddUnit = () => {
   return useMutation({
     mutationKey: ["AddUnit"],
     mutationFn: async (newUnit: AddUnitInput) => {
-      const res = await axiosInstance.post<Unit>("/units", newUnit);
+      const res = await axiosInstance.post<Unit>("/units", newUnit, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return res.data;
     },
     onError: (error) => {

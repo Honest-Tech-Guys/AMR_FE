@@ -17,6 +17,7 @@ export type Unit = {
   square_feet: number | null;
   unit_image: string | null;
   floor_plan_image: string | null;
+  floor_plan_image_url: string;
   description: string;
   remarks: string;
   access_card_numbers: string[];

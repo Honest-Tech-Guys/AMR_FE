@@ -14,7 +14,11 @@ const useCreateOwner = () => {
   return useMutation({
     mutationKey: ["CreateOwner"],
     mutationFn: async (newOwner: CreateOwnerInput) => {
-      const res = await axiosInstance.post<OwnerType>("/owners", newOwner);
+      const res = await axiosInstance.post<OwnerType>("/owners", {
+        name: newOwner.name,
+        email: newOwner.email,
+        owner_profile: newOwner,
+      });
       return res.data;
     },
     onError: (error) => {

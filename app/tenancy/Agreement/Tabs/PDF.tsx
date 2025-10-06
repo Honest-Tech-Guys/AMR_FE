@@ -6,11 +6,12 @@ interface Props {
   isPreviewLoading: boolean;
 }
 const PDF = ({ previewDocument, isPreviewLoading }: Props) => {
+  console.log(previewDocument);
   return (
     <div className="w-full h-[80vh] border rounded-lg overflow-hidden">
       {previewDocument && previewDocument.blobUrl && (
         <iframe
-          src={previewDocument.blobUrl}
+          src={previewDocument}
           className="w-full h-full "
           title={previewDocument.name}
           style={{ border: "none" }}

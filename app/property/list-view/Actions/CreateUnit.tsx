@@ -35,6 +35,9 @@ import { useParams } from "next/navigation";
 import AddRoom from "../../[id]/unit/AddRoom";
 import AddCarPark from "../../[id]/unit/AddCarpark";
 import useGetBeneficiariesSelection from "@/lib/services/hooks/useGetbeneficiariesSelection";
+import { FileData } from "@/types/FileData";
+import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Schema & type
 const schema = yup.object({
@@ -160,7 +163,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
   // Watch the current rooms and carparks
   const currentRooms = watch("rooms") || [];
   const currentCarparks = watch("carparks") || [];
-
+  const queryClient = useQueryClient();
   const addRoom = (room: { name: string; description: string }) => {
     const newRoom = {
       id: Date.now().toString(),
@@ -187,7 +190,28 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
     setValue("carparks", [...currentCarparks, newCarpark]);
     setIsCarparkDialogOpen(false);
   };
+  function base64ToFile(fileData: FileData): File {
+    const arr = fileData.base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)?.[1] || fileData.type;
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
 
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileData.name, { type: mime });
+  }
+
+  // Convert FileData[] → FileList
+  function fileDataToFileList(fileDataList: FileData[]): FileList {
+    const dataTransfer = new DataTransfer();
+    fileDataList.forEach((fd) => {
+      dataTransfer.items.add(base64ToFile(fd));
+    });
+    return dataTransfer.files;
+  }
   const removeCarpark = (carparkId: string) => {
     setValue(
       "carparks",
@@ -214,8 +238,12 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       square_feet: parseInt(data.square_feet),
       bedroom_count: Number(data.bedroom),
       bathroom_count: Number(data.bathroom),
-      floor_plan_image: data.floor_plan_image?.[0]?.base64 || null,
-      unit_image: data.unit_image?.[0]?.base64 || null,
+      floor_plan_image: fileDataToFileList(
+        (data.floor_plan_image || []) as FileData[]
+      )[0],
+
+      // unit_image: data.unit_image?.[0]?.base64 || null,
+      unit_image: fileDataToFileList((data.unit_image || []) as FileData[]),
       description: data.description || "",
       is_activated: parseInt(data.is_activated ? "1" : "0"),
       beneficiary_id: parseInt(data.beneficiary),
@@ -224,12 +252,13 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       profit_sharing_percentage: data.profit_sharing.toString(),
     };
     if (data.rental_type === "Sublet") {
-      payload.carpark = data.carparks;
+      payload.carparks = data.carparks;
       payload.rooms = data.rooms;
     }
     mutate(payload, {
       onSuccess: () => {
         toast.success("Unit created successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         reset();
         onOpenChange(false);
       },

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import OwnerType from "@/types/OwnerType";
+import Role from "@/types/RoleType";
 
 // Basic owner type - you can update this to match your actual owner structure
 
@@ -9,8 +10,8 @@ import OwnerType from "@/types/OwnerType";
 const useUpdateRole = () => {
   return useMutation({
     mutationKey: ["UpdateRole"],
-    mutationFn: async (Role: object) => {
-      const res = await axiosInstance.put("/roles", Role);
+    mutationFn: async (Role: Role) => {
+      const res = await axiosInstance.put(`/roles/${Role.id}`, Role);
       return res.data;
     },
     onError: (error) => {

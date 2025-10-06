@@ -17,7 +17,7 @@ const useUpdateTenant = () => {
     mutationFn: async (updatedTenant: UpdateTenantInput) => {
       const { id, ...updateData } = updatedTenant;
       const res = await axiosInstance.put<TenantType>(
-        `/update-tenants/${id}`,
+        `/tenants/${id}`,
         updateData
       );
       return res.data;

@@ -100,7 +100,16 @@ const AddRoom = ({ addRoom }: AddRoomProps) => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
+              <Button
+                type="button"
+                onClick={() =>
+                  addRoom({
+                    name: watch("room_name"),
+                    description: watch("description"),
+                  })
+                }
+                className="text-white"
+              >
                 Add
               </Button>
             </DialogFooter>

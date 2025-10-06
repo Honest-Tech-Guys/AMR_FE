@@ -101,7 +101,7 @@ const AddRoomDetails = ({ id, open, onOpenChange }: Props) => {
             <HeaderSection title="Floor Plan Information" />
             <div className="grid col-span-1  gap-4">
               <div className="col-span-1 md:col-span-2">
-                <MapWithPoints />
+                {/* <MapWithPoints /> */}
               </div>
               <div className="col-span-1 md:col-span-2">
                 <SelectWithForm<schemaType>
