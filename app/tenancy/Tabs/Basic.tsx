@@ -125,60 +125,83 @@ const BasicTap = ({ tenancy }: Props) => {
                   </div>
                   <Separator />
                 </div> */}
-                {"unit" in tenancy.tenantable ? (
+                {tenancy.tenantable ? (
+                  "unit" in tenancy.tenantable ? (
+                    // tenantable is a Room
+                    <div>
+                      <div className="flex w-full items-center p-3 justify-between">
+                        <span>Property:</span>
+                        <span>
+                          {tenancy.tenantable.unit?.property?.property_name ||
+                            "N/A"}
+                        </span>
+                      </div>
+                      <Separator />
+                    </div>
+                  ) : (
+                    // tenantable is a Unit
+                    <div>
+                      <div className="flex w-full items-center p-3 justify-between">
+                        <span>Property:</span>
+                        <span>
+                          {tenancy.tenantable.property?.property_name || "N/A"}
+                        </span>
+                      </div>
+                      <Separator />
+                    </div>
+                  )
+                ) : (
+                  // tenantable is null or undefined
                   <div>
                     <div className="flex w-full items-center p-3 justify-between">
                       <span>Property:</span>
-                      <span>
-                        {
-                          (tenancy.tenantable as Room).unit.property
-                            .property_name
-                        }
-                      </span>
-                    </div>
-                    <Separator />
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex w-full items-center p-3 justify-between">
-                      <span>Property:</span>
-                      <span>
-                        {(tenancy.tenantable as Unit).property.property_name}
-                      </span>
-                    </div>
-                    <Separator />
-                  </div>
-                )}
-                {"unit" in tenancy.tenantable ? (
-                  <div>
-                    <div className="flex w-full items-center p-3 justify-between">
-                      <span>Unit:</span>
-                      <span>
-                        {
-                          (tenancy.tenantable as Room).unit
-                            .block_floor_unit_number
-                        }
-                      </span>
-                    </div>
-                    <Separator />
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex w-full items-center p-3 justify-between">
-                      <span>Unit:</span>
-                      <span>
-                        {(tenancy.tenantable as Unit).block_floor_unit_number}
-                      </span>
+                      <span>N/A</span>
                     </div>
                     <Separator />
                   </div>
                 )}
 
-                {"unit" in tenancy.tenantable ? (
+                {tenancy.tenantable ? (
+                  "unit" in tenancy.tenantable ? (
+                    // tenantable is a Room
+                    <div>
+                      <div className="flex w-full items-center p-3 justify-between">
+                        <span>Unit:</span>
+                        <span>
+                          {tenancy.tenantable.unit?.block_floor_unit_number ||
+                            "N/A"}
+                        </span>
+                      </div>
+                      <Separator />
+                    </div>
+                  ) : (
+                    // tenantable is a Unit
+                    <div>
+                      <div className="flex w-full items-center p-3 justify-between">
+                        <span>Unit:</span>
+                        <span>
+                          {tenancy.tenantable.block_floor_unit_number || "N/A"}
+                        </span>
+                      </div>
+                      <Separator />
+                    </div>
+                  )
+                ) : (
+                  // tenantable is null or undefined
+                  <div>
+                    <div className="flex w-full items-center p-3 justify-between">
+                      <span>Unit:</span>
+                      <span>N/A</span>
+                    </div>
+                    <Separator />
+                  </div>
+                )}
+
+                {tenancy.tenantable && "unit" in tenancy.tenantable ? (
                   <div>
                     <div className="flex w-full items-center p-3 justify-between">
                       <span>Room:</span>
-                      <span>{(tenancy.tenantable as Room).name}</span>
+                      <span>{tenancy.tenantable.name || "N/A"}</span>
                     </div>
                     <Separator />
                   </div>
