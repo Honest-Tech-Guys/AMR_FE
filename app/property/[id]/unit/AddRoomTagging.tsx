@@ -3,6 +3,7 @@
 import CustomInput from "@/components/CustomInput";
 import { SelectWithForm } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogClose,
@@ -23,20 +24,25 @@ import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import MapWithPoints from "@/components/ImageMapper";
 import { Room } from "@/types/RoomType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import MapWithSinglePoint from "@/components/MapwithSinglePoint";
+import useAddTagRoom from "@/lib/services/hooks/useAddTagRoom";
 // Schema & type
 const schema = yup.object({
   room_id: yup.string().required("Property type is required"),
   remark: yup.string().required("Owner name is required"),
+  x: yup.string().required("Owner name is required"),
+  y: yup.string().required("Owner name is required"),
 });
 type schemaType = yup.InferType<typeof schema>;
 interface Props {
+  unit_id: number;
   url: string;
   rooms: Room[];
   open: boolean; // controlled open state
   onOpenChange: (open: boolean) => void;
 }
-const AddRoomTagging = ({ rooms, url, open, onOpenChange }: Props) => {
+const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -49,29 +55,33 @@ const AddRoomTagging = ({ rooms, url, open, onOpenChange }: Props) => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
+
   const [Rooms, setRooms] = useState([
     { id: "1", name: "Room1" },
     { id: "2", name: "Room2" },
     { id: "3", name: "Room3 " },
   ]);
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
+  useEffect(() => {
+    if (rooms) {
+      const dataT = rooms.map((room) => {
+        return { id: `${room.id}`, name: room.name };
+      });
+      setRooms(dataT as never);
+    }
+  }, [rooms]);
+  const { mutate } = useAddTagRoom(unit_id);
   const onSubmit: SubmitHandler<schemaType> = (data) => {
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Add Room Tag successfully!");
+        reset();
+        // refetch();
+        onOpenChange(false);
+      },
+      onError: (err) => {
+        toast.error((err as any)?.message || "Failed to create property.");
+      },
+    });
     console.log("Form data:", data);
   };
   console.log(url);
@@ -86,7 +96,18 @@ const AddRoomTagging = ({ rooms, url, open, onOpenChange }: Props) => {
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="md:min-h-[78vh]">
             <div className="w-full flex justify-center">
-              <MapWithPoints url={url} />
+              <MapWithSinglePoint
+                url={url}
+                onChange={(point) => {
+                  if (point) {
+                    setValue("x", point.x.toFixed(2));
+                    setValue("y", point.y.toFixed(2));
+                  } else {
+                    setValue("x", "");
+                    setValue("y", "");
+                  }
+                }}
+              />
             </div>
             <div className="flex justify-center gap-5">
               <div>

@@ -18,16 +18,18 @@ interface Point {
 }
 
 const COLORS = ["red", "green", "#32a8a8", "#f57c02", "purple"];
+
 interface Props {
   url: string;
-  onChange: () => void;
+  onChange?: (point: { x: number; y: number } | null) => void;
 }
-export default function MapWithPoints({ url }: Props) {
-  const [points, setPoints] = useState<Point[]>([]);
-  const [activePointIndex, setActivePointIndex] = useState<number | null>(null);
-  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-  const dragTimeout = useRef<NodeJS.Timeout | null>(null);
+
+export default function MapWithSinglePoint({ url, onChange }: Props) {
+  const [point, setPoint] = useState<Point | null>(null);
+  const [active, setActive] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dragTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if ((e.target as HTMLElement).closest("button")) return;
@@ -36,30 +38,35 @@ export default function MapWithPoints({ url }: Props) {
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setPoints((prev) => [...prev, { x, y, color: "red" }]);
+    const newPoint = { x, y, color: "red" };
+    setPoint(newPoint);
+    onChange?.(newPoint);
   };
 
-  const handleCommentChange = (index: number, value: string) => {
-    const updated = [...points];
-    updated[index].comment = value;
-    setPoints(updated);
+  const handleCommentChange = (value: string) => {
+    if (!point) return;
+    const updated = { ...point, comment: value };
+    setPoint(updated);
+    onChange?.(updated);
   };
 
-  const handleColorChange = (index: number, color: string) => {
-    const updated = [...points];
-    updated[index].color = color;
-    setPoints(updated);
+  const handleColorChange = (color: string) => {
+    if (!point) return;
+    const updated = { ...point, color };
+    setPoint(updated);
+    onChange?.(updated);
   };
 
-  const handleDeletePoint = (index: number) => {
-    setPoints((prev) => prev.filter((_, i) => i !== index));
-    setActivePointIndex(null);
+  const handleDelete = () => {
+    setPoint(null);
+    setActive(false);
+    onChange?.(null);
   };
 
-  const handleMouseDown = (index: number) => {
+  const handleMouseDown = () => {
     dragTimeout.current = setTimeout(() => {
-      setDraggingIndex(index);
-    }, 200); // long press to drag
+      setDragging(true);
+    }, 200);
   };
 
   const handleMouseUp = () => {
@@ -67,25 +74,25 @@ export default function MapWithPoints({ url }: Props) {
       clearTimeout(dragTimeout.current);
       dragTimeout.current = null;
     }
-    setDraggingIndex(null);
+    setDragging(false);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (draggingIndex === null || !containerRef.current) return;
+    if (!dragging || !containerRef.current || !point) return;
 
     const rect = containerRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    const updated = [...points];
-    updated[draggingIndex] = {
-      ...updated[draggingIndex],
+    const updated = {
+      ...point,
       x: Math.min(Math.max(x, 0), 100),
       y: Math.min(Math.max(y, 0), 100),
     };
-    setPoints(updated);
+    setPoint(updated);
+    onChange?.(updated);
   };
-  console.log(url);
+
   return (
     <div
       ref={containerRef}
@@ -100,33 +107,27 @@ export default function MapWithPoints({ url }: Props) {
         className="w-full h-full cursor-pointer object-cover"
       />
 
-      {points.map((point, index) => (
+      {point && (
         <div
-          key={index}
           className="absolute"
           style={{
             left: `${point.x}%`,
             top: `${point.y}%`,
             transform: "translate(-50%, -50%)",
-            cursor: draggingIndex === index ? "grabbing" : "grab",
-            zIndex: activePointIndex === index ? 50 : 10,
+            cursor: dragging ? "grabbing" : "grab",
+            zIndex: active ? 50 : 10,
           }}
-          onMouseDown={() => handleMouseDown(index)}
+          onMouseDown={handleMouseDown}
         >
-          <Popover
-            open={activePointIndex === index && draggingIndex === null}
-            onOpenChange={(open) => setActivePointIndex(open ? index : null)}
-          >
+          <Popover open={active && !dragging} onOpenChange={setActive}>
             <PopoverTrigger asChild>
               <button
                 className="w-5 h-5 rounded-full border text-white text-xs border-white"
                 style={{ backgroundColor: point.color || "red" }}
-              >
-                {index + 1}
-              </button>
+              ></button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-64 space-y-3">
+            <PopoverContent className="w-64 z-1000 space-y-3">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   🎨
@@ -139,40 +140,38 @@ export default function MapWithPoints({ url }: Props) {
                           : "border-transparent"
                       }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => handleColorChange(index, color)}
+                      onClick={() => handleColorChange(color)}
                     />
                   ))}
                 </div>
-                <div className="flex justify-end">
-                  <Button
-                    size="icon"
-                    className="flex-1 w-3 max-w-3 h-5 bg-transparent cursor-pointer text-red-500 hover:bg-transparent    shadow-none"
-                    onClick={() => handleDeletePoint(index)}
-                  >
-                    <Trash />
-                  </Button>
-                </div>
-              </div>
-
-              <Textarea
-                value={point.comment || ""}
-                onChange={(e) => handleCommentChange(index, e.target.value)}
-                placeholder="Enter comment or command..."
-              />
-              <div className="flex justify-end mt-3">
                 <Button
                   size="icon"
-                  variant="outline"
-                  className="flex-1 w-5"
-                  onClick={() => setActivePointIndex(null)}
+                  className="bg-transparent text-red-500 hover:bg-transparent"
+                  onClick={handleDelete}
                 >
-                  Command
+                  <Trash />
+                </Button>
+              </div>
+
+              {/* <Textarea
+                value={point.comment || ""}
+                onChange={(e) => handleCommentChange(e.target.value)}
+                placeholder="Enter comment..."
+              /> */}
+
+              <div className="flex justify-end mt-3">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setActive(false)}
+                >
+                  Close
                 </Button>
               </div>
             </PopoverContent>
           </Popover>
         </div>
-      ))}
+      )}
     </div>
   );
 }

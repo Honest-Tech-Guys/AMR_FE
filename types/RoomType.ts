@@ -7,6 +7,7 @@ export type Room = {
   unit: Unit;
   status: "Vacant" | "Occupied";
   locks: Locks[];
+  coordinates: { x: string; y: string } | null;
   meters: Meter[];
   description: string;
   remarks: string;

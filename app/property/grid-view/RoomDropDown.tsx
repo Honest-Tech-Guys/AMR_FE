@@ -74,7 +74,7 @@ export default function RoomDropDown({ room }: { room: any }) {
           onClick={(e) => e.stopPropagation()}
         >
           <MenuItem dialogKey="editRoom">Edit Room</MenuItem>
-          <MenuItem dialogKey="addRoomTagging">Add Room Tagging</MenuItem>
+          {/* <MenuItem dialogKey="addRoomTagging">Add Room Tagging</MenuItem> */}
           <MenuItem dialogKey="addRoomDetails">Add Room Details</MenuItem>
           <MenuItem dialogKey="createTenancy">Add Tenancy</MenuItem>
           <MenuItem dialogKey="addMeter">Add Meter</MenuItem>
