@@ -174,20 +174,39 @@ const Page = () => {
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Type:</span>{" "}
-                    {"unit" in tenancy.tenantable
-                      ? "Sublet"
-                      : (tenancy.tenantable as Unit).rental_type}
+                    {tenancy.tenantable
+                      ? "unit" in tenancy.tenantable
+                        ? "Sublet"
+                        : (tenancy.tenantable as Unit).rental_type
+                      : "N/A"}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Property:</span>{" "}
-                    {(tenancy.tenantable as Unit).property?.property_name}
-                    {(tenancy.tenantable as Room).unit?.property?.property_name}
-                    \{(tenancy.tenantable as Unit).block_floor_unit_number}
-                    {(tenancy.tenantable as Room).unit?.block_floor_unit_number}
-                    {(tenancy.tenantable as Room).name ? (
-                      <>\{(tenancy.tenantable as Room).name}</>
-                    ) : null}
+                    {tenancy.tenantable ? (
+                      "unit" in tenancy.tenantable ? (
+                        // tenantable is a Room
+                        <>
+                          {tenancy.tenantable.unit?.property?.property_name}{" "}
+                          {"\\"}
+                          {
+                            tenancy.tenantable.unit?.block_floor_unit_number
+                          }{" "}
+                          {tenancy.tenantable.name
+                            ? `\\${tenancy.tenantable.name}`
+                            : ""}
+                        </>
+                      ) : (
+                        // tenantable is a Unit
+                        <>
+                          {tenancy.tenantable.property?.property_name} {"\\"}
+                          {tenancy.tenantable.block_floor_unit_number}
+                        </>
+                      )
+                    ) : (
+                      "N/A"
+                    )}
                   </p>
+
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Tenancy:</span> {tenancy.code}
                   </p>
