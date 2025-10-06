@@ -22,20 +22,11 @@ const useAddTagRoom = (unit_id: number) => {
       );
       return res.data;
     },
-    onSuccess: (updatedUnit) => {
+    onSuccess: () => {
       // Invalidate and refetch units list
       queryClient.invalidateQueries({ queryKey: ["GetPropertyList"] });
 
       // Optionally update the cache directly for better UX
-      queryClient.setQueryData(
-        ["GetPropertyList"],
-        (oldData: Unit[] | undefined) => {
-          if (!oldData) return [updatedUnit];
-          return oldData.map((unit) =>
-            unit.id === updatedUnit.id ? updatedUnit : unit
-          );
-        }
-      );
     },
     onError: (error) => {
       // Optionally handle error globally

@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Room } from "@/types/RoomType";
 import { Unit } from "@/types/UnitType";
+import MapRoomViewer from "@/components/MapRoomViewer";
 
 // Schema & type
 const schema = yup.object({
@@ -299,7 +300,6 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
     { label: "Rooms", value: "rooms" },
     { label: "Car Parks", value: "carParks" },
   ];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* <DialogTrigger asChild>
@@ -335,6 +335,11 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
             })}
           </TabsList>
           <TabsContent value="basic_information">
+            <MapRoomViewer
+              rooms={unit?.rooms ?? []}
+              url={unit?.floor_plan_image_url ?? ""}
+            />
+
             <FormProvider {...form}>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <HeaderSection title="Basic Information" />

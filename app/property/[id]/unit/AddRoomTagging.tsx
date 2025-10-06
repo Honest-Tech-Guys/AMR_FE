@@ -84,7 +84,6 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
     });
     console.log("Form data:", data);
   };
-  console.log(url);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto">
