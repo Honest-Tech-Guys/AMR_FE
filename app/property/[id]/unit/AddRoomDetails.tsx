@@ -115,7 +115,6 @@ const AddRoomDetails = ({ id, open, onOpenChange }: Props) => {
                   name="amenities"
                   title="Amenities"
                   options={Amenities}
-                  multiple
                 />
               </div>
 

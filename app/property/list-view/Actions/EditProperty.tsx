@@ -183,7 +183,7 @@ const EditProperty = ({
     { id: "putrajaya", name: "Putrajaya" },
   ];
   const PartnerType = [
-    { id: "Apartment1", name: "Apartment" },
+    { id: "Apartment", name: "Apartment" },
     { id: "Condominium", name: "Condominium" },
     { id: "Flat", name: "Flat" },
     { id: "Landed", name: "Landed" },
