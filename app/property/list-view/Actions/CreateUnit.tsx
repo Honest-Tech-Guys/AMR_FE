@@ -178,11 +178,9 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
   const currentCarparks = watch("carparks") || [];
 
   const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat" },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
+    { id: "Agency", name: "Agency" },
+    { id: "Agent", name: "Agent" },
+    { id: "Owner", name: "Owner" },
   ];
 
   const addRoom = (room: { name: string; description: string }) => {
