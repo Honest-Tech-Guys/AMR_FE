@@ -192,9 +192,6 @@ const UpdateProfile = ({ open, onOpenChange }: Props) => {
         refetch();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to update profile.");
-      },
     });
   };
   const { mutate: updateAvatar, isPending: IsUpdatingAvatar } =
@@ -264,11 +261,6 @@ const UpdateProfile = ({ open, onOpenChange }: Props) => {
                       {
                         onSuccess: () => {
                           toast.success("Avatar Update successfully!");
-                        },
-                        onError: (err) => {
-                          toast.error(
-                            (err as any)?.message || "Failed to update Avatar."
-                          );
                         },
                       }
                     );

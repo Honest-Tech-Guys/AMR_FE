@@ -157,9 +157,6 @@ const CreateNewBooking = () => {
         refetch();
         setIsOpen(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create Booking.");
-      },
     });
     console.log("Form data:", data);
   };

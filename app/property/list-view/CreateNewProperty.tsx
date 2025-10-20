@@ -65,7 +65,7 @@ const CreateNewProperty = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const { mutate, isPending } = useAddProperty();
+  const { mutate, error, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
   const { refetch } = useGetPropertiesList({});
   const { user_role } = useAuthStore();
@@ -136,9 +136,6 @@ const CreateNewProperty = () => {
         reset();
         refetch();
         setIsOpen(false);
-      },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create property.");
       },
     });
   };

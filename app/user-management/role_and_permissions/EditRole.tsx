@@ -142,9 +142,6 @@ const EditRole = ({ role }: Props) => {
           refetch();
           setIsOpen(false);
         },
-        onError: (err) => {
-          toast.error((err as any)?.message || "Failed to update role.");
-        },
       }
     );
   };

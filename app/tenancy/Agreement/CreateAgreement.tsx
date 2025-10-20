@@ -213,9 +213,6 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
         refetch();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create agreement");
-      },
     });
   };
 

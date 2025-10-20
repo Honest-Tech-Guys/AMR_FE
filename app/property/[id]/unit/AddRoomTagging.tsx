@@ -78,9 +78,6 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
         // refetch();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create property.");
-      },
     });
     console.log("Form data:", data);
   };

@@ -72,9 +72,6 @@ const CreateBulkPropertyModal = () => {
         setProperties([]);
         setIsOpen(false);
       },
-      onError: (err) => {
-        toast.error("Failed to create all properties");
-      },
     });
   };
 

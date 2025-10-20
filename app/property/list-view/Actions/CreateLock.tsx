@@ -123,9 +123,6 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
         // setIsOpen(false);
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create Lock");
-      },
     });
     console.log("Lock form data:", data);
   };

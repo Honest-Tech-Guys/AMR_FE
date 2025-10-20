@@ -111,6 +111,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ...(user_role === "Owner"
           ? []
           : [{ title: "Owner", url: "/people/owner" }]),
+        ...(user_role === "Tenant"
+          ? []
+          : [{ title: "Beneficiary", url: "/people/beneficiary" }]),
       ],
     },
     ...(user_role === "Admin"

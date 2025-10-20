@@ -115,9 +115,6 @@ const Basic = ({ id, initialData }: Props) => {
       onSuccess: () => {
         toast.success("Agreement updated successfully!");
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to update agreement");
-      },
     });
   };
   return (

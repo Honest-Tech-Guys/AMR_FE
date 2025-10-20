@@ -126,9 +126,6 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
         reset();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create tenancy.");
-      },
     });
   };
   const [treeData, setTreeData] = useState<TreeNode[]>([]);

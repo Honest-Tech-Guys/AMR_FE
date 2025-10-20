@@ -89,9 +89,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
         reset();
         refetch();
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create agreement");
-      },
     });
   };
 
@@ -325,11 +322,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
                     reset();
                     refetch();
                   },
-                  onError: (err) => {
-                    toast.error(
-                      (err as any)?.message || "Failed to Upload Private Files"
-                    );
-                  },
                 }
               );
             }}
@@ -422,11 +414,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
                     toast.success("Upload Shared Files successfully!");
                     reset();
                     refetch();
-                  },
-                  onError: (err) => {
-                    toast.error(
-                      (err as any)?.message || "Failed to Upload Shared Files"
-                    );
                   },
                 }
               );

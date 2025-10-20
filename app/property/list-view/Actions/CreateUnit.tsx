@@ -170,7 +170,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
     handleSubmit,
     formState: { errors },
   } = form;
-
+  console.log(errors);
   const queryClient = useQueryClient();
   const { mutate, isPending } = useAddUnit();
 
@@ -271,8 +271,6 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
         reset();
         onOpenChange(false);
       },
-      onError: (err) =>
-        toast.error((err as any)?.message || "Failed to create unit."),
     });
   };
 

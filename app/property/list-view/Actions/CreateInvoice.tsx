@@ -111,9 +111,6 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
         reset();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create Invoice");
-      },
     });
     console.log("Form data:", api_data);
   };

@@ -70,9 +70,6 @@ const CreateBulkPropertyModal = () => {
         setBookings([]);
         setIsOpen(false);
       },
-      onError: (err) => {
-        toast.error("Failed to create all bookings");
-      },
     });
   };
   console.log(Bookings);

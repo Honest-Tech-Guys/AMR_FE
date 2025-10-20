@@ -58,9 +58,6 @@ const Register = ({ setStatus }: Props) => {
         reset();
         setStatus("Login");
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to register property.");
-      },
     });
   };
   return (

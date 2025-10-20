@@ -136,9 +136,6 @@ const CreateMeter = () => {
         reset();
         // setIsOpen(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create unit.");
-      },
     });
     console.log("Meter form data:", data);
   };

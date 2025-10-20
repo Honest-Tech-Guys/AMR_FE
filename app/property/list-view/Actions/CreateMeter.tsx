@@ -142,9 +142,6 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
         reset();
         onOpenChange(false);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message || "Failed to create Meter");
-      },
     });
     console.log("Meter form data:", data);
   };
