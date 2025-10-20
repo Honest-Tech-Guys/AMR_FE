@@ -197,13 +197,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       className={
                         isItemActive
-                          ? "bg-primary-foreground/8 border-l-3 border-primary-foreground  py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
+                          ? "bg-primary-foreground/8 border-l-3 border-primary-foreground text-white   py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
                           : "font-semibold py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
                       }
                     >
                       <Link
                         href={item.url as string}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 text-white "
                       >
                         {isItemActive ? item.icon_active : item.icon}
                         {item.title}
@@ -224,7 +224,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarGroup className="py-0">
                 <SidebarGroupLabel
                   asChild
-                  className={`group/label text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+                  className={`group/label text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-white  ${
                     isChildActive
                       ? "bg-primary-foreground/8 border-l-3 border-primary-foreground  py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
                       : "text-sidebar-foreground py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
@@ -232,7 +232,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <CollapsibleTrigger className="cursor-pointer">
                     {/* <House className="mr-2" strokeWidth={2.5} /> */}
-                    <div className="flex gap-1 items-center">
+                    <div className="flex gap-1 items-center text-white ">
                       {isChildActive ? item.icon_active : item.icon}
                       {item.title}
                     </div>
@@ -251,7 +251,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <SidebarMenuButton
                               asChild
                               className={
-                                isActive ? " text-primary font-semibold" : ""
+                                isActive
+                                  ? " text-primary-foreground font-semibold"
+                                  : "text-white"
                               }
                             >
                               <Link href={child.url}>{child.title}</Link>
