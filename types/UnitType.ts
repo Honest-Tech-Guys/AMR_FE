@@ -11,7 +11,7 @@ export type Unit = {
   floor: string;
   unit_number: string;
   block_floor_unit_number: string;
-  rental_type: "Whole Unit" | "Sublet";
+  rental_type: "Whole Unit" | "Room Rental";
   bedroom_count: number;
   bathroom_count: number;
   square_feet: number | null;

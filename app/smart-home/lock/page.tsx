@@ -116,7 +116,7 @@ const Page = () => {
               type: "select",
               selectItems: [
                 { label: "whole unit", value: "Whole Unit" },
-                { label: "Sublet", value: "Sublet" },
+                { label: "Room Rental", value: "Room Rental" },
               ],
               icon: Search,
             },

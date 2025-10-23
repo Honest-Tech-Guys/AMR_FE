@@ -212,7 +212,7 @@ const CreateUnit = () => {
       service_fee_percentage: data.service_fee.toString(),
       profit_sharing_percentage: data.profit_sharing.toString(),
     };
-    if (data.rental_type === "Sublet") {
+    if (data.rental_type === "Room Rental") {
       payload.carpark = data.carparks;
       payload.rooms = data.rooms;
     }
@@ -305,10 +305,10 @@ const CreateUnit = () => {
                         </ToggleGroupItem>
                         <ToggleGroupItem
                           className="px-3"
-                          value="Sublet"
-                          aria-label="Sublet"
+                          value="Room Rental"
+                          aria-label="Room Rental"
                         >
-                          Sublet
+                          Room Rental
                         </ToggleGroupItem>
                       </ToggleGroup>
                     )}
@@ -320,7 +320,7 @@ const CreateUnit = () => {
                   )}
                 </div>
               </div>
-              {watch("rental_type") === "Sublet" && (
+              {watch("rental_type") === "Room Rental" && (
                 <>
                   <div className="col-span-2 mt-6">
                     <HeaderSection title="Rooms" />

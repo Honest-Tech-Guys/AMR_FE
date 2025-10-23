@@ -100,7 +100,7 @@ const Page = () => {
               type: "select",
               selectItems: [
                 { label: "whole unit", value: "Whole Unit" },
-                { label: "Sublet", value: "Sublet" },
+                { label: "Room Rental", value: "Room Rental" },
               ],
               icon: Search,
             },
@@ -176,7 +176,7 @@ const Page = () => {
                     <span className="font-medium">Type:</span>{" "}
                     {tenancy.tenantable
                       ? "unit" in tenancy.tenantable
-                        ? "Sublet"
+                        ? "Room Rental"
                         : (tenancy.tenantable as Unit).rental_type
                       : "N/A"}
                   </p>

@@ -34,6 +34,7 @@ axiosInstance.interceptors.response.use(
                 console.log(err);
                 return <div key={index}>{err}</div>;
               })}
+          {(error as any).response?.data?.message}
           {(error as any)?.message}
         </div>
       )
@@ -44,7 +45,7 @@ axiosInstance.interceptors.response.use(
       window.location.replace("/");
     }
 
-    return Promise.reject(error);
+    return error;
   }
 );
 axiosInstance.defaults.withCredentials = true;

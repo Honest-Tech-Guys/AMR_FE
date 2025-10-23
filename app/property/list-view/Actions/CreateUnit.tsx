@@ -259,7 +259,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       payload.profit_sharing_percentage = data?.profit_sharing?.toString();
     }
 
-    if (data.rental_type === "Sublet") {
+    if (data.rental_type === "Room Rental") {
       payload.carparks = data.carparks;
       payload.rooms = data.rooms;
     }
@@ -361,11 +361,11 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                         </ToggleGroupItem>{" "}
                         <ToggleGroupItem
                           className="px-3"
-                          value="Sublet"
-                          aria-label="Sublet"
+                          value="Room Rental"
+                          aria-label="Room Rental"
                         >
                           {" "}
-                          Sublet{" "}
+                          Room Rental{" "}
                         </ToggleGroupItem>{" "}
                       </ToggleGroup>
                     )}
@@ -378,7 +378,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                   )}{" "}
                 </div>{" "}
               </div>{" "}
-              {watch("rental_type") === "Sublet" && (
+              {watch("rental_type") === "Room Rental" && (
                 <>
                   {" "}
                   <div className="col-span-2 mt-6">

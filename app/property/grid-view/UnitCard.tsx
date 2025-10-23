@@ -30,7 +30,7 @@ const UnitCard = ({ unit }: { unit: any }) => {
             </p>
             <p>{unit.rental_type}</p>
 
-            {unit.rental_type === "Sublet" && (
+            {unit.rental_type === "Room Rental" && (
               <div className="flex gap-3">
                 <span>Rooms:</span>
                 <Badge className={badgeClass}>{label}</Badge>
@@ -76,7 +76,7 @@ const UnitCard = ({ unit }: { unit: any }) => {
       </AccordionTrigger>
 
       <AccordionContent>
-        {unit.rental_type === "Sublet" ? (
+        {unit.rental_type === "Room Rental" ? (
           <Accordion type="multiple">
             {roomsStatus !== "No Rooms" && (
               <AccordionItem value="rooms">

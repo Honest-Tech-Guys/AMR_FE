@@ -75,7 +75,7 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
           onClick={(e) => e.stopPropagation()}
         >
           <MenuItem dialogKey="editUnit">Edit Unit</MenuItem>
-          {unit.rental_type === "Sublet" ? (
+          {unit.rental_type === "Room Rental" ? (
             <>
               <MenuItem dialogKey="addRoomTagging">Add Room Tagging</MenuItem>
               <MenuItem dialogKey="addRoomDetails">Add Room Details</MenuItem>
