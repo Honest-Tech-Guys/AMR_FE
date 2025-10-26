@@ -15,7 +15,7 @@ import DateRangePicker from "@/components/DatePickerRanger";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { data, isPending } = useGetDashboard();
@@ -52,43 +52,59 @@ export default function Home() {
     { timeframe: "1 Day", percentage: 3.8, amount: 16000 },
     // ... and so on based on your image
   ];
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10); // add background when user scrolls 10px
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   if (isPending) {
     return <LoaderCircle className="animate-spin" />;
   }
   return (
     <>
-      <div className="flex justify-end ">
-        <ToggleGroup
-          variant="outline"
-          type="single"
-          value={range}
-          onValueChange={(val) => setRange(val)}
+      <div className=" ">
+        <div
+          className={`fixed top-12 left-0 right-0  flex justify-end px-4 transition-all duration-300   ${
+            isScrolled ? "bg-white/70 backdrop-blur-md" : "bg-transparent"
+          }`}
         >
-          <ToggleGroupItem value="This Month" aria-label="This Month">
-            This Month
-          </ToggleGroupItem>
-          <ToggleGroupItem value="Last Quarter" aria-label="Last Quarter">
-            Last Quarter
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="Custom Range"
-            aria-label="Custom Range"
-            className="w-[420px]"
+          <ToggleGroup
+            variant="outline"
+            type="single"
+            value={range}
+            onValueChange={(val) => setRange(val)}
+            className="my-5"
           >
-            <DateRangePicker
-              // value={
-              //   formFilters.date_range
-              //     ? JSON.parse(formFilters.date_range)
-              //     : undefined
-              // }
-              // onChange={(range) =>
-              //   handleChange(filter.name, JSON.stringify(range))
-              // }
-              placeholder={"Custom Range"}
-              className="rounded-none  bg-transparent border-0 h-[5px] shadow-none"
-            />
-          </ToggleGroupItem>
-        </ToggleGroup>
+            <ToggleGroupItem value="This Month" aria-label="This Month">
+              This Month
+            </ToggleGroupItem>
+            <ToggleGroupItem value="Last Quarter" aria-label="Last Quarter">
+              Last Quarter
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="Custom Range"
+              aria-label="Custom Range"
+              className="md:w-[420px]"
+            >
+              <DateRangePicker
+                // value={
+                //   formFilters.date_range
+                //     ? JSON.parse(formFilters.date_range)
+                //     : undefined
+                // }
+                // onChange={(range) =>
+                //   handleChange(filter.name, JSON.stringify(range))
+                // }
+                placeholder={"Custom Range"}
+                className="rounded-none  bg-transparent border-0 h-[5px] shadow-none"
+              />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
       </div>
       <ActiveInformationSection general={data?.top_stats as never} />
       <div className="grid grid-cols-1 md:grid-cols-2  w-full  gap-5">

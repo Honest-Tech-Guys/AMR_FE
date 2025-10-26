@@ -169,7 +169,7 @@ const Page = () => {
       title: "Address",
       key: "city",
       render: (property) => (
-        <div>
+        <div className=" break-words whitespace-normal">
           {property.city},{property.state},{property.address_line_1}
         </div>
       ),
