@@ -197,7 +197,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       className={
                         isItemActive
-                          ? "bg-primary-foreground/8 border-l-3 border-primary-foreground text-white   py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
+                          ? "bg-primary-foreground/8 border-l-3 border-primary-foreground text-white   py-5  rounded-sm hover:bg-primary-foreground hover:text-white"
                           : "font-semibold py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
                       }
                     >
@@ -236,7 +236,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {isChildActive ? item.icon_active : item.icon}
                       {item.title}
                     </div>
-                    <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                    <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 text-white group-data-[state=open]:text-primary-foreground" />
                   </CollapsibleTrigger>
                 </SidebarGroupLabel>
 

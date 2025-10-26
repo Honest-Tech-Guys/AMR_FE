@@ -72,14 +72,14 @@ export function ChartPieDonutText({
 }: Props) {
   return (
     <Card className="flex flex-col">
-      <CardHeader className="flex items-center justify-between pb-0">
+      <CardHeader className="flex items-center justify-between h-0">
         <div>
           <CardTitle>{MainLabel}</CardTitle>
         </div>
-        <div className="text-sm text-muted-foreground">Details</div>
+        <div className="text-sm text-primary cursor-pointer">Details</div>
       </CardHeader>
       <Separator />
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center h-0">
         <CardTitle>{SubLabel}</CardTitle>
         <CardDescription>{data}</CardDescription>
       </CardHeader>
@@ -87,7 +87,7 @@ export function ChartPieDonutText({
       <CardContent className="flex items-center  pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto flex-1 aspect-square max-h-[250px]"
+          className="mx-auto flex-1 aspect-square max-h-[150px]"
         >
           <PieChart>
             <ChartTooltip
@@ -98,12 +98,12 @@ export function ChartPieDonutText({
               data={chartData}
               dataKey="visitors"
               nameKey="browser"
-              innerRadius={60}
+              innerRadius={43}
               strokeWidth={5}
             >
               <Label
                 position="center"
-                className="text-md font-semibold fill-foreground "
+                className="text-xs font-semibold fill-foreground "
               >
                 {labelCenter}
               </Label>

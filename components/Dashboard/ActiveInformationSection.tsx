@@ -36,7 +36,7 @@ const ActiveInformationSection: React.FC<ActiveInformationSectionProps> = ({
         <div
           key={index}
           className={cn(
-            "flex items-end justify-between shadow-xs bg-white w-full rounded-[10px] text-black/85 p-5",
+            "flex items-end justify-between shadow-xs bg-white w-full rounded-[10px] text-black/85 py-2 px-5",
             item.label === "Units" || item.label === "Rooms"
               ? ""
               : "cursor-pointer"
@@ -51,8 +51,8 @@ const ActiveInformationSection: React.FC<ActiveInformationSectionProps> = ({
           }}
         >
           <div>
-            <h3 className="text-[12px] font-semibold">{item.label}</h3>
-            <h3 className="text-sm font-semibold">{item.value}</h3>
+            <h3 className="text-[15px] font-semibold">{item.label}</h3>
+            <h3 className="text-[15px] font-semibold">{item.value}</h3>
             <h3
               className={cn(
                 "text-primary-foreground text-xs",

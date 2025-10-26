@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ChartPieDonutText } from "../CircleChart";
 
 type PaymentStatusData = {
@@ -13,26 +13,33 @@ type InvoiceChartProps = {
 };
 
 const InvoiceChart = ({ payment_status, month }: InvoiceChartProps) => {
-  const chartData = [
-    { browser: "Paid", visitors: Number(payment_status.paid), fill: "#EFF2F5" },
-    {
-      browser: "Unpaid",
-      visitors: Number(payment_status.unpaid),
-      fill: "#88BD23",
-    },
-    {
-      browser: "Overdue",
-      visitors: Number(payment_status.overdue),
-      fill: "#CF1322",
-    },
-  ];
+  const chartData = useMemo(
+    () => [
+      {
+        browser: "Paid",
+        visitors: Number(payment_status.paid),
+        fill: "#EFF2F5",
+      },
+      {
+        browser: "Unpaid",
+        visitors: Number(payment_status.unpaid),
+        fill: "#88BD23",
+      },
+      {
+        browser: "Overdue",
+        visitors: Number(payment_status.overdue),
+        fill: "#CF1322",
+      },
+    ],
+    [payment_status]
+  );
 
   return (
     <div className="w-full">
       <ChartPieDonutText
         chartData={chartData}
         DetailsLink=""
-        MainLabel="Invoice"
+        MainLabel="Monthly Payment Status"
         SubLabel="Payment Status"
         data={month}
         labelCenter="Payment Status"
