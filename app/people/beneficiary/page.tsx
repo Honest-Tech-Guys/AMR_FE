@@ -1,76 +1,66 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
 
+import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search } from "lucide-react";
 import { useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
-// import CreateNewTenant from "./CreateNewTenant";
-
-import useGetTenantList from "@/lib/services/hooks/useGetTenantsList";
-// import EditTenant from "./EditTenant";
+import useGetBeneficiariesList from "@/lib/services/hooks/useGetBeneficiariesList";
+import CreateNewBeneficiary from "./CreateNewBeneficiary";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
-  const { data, isLoading, error } = useGetTenantList();
   const [open, setOpen] = useState(false);
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
 
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
+  // Fetch beneficiaries
+  const { data, isLoading, error } = useGetBeneficiariesList();
+
   const [formFilters, setFormFilters] = useState({
-    property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: "",
-    data_range: "",
+    name: "",
+    nationality: "",
+    gender: "",
+    race: "",
+    date_range: "",
     status: "all",
     page: "1",
     per_page: "10",
   });
+
   return (
     <div>
-      <HeaderPage title="Tenant" />
+      <HeaderPage title="Beneficiaries" />
+
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
+        {/* Filter Bar */}
         <ResponsiveFilter
           filters={[
             {
-              name: "property_name",
-              placeholder: "Property Name",
+              name: "date_range",
+              placeholder: "Beneficiary Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Name",
+              name: "date_range",
+              placeholder: "Nationality",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
+              name: "date_range",
+              placeholder: "Gender",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Male", value: "Male" },
+                { label: "Female", value: "Female" },
               ],
               icon: Search,
             },
             {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
+              name: "date_range",
+              placeholder: "Race",
               type: "input",
               icon: Search,
             },
@@ -82,93 +72,97 @@ const Page = () => {
             },
           ]}
           actionButton={
-            <Button
-              // onClick={() => setAppliedFilters(formFilters)}
-              className="text-white"
-            >
+            <Button className="text-white">
               <Search />
             </Button>
           }
           formFilters={formFilters}
           setFormFilters={setFormFilters as never}
         />
+
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
-            {/* <CreateNewTenant /> */}
+            {/* Add new beneficiary button could go here */}
+            <CreateNewBeneficiary />
           </div>
         </div>
 
+        {/* Loading State */}
         {isLoading && (
           <div className="text-center py-8">
-            <div className="text-gray-500">Loading tenants...</div>
+            <div className="text-gray-500">Loading beneficiaries...</div>
           </div>
         )}
 
+        {/* Error State */}
         {error && (
           <div className="text-center py-8">
-            <div className="text-red-500">Error loading tenants.</div>
+            <div className="text-red-500">Error loading beneficiaries.</div>
           </div>
         )}
 
+        {/* Data Grid */}
         {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.map((tenant) => (
+            {data?.map((beneficiary) => (
               <div
-                key={tenant.id}
+                key={beneficiary.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
                 <label
-                  className="font-bold text-[#337AB7] text-lg"
+                  className="font-bold text-[#337AB7] text-lg cursor-pointer"
                   onClick={() => setOpen(true)}
                 >
-                  {tenant.name}
+                  {beneficiary.name}
                 </label>
+
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Entity:</span>{" "}
-                    {tenant?.tenant_profile?.type}
+                    <span className="font-medium">Email:</span>{" "}
+                    {beneficiary.email}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Phone:</span>{" "}
-                    {tenant?.tenant_profile?.alt_phone_number}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Email:</span> {tenant?.email}
+                    <span className="font-medium">Type:</span>{" "}
+                    {beneficiary.beneficiary_profile?.type}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Nationality:</span>{" "}
-                    {tenant?.tenant_profile?.nationality}
+                    {beneficiary.beneficiary_profile?.nationality}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Gender:</span>{" "}
-                    {tenant?.tenant_profile?.gender}
+                    {beneficiary.beneficiary_profile?.gender}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Race:</span>{" "}
-                    {tenant?.tenant_profile?.race}
+                    {beneficiary.beneficiary_profile?.race}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">Identity:</span>{" "}
-                    {tenant?.tenant_profile?.type} -{" "}
-                    {tenant?.tenant_profile?.nric_number}
+                    <span className="font-medium">NRIC Number:</span>{" "}
+                    {beneficiary.beneficiary_profile?.nric_number}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Address:</span>{" "}
-                    {tenant?.tenant_profile?.address_line_1},{" "}
-                    {tenant?.tenant_profile?.city},{" "}
-                    {tenant?.tenant_profile?.state}
+                    {beneficiary.beneficiary_profile?.address_line_1},{" "}
+                    {beneficiary.beneficiary_profile?.city},{" "}
+                    {beneficiary.beneficiary_profile?.state}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Contact:</span>{" "}
-                    {tenant?.tenant_profile?.emergency_contact_name} (
-                    {tenant?.tenant_profile?.emergency_contact_relationship})
+                    {beneficiary.beneficiary_profile?.emergency_contact_name} (
+                    {
+                      beneficiary.beneficiary_profile
+                        ?.emergency_contact_relationship
+                    }
+                    )
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Phone:</span>{" "}
-                    {tenant?.tenant_profile?.emergency_contact_phone}
+                    {beneficiary.beneficiary_profile?.emergency_contact_phone}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">iCoins:</span> -
+                    <span className="font-medium">Remarks:</span>{" "}
+                    {beneficiary.beneficiary_profile?.remarks ?? "-"}
                   </p>
                   <p className="flex items-center gap-2">
                     <span className="font-medium text-sm">Status:</span>
@@ -177,15 +171,15 @@ const Page = () => {
                     </Badge>
                   </p>
                 </div>
-                {/* <EditTenant tenant={tenant} isOpen={open} setIsOpen={setOpen} /> */}
               </div>
             ))}
           </div>
         )}
 
+        {/* Empty State */}
         {!isLoading && !error && (!data || data.length === 0) && (
           <div className="text-center py-8">
-            <div className="text-gray-500">No tenants found.</div>
+            <div className="text-gray-500">No beneficiaries found.</div>
           </div>
         )}
       </div>

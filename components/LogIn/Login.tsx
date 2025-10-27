@@ -41,7 +41,7 @@ const Login = ({ setStatus }: Props) => {
     <div className="w-full   ">
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="bg-white flex flex-col gap-5 h-[80vh]  justify-center mx-10 md:mx-25">
+          <div className="bg-white flex flex-col gap-5 h-[100vh]  justify-center mx-10 md:mx-25">
             <div className="flex justify-center gap-5 items-center">
               <Image src="/Logo.png" alt="Logo" width={200} height={100} />
             </div>
@@ -110,18 +110,17 @@ const Login = ({ setStatus }: Props) => {
                 )}
               </Button>
             </div>
-          </div>
 
-          <div className=" flex justify-center space-x-2 text-lg">
-            <span>Don't have an account? </span>
-            <span
-              className="text-primary cursor-pointer"
-              onClick={() => setStatus("Register")}
-            >
-              Create an account
-            </span>
+            <div className=" flex justify-center space-x-2 text-lg">
+              <span>Don't have an account? </span>
+              <span
+                className="text-primary cursor-pointer"
+                onClick={() => setStatus("Register")}
+              >
+                Create an account
+              </span>
+            </div>
           </div>
-
           {/* */}
         </form>
       </FormProvider>

@@ -25,13 +25,13 @@ export default function CarouselWithPagination() {
     });
   }, [api]);
   return (
-    <div className=" max-w-lg">
-      <Carousel setApi={setApi} className="w-full py-5  max-w-lf">
+    <div className=" w-full">
+      <Carousel setApi={setApi} className="w-full py-5  ">
         <CarouselContent>
           {Array.from({ length: 3 }).map((_, index) => (
             <CarouselItem key={index}>
-              <Card className="bg-transparent  border-0 py-0">
-                <CardContent className=" text-white ">
+              <Card className="bg-transparent shadow-none  border-0 py-0">
+                <CardContent className=" text-white  ">
                   <p className="text-xl  font-semibold">
                     Malaysia’s Leading Rental
                   </p>

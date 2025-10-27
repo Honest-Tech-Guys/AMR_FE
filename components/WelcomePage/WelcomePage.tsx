@@ -8,10 +8,10 @@ const WelcomePage = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="relative w-full justify-center items-center  overflow-hidden hidden md:flex  ">
-        <img src={"/LoginImg.png"} className="h-[95vh] w-[40vw] rounded-3xl" />
-        <div className="absolute bottom-6">
-          <div className="backdrop-blur-xs bg-black/10 p-6 rounded-lg w-[530px]">
+      <div className="relative w-full justify-center items-center  overflow-hidden hidden md:flex ml-25 ">
+        <img src={"/LoginImg.png"} className="h-[93vh] w-full rounded-3xl " />
+        <div className="absolute bottom-6 px-5 pb-5">
+          <div className=" backdrop-blur-xs bg-black/10 p-6 rounded-lg w-full  ">
             <CarouselWithPagination />
           </div>
         </div>

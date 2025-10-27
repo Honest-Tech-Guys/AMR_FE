@@ -32,7 +32,7 @@ export function SelectWithForm<T>({
   title,
   options,
 }: {
-  name: keyof T & string;
+  name: (keyof T & string) | string;
   title?: string;
   options: OptionType[];
 }) {

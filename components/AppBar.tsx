@@ -65,6 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         { title: "List View", url: "/property/list-view" },
         { title: "Grid View", url: "/property/grid-view" },
+        { title: "Setting", url: "/booking/property-setting" },
       ],
     },
     {
@@ -80,8 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         { title: "List View", url: "/booking/list-view" },
         { title: "Grid View", url: "/booking/grid-view" },
-        { title: "Property Setting", url: "/booking/property-setting" },
-        { title: "Booking Setting", url: "/booking/booking-setting" },
+        { title: "Setting", url: "/booking/booking-setting" },
       ],
     },
     {
