@@ -1,23 +1,32 @@
 "use client";
-import { ChartBarLabelCustom } from "@/components/BarCharts";
 import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
-import { GeneralSection } from "@/components/Dashboard/GeneralSection";
 import InvoiceChart from "@/components/Dashboard/InvoiceChart";
-import MyRentableSpaceSection from "@/components/Dashboard/MyRentableSpaceSection";
 import OccupancyVacancyOverview from "@/components/Dashboard/OccupancyVacancyOverview";
-import RentalCollectionChart from "@/components/Dashboard/RentalCollectionChart";
-import RentalCollectionSection from "@/components/Dashboard/RentalCollectionSection";
-import RentalCollectionForecast from "@/components/Dashboard/RentalV";
 import RentalV from "@/components/Dashboard/RentalV";
-import TenancyExpiryStatusSection from "@/components/Dashboard/TenancyExpiryStatusSection";
 import { TenancyExpiryPipeline } from "@/components/Dashboard/TenencyV";
-import DateRangePicker from "@/components/DatePickerRanger";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ResultTopUp from "@/components/Navbar/ResultTopUp";
 import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-
+import { useParams } from "next/navigation";
 export default function Home() {
+  const { status, message, order_id } = useParams();
+  const [isOpen, setIsOpen] = useState(false);
+  const [paymentData, setPaymentData] = useState({
+    status: "",
+    message: "",
+    order_id: "",
+  });
+  useEffect(() => {
+    if (status) {
+      setPaymentData({
+        status: status as string,
+        message: message as string,
+        order_id: order_id as string,
+      });
+      setIsOpen(true);
+    }
+  }, [status]);
   const { data, isPending } = useGetDashboard();
   const [range, setRange] = useState("This Month");
   interface ChartData {
@@ -26,23 +35,6 @@ export default function Home() {
     amount: number; // The corresponding monetary amount (optional, mainly for tooltip)
   }
 
-  // // Define the structure for the component props
-  // interface RentalForecastProps {
-  //   todayCollections: number;
-  //   vacantUnits: number;
-  //   totalUnits: number;
-  //   unitChange: number; // e.g., 0.21 for 21%
-  //   totalRentMYR: number;
-  //   chartData: ChartData[];
-  // }
-  // const forecastProps = {
-  //   todayCollections: 577,
-  //   vacantUnits: 333,
-  //   totalUnits: 28050,
-  //   unitChange: 0.21,
-  //   totalRentMYR: 1522,
-  //   chartData: rentalForecastData, // The detailed data array
-  // };
   const MOCK_CHART_DATA: ChartData[] = [
     // This is a minimal set; your actual data will be much larger.
     { timeframe: "Today", percentage: 1.2, amount: 5000 },
@@ -126,6 +118,11 @@ export default function Home() {
         />
         {/* <ChartBarLabelCustom /> */}
       </div>
+      <ResultTopUp
+        paymentData={paymentData}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
     </>
   );
 }
