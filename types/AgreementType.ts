@@ -26,7 +26,7 @@ export interface AgreementType {
   advanced_rental_amount: string; // e.g. "0.00"
   house_rules_remarks: string | null;
   terms_conditions_remarks: string | null;
-  attachment_urls: FileData[]; // file paths
+  attachment_urls: string[]; // file paths
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
 }

@@ -19,7 +19,7 @@ import UpdateProfile from "./updateProfile";
 import TopUp from "./TopUp";
 
 const Navbar = () => {
-  const { logout } = useAuthStore();
+  const { logout, user_role } = useAuthStore();
   const { data } = useGetUser();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -75,7 +75,7 @@ const Navbar = () => {
   );
   return (
     <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-4">
-      <SidebarTrigger className="-ml-1" />
+      {user_role !== "Tenant" && <SidebarTrigger className="-ml-1" />}
       {/* <InputWithIcon
         key="search"
         icon={Search}

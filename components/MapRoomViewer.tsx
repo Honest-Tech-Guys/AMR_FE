@@ -14,7 +14,7 @@ export default function MapRoomViewer({ url, rooms }: Props) {
       <img
         src={url}
         alt="Apartment Map"
-        className="w-full h-full object-cover rounded-md border"
+        className="w-full h-full object-contain rounded-md border"
       />
 
       {rooms

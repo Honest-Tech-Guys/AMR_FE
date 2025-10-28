@@ -1,134 +1,239 @@
 "use client";
-import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
-import InvoiceChart from "@/components/Dashboard/InvoiceChart";
-import OccupancyVacancyOverview from "@/components/Dashboard/OccupancyVacancyOverview";
-import RentalV from "@/components/Dashboard/RentalV";
-import { TenancyExpiryPipeline } from "@/components/Dashboard/TenencyV";
-import ResultTopUp from "@/components/Navbar/ResultTopUp";
-import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
-import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import RentalCollectionChart from "@/components/Dashboard/RentalCollectionChart";
+import { LoaderCircle } from "lucide-react";
+
+import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
+import InvoiceChart from "@/components/Dashboard/InvoiceChart";
 import OccupancyChart from "@/components/Dashboard/OccupancyVacancyOverview";
+import RentalCollectionChart from "@/components/Dashboard/RentalCollectionChart";
+import { TenancyExpiryPipeline } from "@/components/Dashboard/TenencyV";
+import ResultTopUp from "@/components/Navbar/ResultTopUp";
+
+import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
+import useGetInvoicesList from "@/lib/services/hooks/useGetInvoices";
+import useGetMetersList from "@/lib/services/hooks/useGetMeterList";
+import useGetLatestAgreement from "@/lib/services/hooks/useGetAgrementsList";
+
+import { AgreementType } from "@/types/AgreementType";
+import { Invoice } from "@/types/InvoiceType";
+import { cn, formatDate } from "@/lib/utils";
+import { useAuthStore } from "@/lib/stores/authStore";
+
 export default function Home() {
-  const searchParams = useSearchParams(); // 👈
+  const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const message = searchParams.get("message");
   const order_id = searchParams.get("order_id");
-  console.log(status);
+  const { user_role } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentData, setPaymentData] = useState({
     status: "",
     message: "",
     order_id: "",
   });
+
   useEffect(() => {
     if (status) {
       setPaymentData({
-        status: status as string,
-        message: message as string,
-        order_id: order_id as string,
+        status: status ?? "",
+        message: message ?? "",
+        order_id: order_id ?? "",
       });
       setIsOpen(true);
     }
-  }, [status]);
-  const { data, isPending } = useGetDashboard();
-  const [range, setRange] = useState("This Month");
-  interface ChartData {
-    timeframe: string; // e.g., 'Today', '1 Day', '7 Days'
-    percentage: number; // The percentage value for the bar height
-    amount: number; // The corresponding monetary amount (optional, mainly for tooltip)
-  }
+  }, [status, message, order_id]);
 
-  const MOCK_CHART_DATA: ChartData[] = [
-    // This is a minimal set; your actual data will be much larger.
-    { timeframe: "Today", percentage: 1.2, amount: 5000 },
-    { timeframe: "1 Day", percentage: 3.0, amount: 12000 },
-    { timeframe: "1 Day", percentage: 2.7, amount: 10000 },
-    { timeframe: "1 Day", percentage: 2.0, amount: 8000 },
-    { timeframe: "1 Day", percentage: 3.8, amount: 16000 },
-    // ... and so on based on your image
-  ];
+  const { data, isPending } = useGetDashboard();
+  const { data: meterData } = useGetMetersList();
+  const { data: invoiceData } = useGetInvoicesList();
+  const { data: agreementData } = useGetLatestAgreement();
 
   if (isPending) {
-    return <LoaderCircle className="animate-spin" />;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoaderCircle className="animate-spin text-emerald-700 w-10 h-10" />
+      </div>
+    );
   }
+
+  /** ---------- UTILITIES ---------- **/
+  const daysRemaining = (endIso: string) => {
+    const today = new Date();
+    const end = new Date(endIso);
+    const diff = Math.ceil(
+      (end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return diff;
+  };
+
+  /** ---------- COMPONENTS ---------- **/
+  const AgreementCard = ({ agreement }: { agreement: AgreementType }) => {
+    const days = daysRemaining(agreement.end_date);
+    return (
+      <article className="bg-white rounded-2xl shadow-sm p-5 mt-4 md:mt-6 border">
+        <div className="flex flex-col md:flex-row md:justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-sm text-gray-500 mt-2">Tenancy Period</p>
+            <p className="font-medium mt-1">
+              {formatDate(agreement.start_date)} –{" "}
+              {formatDate(agreement.end_date)}
+            </p>
+            <p className="text-sm text-gray-500 mt-3">Rental Fee</p>
+            <p className="font-medium">RM {agreement.rental_amount}</p>
+            <button className="mt-5 bg-emerald-700 text-white px-5 py-2 rounded-full">
+              Set up Auto Debit
+            </button>
+          </div>
+          <div className="flex-shrink-0 flex flex-col items-end justify-between">
+            <button className="bg-gray-100 px-3 py-2 rounded-md">
+              View Details
+            </button>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">Tenancy Remaining</p>
+              <div className="mt-2 bg-gray-100 px-4 py-2 rounded-md text-emerald-700 font-semibold">
+                {days} Days
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  };
+
+  const SmartMeterCard = ({ meter }: { meter: Meter }) => (
+    <section className="mt-6">
+      <div className="flex items-center justify-between">
+        <h4 className="font-semibold text-lg">Smart Meter</h4>
+        <a className="text-emerald-700 text-sm" href="#">
+          View All
+        </a>
+      </div>
+      <div className="bg-white border rounded-xl p-4 mt-3 flex items-center justify-between shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
+            ⚡
+          </div>
+          <div>
+            <div className="font-bold">
+              {meter.meterable?.property_name},{" "}
+              {meter.meterable?.address_line_1}
+            </div>
+            <div className="text-sm text-gray-500 mt-1">
+              Balance: {meter.balance_unit} unit
+            </div>
+            <div className="text-sm text-gray-400 mt-1">
+              Last Update: {formatDate(meter.updated_at)}{" "}
+              {new Date(meter.updated_at).toLocaleTimeString()}
+            </div>
+            <div className="flex gap-2 mt-3">
+              <span className="px-2 py-1 border rounded-md text-sm bg-emerald-50">
+                Wifi Connected
+              </span>
+              <span className="px-2 py-1 border rounded-md text-sm bg-emerald-50">
+                Power On
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>›</div>
+      </div>
+    </section>
+  );
+
+  const InvoiceCard = ({ invoice }: { invoice: Invoice }) => (
+    <section className="mt-6">
+      <div className="flex items-center justify-between">
+        <h4 className="font-semibold text-lg">My Invoices</h4>
+        <a className="text-emerald-700 text-sm" href="#">
+          View All
+        </a>
+      </div>
+      <div className="bg-white border rounded-2xl p-4 mt-3 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-semibold">
+            Due
+          </div>
+          <div className="flex-1">
+            <div className="text-sm text-sky-600 font-bold">
+              Invoice #: {invoice.invoice_number}
+            </div>
+            <div className="mt-1">
+              Amount:{" "}
+              <span className="font-bold">RM{invoice.total_amount}</span>
+            </div>
+            <div className="text-sm text-gray-400 mt-1">
+              Due Date: {formatDate(invoice.due_date)}
+            </div>
+          </div>
+          <div>›</div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const QuickAccess = () => {
+    const items = [
+      { title: "My Agreement", icon: "📄" },
+      { title: "Smart Lock", icon: "🔒" },
+      { title: "History", icon: "🕘" },
+    ];
+    return (
+      <section className="mt-6">
+        <h4 className="font-semibold text-lg">Quick Access</h4>
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          {items.map((it) => (
+            <div
+              key={it.title}
+              className="bg-white border rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm"
+            >
+              <div className="text-2xl">{it.icon}</div>
+              <div className="text-sm">{it.title}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  /** ---------- MAIN JSX ---------- **/
   return (
     <>
-      {/* <div className="flex justify-end ">
-        <ToggleGroup
-          variant="outline"
-          type="single"
-          value={range}
-          onValueChange={(val) => setRange(val)}
-        >
-          <ToggleGroupItem value="This Month" aria-label="This Month">
-            This Month
-          </ToggleGroupItem>
-          <ToggleGroupItem value="Last Quarter" aria-label="Last Quarter">
-            Last Quarter
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="Custom Range"
-            aria-label="Custom Range"
-            className="md:w-[420px]"
-          >
-            <DateRangePicker
-              // value={
-              //   formFilters.date_range
-              //     ? JSON.parse(formFilters.date_range)
-              //     : undefined
-              // }
-              // onChange={(range) =>
-              //   handleChange(filter.name, JSON.stringify(range))
-              // }
-              placeholder={"Custom Range"}
-              className="rounded-none  bg-transparent border-0 h-[5px] shadow-none"
-            />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div> */}
-      <ActiveInformationSection general={data?.top_stats as never} />
-      <div className="grid grid-cols-1 md:grid-cols-2  w-full  gap-5">
-        {/* <GeneralSection general={data?.general as never} />
-        <MyRentableSpaceSection
-          rentable_space={data?.rentable_space as never}
-        />
-        <TenancyExpiryStatusSection
-          tenancy_expiry={data?.tenancy_expiry as never}
-        />
+      {user_role === "Tenant" && (
+        <main className="max-w-3xl mx-auto px-4 md:px-6">
+          {agreementData && <AgreementCard agreement={agreementData} />}
+          <QuickAccess />
+          {meterData?.[0] && <SmartMeterCard meter={meterData[0]} />}
+          {invoiceData?.[0] && <InvoiceCard invoice={invoiceData[0]} />}
+          <div className="h-24" />
+        </main>
+      )}
 
-        <RentalCollectionSection
-          rental_collection={data?.rental_collection as never}
-        /> */}
-        <OccupancyChart
-          data={data?.rentable_space as never}
-          MainLabel="Occupancy Overview"
-          SubLabel="Current Tenancy Status"
+      {/* Desktop Dashboard Visuals */}
+      <div className={cn(user_role === "Tenant" ? "hidden md:block" : null)}>
+        <ActiveInformationSection general={data?.top_stats as never} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <OccupancyChart
+            data={data?.rentable_space as never}
+            MainLabel="Occupancy Overview"
+            SubLabel="Current Tenancy Status"
+          />
+          <RentalCollectionChart
+            rental_collection={data?.pie_charts?.rental_collection as never}
+            month={data?.pie_charts?.month as never}
+          />
+          <TenancyExpiryPipeline data={data?.tenancy_expiry as never} />
+          <InvoiceChart
+            payment_status={data?.pie_charts?.payment_status as never}
+            month={data?.pie_charts?.month as never}
+          />
+        </div>
+        <ResultTopUp
+          paymentData={paymentData}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
         />
-
-        <RentalCollectionChart
-          rental_collection={data?.pie_charts.rental_collection as never}
-          month={data?.pie_charts.month as never}
-        />
-        <TenancyExpiryPipeline data={data?.tenancy_expiry as never} />
-        <InvoiceChart
-          payment_status={data?.pie_charts.payment_status as never}
-          month={data?.pie_charts.month as never}
-        />
-        {/* <RentalV
-          occupancyRate={50.3}
-          MainLabel="Rental Collection Forecast"
-          SubLabel=""
-        /> */}
-        {/* <ChartBarLabelCustom /> */}
       </div>
-      <ResultTopUp
-        paymentData={paymentData}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
     </>
   );
 }

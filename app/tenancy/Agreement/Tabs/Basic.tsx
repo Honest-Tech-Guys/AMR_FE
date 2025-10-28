@@ -58,7 +58,7 @@ const Basic = ({ id, initialData }: Props) => {
       advanced_rental_amount: initialData.advanced_rental_amount || "",
       house_rules_remarks: initialData.house_rules_remarks || "",
       terms_conditions_remarks: initialData.terms_conditions_remarks || "",
-      attachments: initialData.attachment_urls || [],
+      // attachments: initialData.attachment_urls || [],
     },
   });
 
@@ -99,7 +99,7 @@ const Basic = ({ id, initialData }: Props) => {
         advanced_rental_amount: initialData.advanced_rental_amount || "",
         house_rules_remarks: initialData.house_rules_remarks || "",
         terms_conditions_remarks: initialData.terms_conditions_remarks || "",
-        attachments: initialData.attachment_urls || [],
+        // attachments: initialData.attachment_urls || [],
       });
     }
   }, [initialData, reset]);

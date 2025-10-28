@@ -11,7 +11,6 @@ import {
 import { Separator } from "../ui/separator";
 
 type TenancyExpiryData = {
-  in_2_days: number;
   in_7_days: number;
   in_14_days: number;
   in_30_days: number;
@@ -44,14 +43,6 @@ interface Props {
 export function TenancyExpiryPipeline({ data }: Props) {
   // ✅ Transform the incoming data into chart-friendly format
   const tenancyData = [
-    {
-      timeframe: "In 2 Days",
-      count: data.in_2_days,
-      urgent: data.in_2_days,
-      short: 0,
-      mid: 0,
-      long: 0,
-    },
     {
       timeframe: "In 7 Days",
       count: data.in_7_days,
@@ -115,7 +106,7 @@ export function TenancyExpiryPipeline({ data }: Props) {
               className="font-medium text-sm"
             />
             <XAxis type="number" hide />
-            <ChartTooltip
+            {/* <ChartTooltip
               cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
               content={
                 <ChartTooltipContent
@@ -123,7 +114,7 @@ export function TenancyExpiryPipeline({ data }: Props) {
                   labelFormatter={(label) => `${label}`}
                 />
               }
-            />
+            /> */}
             <Bar
               dataKey="urgent"
               stackId="a"

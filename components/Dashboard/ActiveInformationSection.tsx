@@ -31,7 +31,7 @@ const ActiveInformationSection: React.FC<ActiveInformationSectionProps> = ({
   ];
   const router = useRouter();
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-5 ">
+    <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-5 mb-5 ">
       {oneSlider.map((item, index) => (
         <div
           key={index}

@@ -70,7 +70,7 @@ export default function RootLayout({
           )}
           {/* {user_role === "Tenant" &&
           } */}
-          {/* <BottomNav /> */}
+          <BottomNav />
         </ReactQueryProvider>
       </body>
     </html>
