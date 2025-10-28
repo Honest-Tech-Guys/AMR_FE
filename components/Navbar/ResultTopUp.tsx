@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { CheckCircle2, XCircle, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
-
+import { useRouter } from "next/navigation";
+import useGetUser from "@/lib/services/hooks/useGetUser";
 interface Props {
   paymentData: {
     status: string;
@@ -24,7 +25,8 @@ interface Props {
 
 const ResultTopUp = ({ paymentData, isOpen, setIsOpen }: Props) => {
   const isSuccess = paymentData?.status === "success";
-
+  const router = useRouter();
+  const { refetch } = useGetUser();
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="md:max-w-[460px] bg-white md:p-8 rounded-2xl shadow-lg border border-gray-100 text-center">
@@ -84,7 +86,13 @@ const ResultTopUp = ({ paymentData, isOpen, setIsOpen }: Props) => {
         <DialogFooter className="mt-6 flex justify-center">
           <Button
             className="text-white px-6"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              router.replace("/");
+              if (isSuccess) {
+                refetch();
+              }
+              setIsOpen(false);
+            }}
             variant={isSuccess ? "default" : "destructive"}
           >
             {isSuccess ? "Done" : "Close"}

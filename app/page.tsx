@@ -8,9 +8,13 @@ import ResultTopUp from "@/components/Navbar/ResultTopUp";
 import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 export default function Home() {
-  const { status, message, order_id } = useParams();
+  const searchParams = useSearchParams(); // 👈
+  const status = searchParams.get("status");
+  const message = searchParams.get("message");
+  const order_id = searchParams.get("order_id");
+  console.log(status);
   const [isOpen, setIsOpen] = useState(false);
   const [paymentData, setPaymentData] = useState({
     status: "",
