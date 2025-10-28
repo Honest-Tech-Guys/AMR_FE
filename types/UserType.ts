@@ -7,6 +7,7 @@ export default interface User {
   id: number;
   name: string;
   email: string;
+  balance: string;
   email_verified_at: string | null;
   avatar_url: string;
   created_at: string;

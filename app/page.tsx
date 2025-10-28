@@ -52,21 +52,13 @@ export default function Home() {
     { timeframe: "1 Day", percentage: 3.8, amount: 16000 },
     // ... and so on based on your image
   ];
-  const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10); // add background when user scrolls 10px
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
   if (isPending) {
     return <LoaderCircle className="animate-spin" />;
   }
   return (
     <>
-      <div className="flex justify-end ">
+      {/* <div className="flex justify-end ">
         <ToggleGroup
           variant="outline"
           type="single"
@@ -98,7 +90,7 @@ export default function Home() {
             />
           </ToggleGroupItem>
         </ToggleGroup>
-      </div>
+      </div> */}
       <ActiveInformationSection general={data?.top_stats as never} />
       <div className="grid grid-cols-1 md:grid-cols-2  w-full  gap-5">
         {/* <GeneralSection general={data?.general as never} />

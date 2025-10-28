@@ -16,6 +16,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import UpdateProfile from "./updateProfile";
+import TopUp from "./TopUp";
 
 const Navbar = () => {
   const { logout } = useAuthStore();
@@ -51,7 +52,9 @@ const Navbar = () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
-  const [openDialog, setOpenDialog] = useState<"editProfile" | null>(null);
+  const [openDialog, setOpenDialog] = useState<"editProfile" | "topUp" | null>(
+    null
+  );
   const MenuItem = ({
     children,
     dialogKey,
@@ -73,12 +76,21 @@ const Navbar = () => {
   return (
     <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-4">
       <SidebarTrigger className="-ml-1" />
-      <InputWithIcon
+      {/* <InputWithIcon
         key="search"
         icon={Search}
         placeholder="Search..."
         className="max-w-50"
-      />
+      /> */}
+      <div className="flex items-center w-full gap-3">
+        <p className="text-primary">Credit Balance: {data?.balance}</p>
+        <p
+          className="text-primary-foreground text-xs cursor-pointer"
+          onClick={() => setOpenDialog("topUp")}
+        >
+          Top Up
+        </p>
+      </div>
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan
           onClick={toggleFullscreen}
@@ -120,6 +132,11 @@ const Navbar = () => {
         <UpdateProfile
           open={openDialog === "editProfile"}
           onOpenChange={(open) => setOpenDialog(open ? "editProfile" : null)}
+        />
+        <TopUp
+          balance={data?.balance}
+          open={openDialog === "topUp"}
+          onOpenChange={(open) => setOpenDialog(open ? "topUp" : null)}
         />
       </div>
     </header>
