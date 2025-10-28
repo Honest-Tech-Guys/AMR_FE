@@ -29,7 +29,6 @@ const UnitCard = ({ unit }: { unit: any }) => {
               Unit - {unit.block_floor_unit_number}
             </p>
             <p>{unit.rental_type}</p>
-
             {unit.rental_type === "Room Rental" && (
               <div className="flex gap-3">
                 <span>Rooms:</span>

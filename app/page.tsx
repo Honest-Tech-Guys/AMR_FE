@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LoaderCircle } from "lucide-react";
+import { ClipboardList, Clock, Gauge, LoaderCircle, Lock } from "lucide-react";
 
 import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
 import InvoiceChart from "@/components/Dashboard/InvoiceChart";
@@ -112,7 +112,7 @@ export default function Home() {
       <div className="bg-white border rounded-xl p-4 mt-3 flex items-center justify-between shadow-sm">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-            ⚡
+            <Gauge className="text-emerald-700" />
           </div>
           <div>
             <div className="font-bold">
@@ -174,9 +174,12 @@ export default function Home() {
 
   const QuickAccess = () => {
     const items = [
-      { title: "My Agreement", icon: "📄" },
-      { title: "Smart Lock", icon: "🔒" },
-      { title: "History", icon: "🕘" },
+      {
+        title: "My Agreement",
+        icon: <ClipboardList className="text-emerald-700" />,
+      },
+      { title: "Smart Lock", icon: <Lock className="text-emerald-700" /> },
+      { title: "History", icon: <Clock className="text-emerald-700" /> },
     ];
     return (
       <section className="mt-6">

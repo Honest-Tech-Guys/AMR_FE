@@ -104,7 +104,7 @@ export default function MapWithSinglePoint({ url, onChange }: Props) {
       <img
         src={url}
         alt="Apartment Map"
-        className="w-full h-full cursor-pointer object-cover"
+        className="w-full h-full cursor-pointer object-contain"
       />
 
       {point && (
@@ -122,7 +122,7 @@ export default function MapWithSinglePoint({ url, onChange }: Props) {
           <Popover open={active && !dragging} onOpenChange={setActive}>
             <PopoverTrigger asChild>
               <button
-                className="w-5 h-5 rounded-full border text-white text-xs border-white"
+                className="w-5 h-5 rounded-full border text-white text-xs border-white z-1000"
                 style={{ backgroundColor: point.color || "red" }}
               ></button>
             </PopoverTrigger>
