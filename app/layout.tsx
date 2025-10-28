@@ -11,6 +11,7 @@ import "./globals.css";
 import WelcomePage from "../components/WelcomePage/WelcomePage";
 import { usePathname } from "next/navigation";
 import AccountVerificationRequiredPage from "@/components/account_verification_required/account_verification_required_page";
+import BottomNav from "@/components/Navbar/BottomNav";
 // Fonts
 // const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 // const geistMono = Geist_Mono({
@@ -22,10 +23,10 @@ import AccountVerificationRequiredPage from "@/components/account_verification_r
 function LayoutShell({ children }: { children: React.ReactNode }) {
   // e.g. "/dashboard"
   // const searchParams = useSearchParams();
-
+  const { user_role } = useAuthStore();
   return (
     <>
-      <AppSidebar />
+      {user_role !== "Tenant" && <AppSidebar />}
       <SidebarInset className="bg-gray-100 ">
         <Navbar />
         <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
@@ -38,7 +39,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuth, isAuthLoading, checkAuth, email_verified_at } =
+  const { isAuth, isAuthLoading, checkAuth, email_verified_at, user_role } =
     useAuthStore();
 
   React.useEffect(() => {
@@ -67,6 +68,9 @@ export default function RootLayout({
           ) : (
             <AccountVerificationRequiredPage />
           )}
+          {/* {user_role === "Tenant" &&
+          } */}
+          {/* <BottomNav /> */}
         </ReactQueryProvider>
       </body>
     </html>

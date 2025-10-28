@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -17,81 +10,91 @@ import {
 } from "@/components/ui/chart";
 import { Separator } from "../ui/separator";
 
-// 1. Updated Data Structure to match the image's segmented timeline
-const tenancyData = [
-  {
-    unitCount: 2, // Total units in this row
-    timeframe: "In 7 Days", // Label for the row (Top label in the image)
-    urgent: 1, // Units expiring very soon (Red)
-    short: 1, // Units expiring shortly (Orange)
-    mid: 0, // Units expiring later (Green/Gray) - not used in this top row
-    long: 0,
-  },
-  {
-    unitCount: 10,
-    timeframe: "In 30 Days", // Just a category label, not an axis value
-    urgent: 0,
-    short: 0,
-    mid: 10,
-    long: 0,
-  },
-  {
-    unitCount: 30,
-    timeframe: "In 90 Days",
-    urgent: 0.5, // Small urgent segment (Tiny red/orange dot)
-    short: 0.5, // Small short segment
-    mid: 29, // Large mid segment
-    long: 0,
-  },
-  {
-    unitCount: 23,
-    timeframe: "In 180 Days",
-    urgent: 0,
-    short: 0,
-    mid: 0,
-    long: 23,
-  },
-];
+type TenancyExpiryData = {
+  in_2_days: number;
+  in_7_days: number;
+  in_14_days: number;
+  in_30_days: number;
+  in_60_days: number;
+};
 
-// 2. Updated Chart Config with custom colors to match the image
 const tenancyChartConfig = {
-  // We'll define colors directly using HEX for better control over the visual
-  // The 'unitCount' is the effective category, but we use the bar keys for config
   urgent: {
     label: "0-7 Days",
-    color: "#D9534F", // Red for urgent
+    color: "#D9534F",
   },
   short: {
     label: "8-30 Days",
-    color: "#F0AD4E", // Orange/Yellow for short
+    color: "#F0AD4E",
   },
   mid: {
     label: "31-90 Days",
-    color: "var(--primary-foreground)", // Green/Gray for mid
+    color: "var(--primary-foreground)",
   },
   long: {
     label: "90+ Days",
-    color: "#6D948E", // A darker gray-green for long
+    color: "#6D948E",
   },
 } satisfies ChartConfig;
 
-// Component now takes no props, using internal data for the example
-export function TenancyExpiryPipeline() {
+interface Props {
+  data: TenancyExpiryData;
+}
+
+export function TenancyExpiryPipeline({ data }: Props) {
+  // ✅ Transform the incoming data into chart-friendly format
+  const tenancyData = [
+    {
+      timeframe: "In 2 Days",
+      count: data.in_2_days,
+      urgent: data.in_2_days,
+      short: 0,
+      mid: 0,
+      long: 0,
+    },
+    {
+      timeframe: "In 7 Days",
+      count: data.in_7_days,
+      urgent: 0,
+      short: data.in_7_days,
+      mid: 0,
+      long: 0,
+    },
+    {
+      timeframe: "In 14 Days",
+      count: data.in_14_days,
+      urgent: 0,
+      short: data.in_14_days,
+      mid: 0,
+      long: 0,
+    },
+    {
+      timeframe: "In 30 Days",
+      count: data.in_30_days,
+      urgent: 0,
+      short: 0,
+      mid: data.in_30_days,
+      long: 0,
+    },
+    {
+      timeframe: "In 60 Days",
+      count: data.in_60_days,
+      urgent: 0,
+      short: 0,
+      mid: 0,
+      long: data.in_60_days,
+    },
+  ];
+
   return (
-    <Card className="w-full">
-      <CardHeader className="flex items-center justify-between h-0">
-        <div>
-          <CardTitle>Tenancy Expiry Pipeline</CardTitle>
-        </div>
-        <div className="text-sm text-primary cursor-pointer ">Details</div>
+    <Card className="w-full py-0 gap-3">
+      <CardHeader className="flex items-center justify-between mt-4  ">
+        <CardTitle className="h-full">Tenancy Expiry Pipeline</CardTitle>
+        <div className="text-sm text-primary cursor-pointer">Details</div>
       </CardHeader>
       <Separator />
-      {/* Label "In 7 Days" placed outside the chart for easier styling */}
-      <div className="px-6 pt-2 text-sm font-medium text-muted-foreground">
-        In 7 Days
-      </div>
 
-      <CardContent className="pt-2 pb-4">
+      <CardContent className=" ">
         <ChartContainer
           config={tenancyChartConfig}
           className="min-h-[160px] h-[200px] w-full"
@@ -99,94 +102,52 @@ export function TenancyExpiryPipeline() {
           <BarChart
             accessibilityLayer
             data={tenancyData}
-            layout="vertical" // Correctly sets up a horizontal bar chart
+            layout="vertical"
             margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
           >
-            {/* YAxis (Left): Shows the unit count (2, 10, 30, 23) */}
             <YAxis
-              dataKey="unitCount"
-              type="category" // Treat the numbers as categories (labels)
+              dataKey="timeframe"
+              type="category"
               tickLine={false}
               axisLine={false}
               tickMargin={5}
-              width={30}
-              className="font-bold text-sm"
+              width={80}
+              className="font-medium text-sm"
             />
-
-            {/* XAxis (Bottom): Represents the pipeline days/values. Hide the numbers but keep the ticks/labels. */}
-            <XAxis
-              type="number"
-              hide={true} // Hide the values (the numbers 0, 5, 10, etc.)
-            />
-
-            {/* Custom X-Axis to display the Day labels (1Day, 7Day, etc.) */}
-            {/* NOTE: For simplicity, we are hardcoding a simple XAxis below. A true solution would use a custom tick component. */}
-            {/* The image's X-Axis labels (1Day, 7Day, etc.) are complex to implement with Recharts out-of-the-box. 
-                We'll place them below the chart using simple divs.
-            */}
-
+            <XAxis type="number" hide />
             <ChartTooltip
               cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
               content={
                 <ChartTooltipContent
                   className="text-sm"
-                  // indicator="none" // No indicator dot
-                  labelFormatter={(label) => `Units: ${label}`} // Formats the unit count label
+                  labelFormatter={(label) => `${label}`}
                 />
               }
             />
-
-            {/* STACKED BARS: Use stackId="a" for all to stack them on the same line */}
-
-            {/* Red segment (Urgent) */}
             <Bar
               dataKey="urgent"
               stackId="a"
-              fill="var(--color-urgent)"
-              radius={[5, 0, 0, 5]} // Rounded only on the left side
-              barSize={20} // Fixed height for bars
-            />
-
-            {/* Orange segment (Short) */}
-            <Bar
-              dataKey="short"
-              stackId="a"
-              fill="var(--color-short)"
+              fill="#D9534F"
               barSize={20}
+              radius={[5, 0, 0, 5]}
             />
-
-            {/* Green/Gray segment (Mid) */}
+            <Bar dataKey="short" stackId="a" fill="#F0AD4E" barSize={20} />
             <Bar
               dataKey="mid"
               stackId="a"
-              fill="var(--color-mid)"
+              fill="var(--primary-foreground)"
               barSize={20}
             />
-
-            {/* Dark Green/Gray segment (Long) */}
             <Bar
               dataKey="long"
               stackId="a"
-              fill="var(--color-long)"
-              radius={[0, 5, 5, 0]} // Rounded only on the right side
+              fill="#6D948E"
               barSize={20}
+              radius={[0, 5, 5, 0]}
             />
           </BarChart>
         </ChartContainer>
-
-        {/* Custom Timeline Labels (Mimicking the X-Axis labels at the bottom) */}
-        <div className="flex justify-between text-xs text-muted-foreground px-10 -mt-2">
-          <span>1 Day</span>
-          <span>7 Day</span>
-          <span>3 Days</span>
-          <span>3 Days</span>
-          <span>5 Days</span>
-          <span>2 Days</span>
-          <span>6 Day</span>
-        </div>
       </CardContent>
     </Card>
   );
 }
-
-// To call this, just render: <TenancyExpiryPipeline />

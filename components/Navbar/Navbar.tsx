@@ -82,8 +82,12 @@ const Navbar = () => {
         placeholder="Search..."
         className="max-w-50"
       /> */}
-      <div className="flex items-center w-full gap-3">
-        <p className="text-primary">Credit Balance: {data?.user.balance}</p>
+      <div className="flex  items-center w-full gap-3">
+        <div className="flex flex-col md:flex-row text-primary md:gap-1">
+          <p className="hidden md:block ">Credit</p>
+          <p>Balance:</p>
+          <p>{data?.user.balance}</p>
+        </div>
         <p
           className="text-primary-foreground text-xs cursor-pointer"
           onClick={() => setOpenDialog("topUp")}
@@ -94,7 +98,7 @@ const Navbar = () => {
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan
           onClick={toggleFullscreen}
-          className="size-5 text-primary cursor-pointer hover:opacity-70 transition-opacity"
+          className="size-5 hidden md:block text-primary cursor-pointer hover:opacity-70 transition-opacity"
           strokeWidth={2.5}
         />
         <NotificationPopover />
@@ -103,7 +107,7 @@ const Navbar = () => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="cursor-pointer"
+              className="cursor-pointer px-0"
               onClick={(e) => e.stopPropagation()}
             >
               <Avatar>

@@ -9,6 +9,8 @@ import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import RentalCollectionChart from "@/components/Dashboard/RentalCollectionChart";
+import OccupancyChart from "@/components/Dashboard/OccupancyVacancyOverview";
 export default function Home() {
   const searchParams = useSearchParams(); // 👈
   const status = searchParams.get("status");
@@ -100,26 +102,26 @@ export default function Home() {
         <RentalCollectionSection
           rental_collection={data?.rental_collection as never}
         /> */}
-        <OccupancyVacancyOverview
-          occupancyRate={50.3}
-          MainLabel="General"
-          SubLabel="Occupancy and Vacancy OverView"
+        <OccupancyChart
+          data={data?.rentable_space as never}
+          MainLabel="Occupancy Overview"
+          SubLabel="Current Tenancy Status"
         />
 
-        {/* <RentalCollectionChart
+        <RentalCollectionChart
           rental_collection={data?.pie_charts.rental_collection as never}
           month={data?.pie_charts.month as never}
-        /> */}
+        />
+        <TenancyExpiryPipeline data={data?.tenancy_expiry as never} />
         <InvoiceChart
           payment_status={data?.pie_charts.payment_status as never}
           month={data?.pie_charts.month as never}
         />
-        <TenancyExpiryPipeline />
-        <RentalV
+        {/* <RentalV
           occupancyRate={50.3}
           MainLabel="Rental Collection Forecast"
           SubLabel=""
-        />
+        /> */}
         {/* <ChartBarLabelCustom /> */}
       </div>
       <ResultTopUp
