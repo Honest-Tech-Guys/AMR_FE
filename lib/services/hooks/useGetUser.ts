@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import User from "@/types/UserType";
+import Role from "@/types/RoleType";
+interface Response {
+  user: User;
+  role: Role;
+}
 const useGetUser = () => {
   return useQuery({
     queryKey: ["GetUser"],
@@ -8,7 +13,7 @@ const useGetUser = () => {
       const url = "/user";
       {
         return axiosInstance
-          .get<User>(url)
+          .get<Response>(url)
           .then((res) => {
             return res.data;
           })

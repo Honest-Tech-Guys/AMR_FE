@@ -83,7 +83,7 @@ const Navbar = () => {
         className="max-w-50"
       /> */}
       <div className="flex items-center w-full gap-3">
-        <p className="text-primary">Credit Balance: {data?.balance}</p>
+        <p className="text-primary">Credit Balance: {data?.user.balance}</p>
         <p
           className="text-primary-foreground text-xs cursor-pointer"
           onClick={() => setOpenDialog("topUp")}
@@ -107,13 +107,13 @@ const Navbar = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <Avatar>
-                <AvatarImage src={data?.avatar_url} alt="@shadcn" />
+                <AvatarImage src={data?.user.avatar_url} alt="@shadcn" />
                 <AvatarFallback className="bg-primary/10">
-                  {data?.name[0]}
-                  {data?.name[1]}
+                  {data?.user.name[0]}
+                  {data?.user.name[1]}
                 </AvatarFallback>
               </Avatar>
-              <span className="tracking-tight">{data?.name}</span>
+              <span className="tracking-tight">{data?.user.name}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
@@ -134,7 +134,7 @@ const Navbar = () => {
           onOpenChange={(open) => setOpenDialog(open ? "editProfile" : null)}
         />
         <TopUp
-          balance={data?.balance}
+          balance={data?.user.balance}
           open={openDialog === "topUp"}
           onOpenChange={(open) => setOpenDialog(open ? "topUp" : null)}
         />

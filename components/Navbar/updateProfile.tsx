@@ -90,23 +90,23 @@ const UpdateProfile = ({ open, onOpenChange }: Props) => {
 
   useEffect(() => {
     if (data) {
-      setAvatarPreview(data.avatar_url);
+      setAvatarPreview(data.user.avatar_url);
       // Reset form with API data when it loads
       reset({
-        name: data.name || "",
-        nationality: data.nationality || "",
-        nric_number: data.nric_number || "",
-        race: data.race || "",
-        gender: data.gender || "",
-        address_line_1: data.address_line_1 || "",
-        city: data.city || "",
-        postcode: data.postcode || "",
-        state: data.state || "",
-        country: data.country || "",
-        emergency_contact_name: data.emergency_contact_name || "",
+        name: data.user.name || "",
+        nationality: data.user.nationality || "",
+        nric_number: data.user.nric_number || "",
+        race: data.user.race || "",
+        gender: data.user.gender || "",
+        address_line_1: data.user.address_line_1 || "",
+        city: data.user.city || "",
+        postcode: data.user.postcode || "",
+        state: data.user.state || "",
+        country: data.user.country || "",
+        emergency_contact_name: data.user.emergency_contact_name || "",
         emergency_contact_relationship:
-          data.emergency_contact_relationship || "",
-        emergency_contact_phone: data.emergency_contact_phone || "",
+          data.user.emergency_contact_relationship || "",
+        emergency_contact_phone: data.user.emergency_contact_phone || "",
       });
     }
   }, [data, reset]);
