@@ -28,6 +28,43 @@ import DragAndDropFiles from "@/components/input-12";
 import useCreateTenancyDocument from "@/lib/services/hooks/useCreateTenancyDocument";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { fileDataToFileList } from "../Agreement/CreateAgreement";
+const getAuthToken = () => {
+  // Try different token storage methods
+  return (
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("authToken") ||
+    ""
+  );
+};
+
+// Helper function to create authenticated fetch request for downloads
+export const createAuthenticatedFetch = async (url: string) => {
+  const token = getAuthToken();
+  if (!token) {
+    console.warn("No authentication token found");
+    return null;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/pdf, application/octet-stream, */*",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch document:", error);
+    return null;
+  }
+};
 
 interface Props {
   tenancy: Tenancy;
@@ -93,43 +130,6 @@ const DocumentsTap = ({ tenancy }: Props) => {
   };
 
   // Helper function to get authentication token
-  const getAuthToken = () => {
-    // Try different token storage methods
-    return (
-      localStorage.getItem("authToken") ||
-      localStorage.getItem("accessToken") ||
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("authToken") ||
-      ""
-    );
-  };
-
-  // Helper function to create authenticated fetch request for downloads
-  const createAuthenticatedFetch = async (url: string) => {
-    const token = getAuthToken();
-    if (!token) {
-      console.warn("No authentication token found");
-      return null;
-    }
-
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/pdf, application/octet-stream, */*",
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch document:", error);
-      return null;
-    }
-  };
 
   const handleDownload = async (document: any) => {
     try {
