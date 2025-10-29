@@ -73,26 +73,26 @@ export default function Home() {
     const days = daysRemaining(agreement.end_date);
     return (
       <article className="bg-white rounded-2xl shadow-sm p-5 mt-4 md:mt-6 border">
-        <div className="flex flex-col md:flex-row md:justify-between gap-4">
+        <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm text-gray-500 mt-2">Tenancy Period</p>
-            <p className="font-medium mt-1">
+            <p className="text-sm text-gray-500 ">Tenancy Period</p>
+            <p className="text-sm font-medium mt-1">
               {formatDate(agreement.start_date)} –{" "}
               {formatDate(agreement.end_date)}
             </p>
             <p className="text-sm text-gray-500 mt-3">Rental Fee</p>
-            <p className="font-medium">RM {agreement.rental_amount}</p>
-            <button className="mt-5 bg-emerald-700 text-white px-5 py-2 rounded-full">
+            <p className="font-medium text-sm">RM {agreement.rental_amount}</p>
+            <button className="mt-5 bg-emerald-700 text-white px-3 py-1 rounded-full">
               Set up Auto Debit
             </button>
           </div>
           <div className="flex-shrink-0 flex flex-col items-end justify-between">
-            <button className="bg-gray-100 px-3 py-2 rounded-md">
+            <button className="bg-gray-100 text-sm px-2 py-1 rounded-md">
               View Details
             </button>
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">Tenancy Remaining</p>
-              <div className="mt-2 bg-gray-100 px-4 py-2 rounded-md text-emerald-700 font-semibold">
+              <div className="mt-2 bg-gray-100 text-sm px-2 py-1 rounded-md text-emerald-700 font-semibold">
                 {days} Days
               </div>
             </div>
