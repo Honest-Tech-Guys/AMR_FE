@@ -44,7 +44,7 @@ export default function RootLayout({
 
   React.useEffect(() => {
     checkAuth();
-  }, []);
+  }, [user_role]);
   const pathname = usePathname();
   return (
     <html lang="en">
@@ -64,13 +64,11 @@ export default function RootLayout({
           ) : email_verified_at ? (
             <SidebarProvider>
               <LayoutShell>{children}</LayoutShell>
+              {user_role === "Tenant" ? <BottomNav /> : null}
             </SidebarProvider>
           ) : (
             <AccountVerificationRequiredPage />
           )}
-          {/* {user_role === "Tenant" &&
-          } */}
-          <BottomNav />
         </ReactQueryProvider>
       </body>
     </html>
