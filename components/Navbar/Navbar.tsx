@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
-import { Bell, LogOut, Scan, Search } from "lucide-react";
+import { Bell, LogOut, Scan, Search, Wallet } from "lucide-react";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -74,7 +74,7 @@ const Navbar = () => {
     </DropdownMenuItem>
   );
   return (
-    <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-4">
+    <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-8">
       {user_role !== "Tenant" && <SidebarTrigger className="-ml-1" />}
       {/* <InputWithIcon
         key="search"
@@ -83,9 +83,9 @@ const Navbar = () => {
         className="max-w-50"
       /> */}
       <div className="flex  items-center w-full gap-3">
-        <div className="flex flex-col md:flex-row text-primary md:gap-1">
-          <p className="hidden md:block ">Credit</p>
-          <p>Balance:</p>
+        <div className="flex  text-primary gap-1">
+          <p className="hidden md:block ">Credit Balance:</p>
+          <Wallet className="md:hidden block" />
           <p>{data?.user.balance}</p>
         </div>
         <p
@@ -117,7 +117,9 @@ const Navbar = () => {
                   {data?.user.name[1]}
                 </AvatarFallback>
               </Avatar>
-              <span className="tracking-tight">{data?.user.name}</span>
+              {user_role !== "Tenant" && (
+                <span className="tracking-tight">{data?.user.name}</span>
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>

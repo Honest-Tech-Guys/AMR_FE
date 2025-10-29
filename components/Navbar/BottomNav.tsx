@@ -1,6 +1,15 @@
 "use client";
 
-import { Home, Heart, BarChart2, User, Lock, Gauge, X } from "lucide-react";
+import {
+  Home,
+  Heart,
+  BarChart2,
+  User,
+  Lock,
+  Gauge,
+  X,
+  ReceiptText,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -17,7 +26,11 @@ const BottomNav = () => {
       path: "/tenancy/Agreement",
     },
     { name: "Smart Home", icon: <BarChart2 size={22} />, path: "/smart-home" },
-    { name: "Profile", icon: <User size={22} />, path: "/profile" },
+    {
+      name: "Invoice",
+      icon: <ReceiptText size={22} />,
+      path: "/accounting/invoice",
+    },
   ];
 
   return (

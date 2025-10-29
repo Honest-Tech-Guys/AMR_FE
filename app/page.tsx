@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ClipboardList, Clock, Gauge, LoaderCircle, Lock } from "lucide-react";
 
 import ActiveInformationSection from "@/components/Dashboard/ActiveInformationSection";
@@ -25,6 +25,7 @@ export default function Home() {
   const status = searchParams.get("status");
   const message = searchParams.get("message");
   const order_id = searchParams.get("order_id");
+  const router = useRouter();
   const { user_role } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [paymentData, setPaymentData] = useState({
@@ -105,9 +106,12 @@ export default function Home() {
     <section className="mt-6">
       <div className="flex items-center justify-between">
         <h4 className="font-semibold text-lg">Smart Meter</h4>
-        <a className="text-emerald-700 text-sm" href="#">
+        <div
+          className="text-emerald-700 text-sm"
+          onClick={() => router.push("/smart-home/meter")}
+        >
           View All
-        </a>
+        </div>
       </div>
       <div className="bg-white border rounded-xl p-4 mt-3 flex items-center justify-between shadow-sm">
         <div className="flex items-start gap-4">
@@ -145,9 +149,12 @@ export default function Home() {
     <section className="mt-6">
       <div className="flex items-center justify-between">
         <h4 className="font-semibold text-lg">My Invoices</h4>
-        <a className="text-emerald-700 text-sm" href="#">
+        <div
+          className="text-emerald-700 text-sm"
+          onClick={() => router.push("/accounting/invoice")}
+        >
           View All
-        </a>
+        </div>
       </div>
       <div className="bg-white border rounded-2xl p-4 mt-3 shadow-sm">
         <div className="flex items-center gap-4">
@@ -175,11 +182,20 @@ export default function Home() {
   const QuickAccess = () => {
     const items = [
       {
-        title: "My Agreement",
+        title: "Agreement",
         icon: <ClipboardList className="text-emerald-700" />,
+        url: "/tenancy/Agreement",
       },
-      { title: "Smart Lock", icon: <Lock className="text-emerald-700" /> },
-      { title: "History", icon: <Clock className="text-emerald-700" /> },
+      {
+        title: "Smart Lock",
+        icon: <Lock className="text-emerald-700" />,
+        url: "/smart-home/lock",
+      },
+      {
+        title: "History",
+        icon: <Clock className="text-emerald-700" />,
+        url: "/",
+      },
     ];
     return (
       <section className="mt-6">
@@ -189,6 +205,7 @@ export default function Home() {
             <div
               key={it.title}
               className="bg-white border rounded-xl p-4 flex flex-col items-center gap-2 shadow-sm"
+              onClick={() => router.push(it.url)}
             >
               <div className="text-2xl">{it.icon}</div>
               <div className="text-sm">{it.title}</div>
