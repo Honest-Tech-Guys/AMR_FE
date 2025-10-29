@@ -9,6 +9,7 @@ interface Props {
 }
 
 export default function MapRoomViewer({ url, rooms }: Props) {
+  console.log(rooms);
   return (
     <div className="relative w-[500px] h-[300px] my-5 select-none">
       <img
@@ -23,15 +24,16 @@ export default function MapRoomViewer({ url, rooms }: Props) {
           const x = parseFloat(room.coordinates!.x);
           const y = parseFloat(room.coordinates!.y);
           const color = room.status === "Vacant" ? "green" : "red";
-
+          console.log(y);
+          console.log(x);
           return (
             <div
               key={room.id}
-              className="absolute z-2000 flex flex-col items-center"
+              className="absolute z-3000 flex flex-col items-center "
               style={{
-                left: `${x}%`,
-                top: `${y}%`,
-                transform: "translate(-50%, -50%)",
+                left: `${x}px`,
+                top: `${y}px`,
+                // transform: "translate(-50%, -50%)",
               }}
             >
               <div
