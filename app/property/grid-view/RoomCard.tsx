@@ -4,7 +4,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Image, Share2 } from "lucide-react";
+import { Image, Share2, Lock, Gauge } from "lucide-react";
 import { capitalize } from "@/lib/utilities/Capitalize";
 import { getStatus } from "@/components/General/GetStatus";
 import { FormProvider, useForm } from "react-hook-form";
@@ -39,6 +39,16 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
             <Image className="size-4 text-black/30" />
             <Share2 className="size-4 text-black/30" />
             {room && <RoomDropDown room={room} />}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex gap-1 items-center">
+            <Lock className="size-4" />
+            <span>{(room?.locks?.length as number) > 0 ? "on" : "off"}</span>
+          </div>
+          <div className="flex gap-1 items-center">
+            <Gauge className="size-4" />
+            <span>{(room?.meters?.length as number) > 0 ? "on" : "off"}</span>
           </div>
         </div>
         {getStatus(room?.status || (unit?.status as never))}

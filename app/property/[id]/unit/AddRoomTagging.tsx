@@ -83,7 +83,12 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-center text-2xl font-bold rounded-[6px] bg-white ">
             Add Room Tagging

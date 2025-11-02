@@ -1,13 +1,8 @@
 "use client";
 
-import { Bar, BarChart, XAxis, YAxis, Tooltip } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, LabelList, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { Separator } from "../ui/separator";
 
 type TenancyExpiryData = {
@@ -15,25 +10,15 @@ type TenancyExpiryData = {
   in_14_days: number;
   in_30_days: number;
   in_60_days: number;
+  in_90_days: number;
 };
 
 const tenancyChartConfig = {
-  urgent: {
-    label: "0-7 Days",
-    color: "#D9534F",
-  },
-  short: {
-    label: "8-30 Days",
-    color: "#F0AD4E",
-  },
-  mid: {
-    label: "31-90 Days",
-    color: "var(--primary-foreground)",
-  },
-  long: {
-    label: "90+ Days",
-    color: "#6D948E",
-  },
+  urgent: { label: "0-7 Days", color: "#D9534F" }, // red
+  short: { label: "8-14 Days", color: "#F0AD4E" }, // orange
+  mid: { label: "15-30 Days", color: "#5BC0DE" }, // blue
+  long: { label: "31-60 Days", color: "#5CB85C" }, // green
+  too_long: { label: "61-90 Days", color: "#6D948E" }, // gray-green
 } satisfies ChartConfig;
 
 interface Props {
@@ -41,57 +26,48 @@ interface Props {
 }
 
 export function TenancyExpiryPipeline({ data }: Props) {
-  // ✅ Transform the incoming data into chart-friendly format
+  const total =
+    data.in_7_days +
+    data.in_14_days +
+    data.in_30_days +
+    data.in_60_days +
+    data.in_90_days;
+
   const tenancyData = [
-    {
-      timeframe: "In 7 Days",
-      count: data.in_7_days,
-      urgent: 0,
-      short: data.in_7_days,
-      mid: 0,
-      long: 0,
-    },
-    {
-      timeframe: "In 14 Days",
-      count: data.in_14_days,
-      urgent: 0,
-      short: data.in_14_days,
-      mid: 0,
-      long: 0,
-    },
-    {
-      timeframe: "In 30 Days",
-      count: data.in_30_days,
-      urgent: 0,
-      short: 0,
-      mid: data.in_30_days,
-      long: 0,
-    },
-    {
-      timeframe: "In 60 Days",
-      count: data.in_60_days,
-      urgent: 0,
-      short: 0,
-      mid: 0,
-      long: data.in_60_days,
-    },
+    { timeframe: "0-7 Days", value: data.in_7_days },
+    { timeframe: "8-14 Days", value: data.in_14_days },
+    { timeframe: "15-30 Days", value: data.in_30_days },
+    { timeframe: "31-60 Days", value: data.in_60_days },
+    { timeframe: "61-90 Days", value: data.in_90_days },
   ];
 
+  const formatPercentage = (value: number) => {
+    if (!total) return "";
+    const percent = (value / total) * 100;
+    return percent > 0 ? `${percent.toFixed(1)}%` : "";
+  };
+  const getColor = (value: number) => {
+    if (!total) return "#ccc";
+    const percent = (value / total) * 100;
+    if (percent < 10) return "#D9534F"; // 🔴 red
+    if (percent < 30) return "#F0AD4E"; // 🟠 orange
+    if (percent < 50) return "#007BFF"; // 🔵 blue
+    return "#88bd23"; // 🟢 green
+  };
   return (
     <Card className="w-full py-0 gap-3">
-      <CardHeader className="flex items-center justify-between mt-4  ">
+      <CardHeader className="flex items-center justify-between mt-4">
         <CardTitle className="h-full">Tenancy Expiry Pipeline</CardTitle>
         <div className="text-sm text-primary cursor-pointer">Details</div>
       </CardHeader>
       <Separator />
 
-      <CardContent className=" ">
+      <CardContent>
         <ChartContainer
           config={tenancyChartConfig}
-          className="min-h-[160px] h-[200px] w-full"
+          className="min-h-[150px] h-[220px] w-full"
         >
           <BarChart
-            accessibilityLayer
             data={tenancyData}
             layout="vertical"
             margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
@@ -101,41 +77,21 @@ export function TenancyExpiryPipeline({ data }: Props) {
               type="category"
               tickLine={false}
               axisLine={false}
-              tickMargin={5}
-              width={80}
               className="font-medium text-sm"
             />
             <XAxis type="number" hide />
-            {/* <ChartTooltip
-              cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
-              content={
-                <ChartTooltipContent
-                  className="text-sm"
-                  labelFormatter={(label) => `${label}`}
-                />
-              }
-            /> */}
-            <Bar
-              dataKey="urgent"
-              stackId="a"
-              fill="#D9534F"
-              barSize={20}
-              radius={[5, 0, 0, 5]}
-            />
-            <Bar dataKey="short" stackId="a" fill="#F0AD4E" barSize={20} />
-            <Bar
-              dataKey="mid"
-              stackId="a"
-              fill="var(--primary-foreground)"
-              barSize={20}
-            />
-            <Bar
-              dataKey="long"
-              stackId="a"
-              fill="#6D948E"
-              barSize={20}
-              radius={[0, 5, 5, 0]}
-            />
+
+            <Bar dataKey="value" barSize={25}>
+              <LabelList
+                dataKey="value"
+                position="inside"
+                formatter={(v: number) => formatPercentage(v)}
+                className="fill-white text-xs font-semibold"
+              />
+              {tenancyData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={getColor(entry.value)} />
+              ))}
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>

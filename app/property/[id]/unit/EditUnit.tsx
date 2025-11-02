@@ -308,7 +308,12 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         </Button>
       </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px]  bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px]  bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             View Unit

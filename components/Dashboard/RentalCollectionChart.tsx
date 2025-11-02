@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ChartPieDonutText } from "../CircleChart";
 
 type PieChartData = {
@@ -15,18 +15,21 @@ const RentalCollectionChart = ({
   rental_collection,
   month,
 }: RentalCollectionChartProps) => {
-  const chartData = [
-    {
-      browser: "Paid",
-      visitors: Number(rental_collection.paid),
-      fill: "#88BD23",
-    },
-    {
-      browser: "Unpaid",
-      visitors: Number(rental_collection.unpaid),
-      fill: "#EFF2F5",
-    },
-  ];
+  const chartData = useMemo(
+    () => [
+      {
+        browser: "paid",
+        visitors: Number(rental_collection.paid),
+        fill: "#88BD23",
+      },
+      {
+        browser: "unpaid",
+        visitors: Number(rental_collection.unpaid),
+        fill: "#EFF2F5",
+      },
+    ],
+    [rental_collection]
+  );
 
   return (
     <div className="w-full">

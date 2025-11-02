@@ -93,20 +93,20 @@ const OccupancyChart = ({ data, MainLabel, SubLabel }: OccupancyChartProps) => {
 
         {/* Summary Stats */}
         <div className="text-sm">
-          <div className="flex items-center space-x-4">
-            <div className="text-center">
-              <p className="font-semibold">{data.occupied}</p>
+          <div className="flex flex-col  ">
+            <div className="flex gap-3  justify-between">
               <p className="text-muted-foreground text-xs">Occupied</p>
+              <p className=" font-semibold">{data.occupied}</p>
             </div>
-            <Separator orientation="vertical" className="h-8" />
-            <div className="text-center">
-              <p className="font-semibold">{data.vacant}</p>
+            {/* <Separator orientation="vertical" className="h-8" /> */}
+            <div className="flex gap-3 justify-between">
               <p className="text-muted-foreground text-xs">Vacant</p>
+              <p className=" font-semibold">{data.vacant}</p>
             </div>
-            <Separator orientation="vertical" className="h-8" />
-            <div className="text-center">
-              <p className="font-semibold">{data.total}</p>
+            {/* <Separator orientation="vertical" className="h-8" /> */}
+            <div className="flex gap-3 justify-between">
               <p className="text-muted-foreground text-xs">Total</p>
+              <p className=" font-semibold">{data.total}</p>
             </div>
           </div>
         </div>

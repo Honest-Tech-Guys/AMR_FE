@@ -171,7 +171,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <Link href={"/"}>
           <div className="flex justify-center items-center">
-            <img src="/Logo.png" alt="Logo" width={204} height={71} />
+            <img src="/Logo1.png" alt="Logo" width={204} height={71} />
           </div>
         </Link>
       </SidebarHeader>
@@ -197,7 +197,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       className={
                         isItemActive
-                          ? "bg-primary-foreground/8 border-l-3 border-primary-foreground text-white   py-5  rounded-sm hover:bg-primary-foreground hover:text-white"
+                          ? "bg-primary-foreground text-white   py-5  rounded-sm hover:bg-primary-foreground hover:text-white"
                           : "font-semibold py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
                       }
                     >
@@ -205,7 +205,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         href={item.url as string}
                         className="flex items-center gap-2 text-white "
                       >
-                        {isItemActive ? item.icon_active : item.icon}
+                        {item.icon}
                         {item.title}
                       </Link>
                     </SidebarMenuButton>
@@ -226,14 +226,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   className={`group/label text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-white  ${
                     isChildActive
-                      ? "bg-primary-foreground/8 border-l-3 border-primary-foreground  py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
+                      ? "bg-primary-foreground  py-5 text-primary-foreground rounded-sm hover:bg-primary-foreground hover:text-white"
                       : "text-sidebar-foreground py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
                   }`}
                 >
                   <CollapsibleTrigger className="cursor-pointer">
                     {/* <House className="mr-2" strokeWidth={2.5} /> */}
                     <div className="flex gap-1 items-center text-white ">
-                      {isChildActive ? item.icon_active : item.icon}
+                      {item.icon}
                       {item.title}
                     </div>
                     <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90 text-white group-data-[state=open]:text-primary-foreground" />

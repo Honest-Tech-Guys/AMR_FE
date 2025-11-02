@@ -198,7 +198,6 @@ const EditProperty = ({
     { id: "game_room" as const, label: "Game Room" },
     { id: "basketball_court" as const, label: "Basketball Court" },
     { id: "sauna" as const, label: "Sauna" },
-    { id: "free_text" as const, label: "Free Text" },
   ];
 
   const onSubmit: SubmitHandler<schemaType> = (data) => {
@@ -266,7 +265,12 @@ const EditProperty = ({
         </Button>
       </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px]  bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px]  bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             View Property

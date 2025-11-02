@@ -90,7 +90,12 @@ const AddRoomDetails = ({ id, open, onOpenChange }: Props) => {
         </Button>
       </DialogTrigger> */}
 
-      <DialogContent className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
             Add Room Details
