@@ -18,7 +18,7 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import useAddProperty from "@/lib/services/hooks/useAddProperties";
@@ -40,7 +40,7 @@ const schema = yup.object({
   contact_phone_number: yup
     .string()
     .required("Contact phone number is required"),
-  remarks: yup.string().nullable(),
+  remarks: yup.string().nullable().optional(),
   address: yup.string().required("Address is required"),
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
@@ -74,6 +74,7 @@ const CreateBulk = ({ payload, setPayload }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema) as any,
   });
   const {
     setValue,

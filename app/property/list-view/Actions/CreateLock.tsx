@@ -17,7 +17,7 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,7 @@ interface Props {
 const CreateLock = ({ id, onOpenChange, open }: Props) => {
   const form = useForm<SchemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema),
   });
   const {
     setValue,
@@ -60,6 +61,7 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
   } = form;
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   function mapToTreeData(properties: PropertySelection[]): TreeNode[] {
+    console.log(id);
     return properties
       .filter((property) => (id ? property.id === id : true))
       .map((property) => ({

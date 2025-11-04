@@ -17,6 +17,8 @@ import CreateMeter from "../list-view/Actions/CreateMeter";
 import CreateLock from "../list-view/Actions/CreateLock";
 import CreateTenancy from "../list-view/Actions/CreateTenancy";
 import { Unit } from "@/types/UnitType";
+import EditMeter from "@/app/smart-home/meter/EditMeter";
+import EditLock from "@/app/smart-home/lock/EditLock";
 
 // Import dialogs for units
 
@@ -29,6 +31,8 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
     | "editUnit"
     | "addMeter"
     | "addLock"
+    | "editMeter"
+    | "editLock"
     | "renameRoom"
     | "addCarpark"
     | null
@@ -44,6 +48,10 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
   }) => (
     <DropdownMenuItem
       className="hover:bg-gray-100 hover:cursor-pointer"
+      onClick={() => {
+        console.log("locks", unit.locks.length);
+        console.log("meters", unit.meters.length);
+      }}
       onSelect={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -83,14 +91,14 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
             </>
           ) : null}
           {unit.meters.length > 0 ? (
-            <MenuItem dialogKey="addMeter">Add Meter</MenuItem>
+            <MenuItem dialogKey="editMeter">Edit Meter</MenuItem>
           ) : (
-            <MenuItem dialogKey="addMeter">Edit Meter</MenuItem>
+            <MenuItem dialogKey="addMeter">Add Meter</MenuItem>
           )}
           {unit.locks.length > 0 ? (
-            <MenuItem dialogKey="addLock">Add Lock</MenuItem>
+            <MenuItem dialogKey="editLock">Edit Lock</MenuItem>
           ) : (
-            <MenuItem dialogKey="addLock">Edit Lock</MenuItem>
+            <MenuItem dialogKey="addLock">Add Lock</MenuItem>
           )}
 
           <MenuItem dialogKey="createTenancy">Add Tenancy</MenuItem>
@@ -133,6 +141,21 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
         open={openDialog === "addLock"}
         onOpenChange={(open) => setOpenDialog(open ? "addLock" : null)}
       />
+      {unit.meters.length > 0 ? (
+        <EditMeter
+          meter={unit.meters[0]}
+          open={openDialog === "editMeter"}
+          onOpenChange={(open) => setOpenDialog(open ? "editMeter" : null)}
+        />
+      ) : null}
+      {unit.locks.length > 0 ? (
+        <EditLock
+          lock={unit.locks[0]}
+          open={openDialog === "editLock"}
+          onOpenChange={(open) => setOpenDialog(open ? "editLock" : null)}
+        />
+      ) : null}
+
       {/* For placeholders like SmartHome & RenameRoom, you can replace with actual components later */}
     </>
   );

@@ -71,7 +71,7 @@ export default function PropertyDropdown({ property }: { property: any }) {
           <MenuItem dialogKey="createUnit">Create Unit</MenuItem>
           {/* <MenuItem dialogKey="createTenancy">Create Tenancy</MenuItem> */}
           {/* <MenuItem dialogKey="createMeter">Create Meter</MenuItem> */}
-          <MenuItem dialogKey="createLock">Create Lock</MenuItem>
+          {/* <MenuItem dialogKey="createLock">Create Lock</MenuItem> */}
           <MenuItem dialogKey="createInvoice">Create Invoice</MenuItem>
           {/* <MenuItem dialogKey="createEquipment">Create Equipment</MenuItem> */}
         </DropdownMenuContent>

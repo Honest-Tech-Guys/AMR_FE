@@ -18,43 +18,55 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { useAuthStore } from "@/lib/stores/authStore";
-// Schema & type
-const schema = yup.object({
-  postcode: yup.string().required("Country is required"),
-  city: yup.string().required("Country is required"),
-  state: yup.string().required("Country is required"),
-  property_name: yup.string().required("Property name is required"),
-  property_type: yup.string().required("Property type is required"),
-  owner_id: yup.string().required("Owner is required"),
-  owner_phone_number: yup.string().required("Owner phone number is required"),
-  contact_name: yup.string().required("Contact name is required"),
-  contact_phone_number: yup
-    .string()
-    .required("Contact phone number is required"),
-  remarks: yup.string().nullable(),
-  address: yup.string().required("Address is required"),
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
-});
-type schemaType = yup.InferType<typeof schema>;
+// Schema & type - Factory function for conditional validation
+const createSchema = (user_role: string) =>
+  yup.object({
+    postcode: yup.string().required("Country is required"),
+    city: yup.string().required("Country is required"),
+    state: yup.string().required("Country is required"),
+    property_name: yup.string().required("Property name is required"),
+    property_type: yup.string().required("Property type is required"),
+    owner_id: yup.string().when([], {
+      is: () => user_role !== "Owner",
+      then: (schema) => schema.required("Owner is required"),
+      otherwise: (schema) => schema.optional().nullable(),
+    }),
+    owner_phone_number: yup.string().when([], {
+      is: () => user_role !== "Owner",
+      then: (schema) => schema.required("Owner phone number is required"),
+      otherwise: (schema) => schema.optional().nullable(),
+    }),
+    contact_name: yup.string().required("Contact name is required"),
+    contact_phone_number: yup
+      .string()
+      .required("Contact phone number is required"),
+    remarks: yup.string().nullable().optional(),
+    address: yup.string().required("Address is required"),
+    meeting_room: yup.boolean().default(false),
+    game_room: yup.boolean().default(false),
+    basketball_court: yup.boolean().default(false),
+    sauna: yup.boolean().default(false),
+    free_text: yup.boolean().default(false),
+  });
+type schemaType = yup.InferType<ReturnType<typeof createSchema>>;
 
 const CreateNewProperty = () => {
   const [owners, setOwners] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const { user_role } = useAuthStore();
+  const schema = useMemo(() => createSchema(user_role || ""), [user_role]);
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema) as any,
   });
   const {
     setValue,
@@ -68,7 +80,6 @@ const CreateNewProperty = () => {
   const { mutate, error, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
   const { refetch } = useGetPropertiesList({});
-  const { user_role } = useAuthStore();
   useEffect(() => {
     if (data) {
       const dataT = data.map((owner) => {

@@ -90,7 +90,13 @@ const AddItems = ({ setItems }: Props) => {
     { id: "waterbill", name: "Water Bill" },
   ];
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: any, event?: React.BaseSyntheticEvent) => {
+    // Prevent form submission from bubbling up to parent form
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     setItems((prev) => [
       ...prev,
       {
@@ -118,14 +124,28 @@ const AddItems = ({ setItems }: Props) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:max-w-[500px] z-[500]  bg-white md:p-10 max-h-[95vh] overflow-y-auto">
+      <DialogContent
+        className="md:max-w-[500px] z-[500]  bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <DialogHeader>
           <div className="w-full text-2xl font-bold text-center rounded-[6px] bg-white ">
             Add Item
           </div>
         </DialogHeader>
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter" &&
+                (e.target as HTMLElement).tagName !== "TEXTAREA"
+              ) {
+                e.stopPropagation();
+              }
+            }}
+          >
             <div className="grid grid-cols-3  gap-4">
               <div className="col-span-3">
                 <SelectWithForm<schemaType>
@@ -189,7 +209,11 @@ const AddItems = ({ setItems }: Props) => {
                 </Button>
               </DialogClose>
 
-              <Button type="submit" className="text-white">
+              <Button
+                type="submit"
+                className="text-white"
+                onClick={(e) => e.stopPropagation()}
+              >
                 Submit
               </Button>
             </DialogFooter>

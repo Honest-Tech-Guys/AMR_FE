@@ -32,20 +32,21 @@ import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
 // Schema & type
 const schema = yup.object({
   // Basic Information
-  property_id: yup.string().required("Nationality is required"),
-  tenant: yup.string().required("Nationality is required"),
+  property_id: yup.string().required("Item is required"),
+  tenant: yup.string().required("Tenant is required"),
   move_in_date: yup.string().required("Move in date is required"),
-  move_out_date: yup.string().required(),
+  move_out_date: yup.string().required("Move out date is required"),
   type: yup.string().required("Type is required"),
   // Rental Information
   rental: yup.string().required("Rental fee is required"),
   rental_payment_frequency: yup
     .string()
     .required("Rental payment frequency is required"),
-  remarks: yup.string().required(),
+  remarks: yup.string().required("Remarks is required"),
 
   front_side: yup
     .array()
@@ -88,7 +89,10 @@ interface Props {
 const CreateBulk = ({ setPayload }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
+    defaultValues: {
+      type: "NRIC",
+    },
   });
   const {
     setValue,
@@ -216,6 +220,11 @@ const CreateBulk = ({ setPayload }: Props) => {
                   placeholder="Choose item..."
                   treeData={treeData}
                 />
+                {errors.property_id && (
+                  <span className="text-red-500 text-sm">
+                    {errors.property_id.message}
+                  </span>
+                )}
               </div>
               <SelectWithForm<schemaType>
                 name="tenant"
@@ -245,7 +254,7 @@ const CreateBulk = ({ setPayload }: Props) => {
               <div>
                 <Label className="mb-5">Type</Label>
                 <RadioGroup
-                  defaultValue="NRIC"
+                  value={watch("type")}
                   className="flex items-center gap-3"
                   onValueChange={(val) => setValue("type", val)}
                 >

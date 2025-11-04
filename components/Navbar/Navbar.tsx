@@ -82,7 +82,7 @@ const Navbar = () => {
         placeholder="Search..."
         className="max-w-50"
       /> */}
-      <div className="flex  items-center w-full gap-3">
+      {/* <div className="flex  items-center w-full gap-3">
         <div className="flex  text-primary gap-1">
           <p className="hidden md:block ">Credit Balance:</p>
           <Wallet className="md:hidden block" />
@@ -94,7 +94,7 @@ const Navbar = () => {
         >
           Top Up
         </p>
-      </div>
+      </div> */}
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan
           onClick={toggleFullscreen}

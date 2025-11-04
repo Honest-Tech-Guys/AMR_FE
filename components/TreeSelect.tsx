@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { useController, Control } from "react-hook-form";
 import { Check, ChevronRight, ChevronDown } from "lucide-react";
@@ -50,41 +52,67 @@ export function TreeSelect({
   };
 
   const renderTree = (nodes: TreeNode[]) => {
-    return nodes.map((node) => (
-      <div key={node.value} className="ml-2">
-        <CommandItem
-          onSelect={() => {
-            field.onChange(node.value); // ✅ select any node (parent or child)
-            setOpen(false);
-          }}
-        >
-          {node.children ? (
-            <span
-              className="mr-2 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation(); // prevent triggering select
+    return nodes.map((node) => {
+      const isLeaf = !node.children || node.children.length === 0;
+      const isProperty = node.value.startsWith("property-");
+      const isUnit = node.value.startsWith("unit-");
+      const isRoom = node.value.startsWith("room-");
+
+      // Only leaf nodes can be selected (leaf units or rooms)
+      // If a unit has children (rooms), it should expand instead of being selected
+      const canSelect = (isUnit && isLeaf) || isRoom;
+      const canExpand = (isProperty || isUnit) && !isLeaf;
+      // Disable properties that have no units
+      const isDisabled =
+        isProperty && (!node.children || node.children.length === 0);
+
+      return (
+        <div key={node.value} className="ml-2">
+          <CommandItem
+            onSelect={() => {
+              if (canSelect) {
+                // ✅ Select leaf units or rooms only
+                field.onChange(node.value);
+                setOpen(false);
+              } else if (canExpand) {
+                // ✅ Toggle expand for properties with units or units with rooms
                 toggleExpand(node.value);
-              }}
-            >
-              {expanded.includes(node.value) ? (
-                <ChevronDown className="h-4 w-4" />
-              ) : (
-                <ChevronRight className="h-4 w-4" />
-              )}
-            </span>
-          ) : (
-            <span className="mr-6" />
+              }
+            }}
+            disabled={isDisabled}
+            className={`flex items-center ${
+              canExpand ? "cursor-pointer font-medium" : ""
+            } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            {/* Icon section */}
+            {node.children ? (
+              <span className="mr-2">
+                {expanded.includes(node.value) ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </span>
+            ) : (
+              <span className="mr-6" />
+            )}
+
+            {/* Selected icon */}
+            {field.value === node.value && <Check className="mr-2 h-4 w-4" />}
+
+            {/* Label */}
+            <span>{node.label}</span>
+          </CommandItem>
+
+          {/* Render children when expanded */}
+          {node.children && expanded.includes(node.value) && (
+            <div className="ml-4 border-l pl-2">
+              {renderTree(node.children)}
+            </div>
           )}
-
-          {field.value === node.value && <Check className="mr-2 h-4 w-4" />}
-          <span>{node.label}</span>
-        </CommandItem>
-
-        {node.children && expanded.includes(node.value) && (
-          <div className="ml-4 border-l pl-2">{renderTree(node.children)}</div>
-        )}
-      </div>
-    ));
+        </div>
+      );
+    });
   };
 
   const getLabel = (value: string | null): string => {
@@ -105,7 +133,7 @@ export function TreeSelect({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -125,10 +153,19 @@ export function TreeSelect({
           side="bottom"
           align="start"
         >
+          {/* ✅ Rely on CommandList native scrolling to fix wheel events */}
           <Command>
             <CommandInput placeholder="Search..." />
             <CommandEmpty>No item found.</CommandEmpty>
-            <CommandList>
+            <CommandList
+              className="max-h-[300px] overflow-y-auto overscroll-auto touch-pan-y"
+              onWheelCapture={(e) => {
+                const el = e.currentTarget;
+                if (el.scrollHeight > el.clientHeight) {
+                  e.stopPropagation();
+                }
+              }}
+            >
               <CommandGroup>{renderTree(treeData)}</CommandGroup>
             </CommandList>
           </Command>

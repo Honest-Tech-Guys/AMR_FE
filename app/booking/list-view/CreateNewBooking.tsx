@@ -38,17 +38,17 @@ import useCreateBooking from "@/lib/services/hooks/useCreateBooking";
 // Schema & type
 const schema = yup.object({
   // Basic Information
-  property_id: yup.string().required("Nationality is required"),
-  tenant: yup.string().required("Nationality is required"),
+  property_id: yup.string().required("Item is required"),
+  tenant: yup.string().required("Tenant is required"),
   move_in_date: yup.string().required("Move in date is required"),
-  move_out_date: yup.string().required(),
+  move_out_date: yup.string().required("Move out date is required"),
   type: yup.string().required("Type is required"),
   // Rental Information
   rental: yup.string().required("Rental fee is required"),
   rental_payment_frequency: yup
     .string()
     .required("Rental payment frequency is required"),
-  remarks: yup.string().required(),
+  remarks: yup.string().required("Remarks is required"),
 
   front_side: yup
     .array()
@@ -77,7 +77,10 @@ type schemaType = yup.InferType<typeof schema>;
 const CreateNewBooking = () => {
   const form = useForm<schemaType>({
     mode: "onTouched",
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
+    defaultValues: {
+      type: "NRIC",
+    },
   });
   const {
     setValue,
@@ -160,6 +163,7 @@ const CreateNewBooking = () => {
     });
     console.log("Form data:", data);
   };
+  console.log(errors);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -189,6 +193,11 @@ const CreateNewBooking = () => {
                   placeholder="Choose item..."
                   treeData={treeData}
                 />
+                {errors.property_id && (
+                  <span className="text-red-500 text-sm">
+                    {errors.property_id.message}
+                  </span>
+                )}
               </div>
               <SelectWithForm<schemaType>
                 name="tenant"
@@ -218,7 +227,7 @@ const CreateNewBooking = () => {
               <div>
                 <Label className="mb-5">Type</Label>
                 <RadioGroup
-                  defaultValue="NRIC"
+                  value={watch("type")}
                   className="flex items-center gap-3"
                   onValueChange={(val) => setValue("type", val)}
                 >
@@ -227,7 +236,7 @@ const CreateNewBooking = () => {
                     <Label htmlFor="NRIC">NRIC</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="comfortable" id="passport" />
+                    <RadioGroupItem value="passport" id="passport" />
                     <Label htmlFor="passport">Passport</Label>
                   </div>
                 </RadioGroup>

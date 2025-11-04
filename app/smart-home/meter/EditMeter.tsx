@@ -142,8 +142,10 @@ const EditMeter = ({ meter, open, onOpenChange }: Props) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        onClick={(e) => e.stopPropagation()}
-        className="md:max-w-[1000px] bg-white z-200 md:p-10 max-h-[95vh] overflow-y-auto"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="md:max-w-[1000px] bg-white z-400 md:p-10 max-h-[95vh] overflow-y-auto"
       >
         <DialogHeader>
           <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">

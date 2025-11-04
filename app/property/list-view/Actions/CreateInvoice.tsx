@@ -37,14 +37,15 @@ import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import useGetTenancyFieldList from "@/lib/services/hooks/useGetTenancyFieldList";
 import useCreateInvoice from "@/lib/services/hooks/useCreateInvoice";
+
+import { yupResolver } from "@hookform/resolvers/yup";
 // Schema & type
 const schema = yup.object({
   tenant: yup.string().required("Tenant is required"),
   tenancy: yup.string().required("Tenancy is required"),
   property_name: yup.string().required("Property name is required"),
   document_date: yup.string().required("Document Date is required"),
-
-  remarks: yup.string().nullable(),
+  remarks: yup.string().nullable().optional(),
 });
 
 type schemaType = yup.InferType<typeof schema>;
@@ -57,9 +58,10 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
   const [tenancyData, setTenancyData] = useState([]);
   const [items, setItems] = useState<any[]>([]);
   const { data: tenancies } = useGetTenancyFieldList();
-  const { mutate } = useCreateInvoice();
+  const { mutate, isPending } = useCreateInvoice();
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema) as any,
   });
   const {
     setValue,
@@ -122,7 +124,6 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
           Add Invoice
         </Button>
       </DialogTrigger> */}
-
       <DialogContent
         onClick={(e) => {
           e.stopPropagation();
@@ -260,8 +261,9 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
                 type="submit"
                 onClick={() => setStatus("Sent")}
                 className="text-white"
+                disabled={isPending}
               >
-                Submit
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>

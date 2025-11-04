@@ -17,6 +17,9 @@ type Dashboard = {
   tenancy_expiry: {
     in_7_days: number;
     in_14_days: number;
+    in_30_days: number;
+    in_60_days: number;
+    in_90_days: number;
   };
   rental_collection: {
     today: number;

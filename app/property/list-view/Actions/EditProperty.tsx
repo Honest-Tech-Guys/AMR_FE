@@ -32,7 +32,7 @@ import { PaginationData } from "@/components/ui/pagination";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import { Property } from "@/types/PropertyType";
 import { Unit } from "@/types/UnitType";
-
+import { yupResolver } from "@hookform/resolvers/yup";
 // Schema & type
 const schema = yup.object({
   postcode: yup.string().required("Postcode is required"),
@@ -44,8 +44,8 @@ const schema = yup.object({
   owner_phone_number: yup.string().required(""),
   contact_name: yup.string().required("owner is required"),
   contact_phone_number: yup.string().required(""),
-  remarks: yup.string().nullable(),
-  address_line_1: yup.string().nullable(),
+  remarks: yup.string().nullable().optional(),
+  address_line_1: yup.string().nullable().optional(),
   meeting_room: yup.boolean().default(false),
   game_room: yup.boolean().default(false),
   basketball_court: yup.boolean().default(false),
@@ -113,6 +113,7 @@ const EditProperty = ({
   });
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       property_name: "",
       property_type: "",
