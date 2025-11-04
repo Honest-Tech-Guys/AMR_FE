@@ -17,23 +17,20 @@ export default function MapRoomViewer({ url, rooms }: Props) {
         alt="Apartment Map"
         className="w-full h-full object-contain rounded-md border"
       />
-
       {rooms
         .filter((room) => room.coordinates)
         .map((room, index) => {
           const x = parseFloat(room.coordinates!.x);
           const y = parseFloat(room.coordinates!.y);
           const color = room.status === "Vacant" ? "green" : "red";
-          console.log(y);
-          console.log(x);
           return (
             <div
               key={room.id}
-              className="absolute z-3000 flex flex-col items-center "
+              className="absolute z-3000 flex flex-col items-center"
               style={{
-                left: `${x}px`,
-                top: `${y}px`,
-                // transform: "translate(-50%, -50%)",
+                left: `${x}%`,
+                top: `${y}%`,
+                transform: "translate(-50%, -50%)",
               }}
             >
               <div
