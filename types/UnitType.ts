@@ -1,3 +1,5 @@
+import EquipmentType from "./EquipmentType";
+import PropertySettingType from "./PropertySetting";
 import { Property } from "./PropertyType";
 import { Room } from "./RoomType";
 import { Tenancy } from "./TenancyType";
@@ -31,5 +33,7 @@ export type Unit = {
   locks: Locks[];
   rooms: Room[];
   carparks: Carpark[];
+  equipment?: EquipmentType[];
+  setting?: PropertySettingType;
   property: Property;
 };

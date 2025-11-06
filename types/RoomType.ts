@@ -1,3 +1,5 @@
+import EquipmentType from "./EquipmentType";
+import PropertySettingType from "./PropertySetting";
 import { Unit } from "./UnitType";
 
 export type Room = {
@@ -10,6 +12,8 @@ export type Room = {
   coordinates: { x: string; y: string } | null;
   meters: Meter[];
   description: string;
+  equipment?: EquipmentType[];
+  setting?: PropertySettingType;
   remarks: string;
   created_at: string;
   updated_at: string;

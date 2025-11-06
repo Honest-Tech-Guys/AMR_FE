@@ -1,0 +1,34 @@
+interface PropertySettingType {
+  id: number;
+  settingable_type: string;
+  settingable_id: number;
+  vr_url: string | null;
+  no_bed: number | null;
+  no_bath: number | null;
+  preferred_gender: string | null;
+  preferred_race: string | null;
+  cooking_facilities: number;
+  fridge: number;
+  wifi: number;
+  washing_machine: number;
+  cleaning: number;
+  water_heater: number;
+  dryer: number;
+  balcony: number;
+  room_image: string | null;
+  rental: string;
+  bed_type: string;
+  bath_type: string;
+  aircond: string;
+  window: string;
+  type_of_walls: string;
+  furnishing: string;
+  furnishing_details: string;
+  meter_type: string;
+  electricity_tracking: string;
+  electricity_rate: string;
+  size_sqft: string;
+  created_at: string;
+  updated_at: string;
+}
+export default PropertySettingType;

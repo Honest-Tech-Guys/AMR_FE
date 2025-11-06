@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { EllipsisVertical } from "lucide-react";
 
 // import CreateNewTenant from "../[id]/room/CreateNewTenant";
-// import Editroom from "../[id]/room/Editroom";
+import EditRoom from "./EditRoom";
 import CreateMeter from "../list-view/Actions/CreateMeter";
 import CreateLock from "../list-view/Actions/CreateLock";
 import CreateTenancy from "../list-view/Actions/CreateTenancy";
@@ -103,11 +103,11 @@ export default function RoomDropDown({ room }: { room: any }) {
         type="Room"
         onOpenChange={(open) => setOpenDialog(open ? "createTenancy" : null)}
       />
-      {/* <EditRoom
-        room={room.id}
+      <EditRoom
+        room={room}
         open={openDialog === "editRoom"}
         onOpenChange={(open) => setOpenDialog(open ? "editRoom" : null)}
-      /> */}
+      />
       <CreateMeter
         id={room.id}
         open={openDialog === "addMeter"}
