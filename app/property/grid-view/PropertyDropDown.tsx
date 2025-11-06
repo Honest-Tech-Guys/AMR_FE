@@ -73,7 +73,6 @@ export default function PropertyDropdown({ property }: { property: any }) {
           {/* <MenuItem dialogKey="createMeter">Create Meter</MenuItem> */}
           {/* <MenuItem dialogKey="createLock">Create Lock</MenuItem> */}
           <MenuItem dialogKey="createInvoice">Create Invoice</MenuItem>
-          {/* <MenuItem dialogKey="createEquipment">Create Equipment</MenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -107,11 +106,6 @@ export default function PropertyDropdown({ property }: { property: any }) {
         id={property.id}
         open={openDialog === "createInvoice"}
         onOpenChange={(open) => setOpenDialog(open ? "createInvoice" : null)}
-      />
-      <CreateEquipment
-        id={property.id}
-        open={openDialog === "createEquipment"}
-        onOpenChange={(open) => setOpenDialog(open ? "createEquipment" : null)}
       />
     </>
   );

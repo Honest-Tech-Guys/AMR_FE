@@ -17,6 +17,7 @@ import CreateLock from "../list-view/Actions/CreateLock";
 import CreateTenancy from "../list-view/Actions/CreateTenancy";
 import AddRoomTagging from "../[id]/unit/AddRoomTagging";
 import AddRoomDetails from "../[id]/unit/AddRoomDetails";
+import CreateEquipment from "../list-view/Actions/CreateEquipment";
 
 // Import dialogs for rooms
 
@@ -30,6 +31,7 @@ export default function RoomDropDown({ room }: { room: any }) {
     | "renameRoom"
     | "addRoomTagging"
     | "addRoomDetails"
+    | "createEquipment"
     | null
   >(null);
 
@@ -80,6 +82,7 @@ export default function RoomDropDown({ room }: { room: any }) {
           <MenuItem dialogKey="addMeter">Add Meter</MenuItem>
           <MenuItem dialogKey="addLock">Add Lock</MenuItem>
           <MenuItem dialogKey="renameRoom">Rename Room</MenuItem>
+          <MenuItem dialogKey="createEquipment">Add Equipment</MenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -114,6 +117,12 @@ export default function RoomDropDown({ room }: { room: any }) {
         id={room.id}
         open={openDialog === "addLock"}
         onOpenChange={(open) => setOpenDialog(open ? "addLock" : null)}
+      />
+      <CreateEquipment
+        type="Room"
+        id={room.id}
+        open={openDialog === "createEquipment"}
+        onOpenChange={(open) => setOpenDialog(open ? "createEquipment" : null)}
       />
       {/* For placeholders like SmartHome & RenameRoom, you can replace with actual components later */}
     </>

@@ -9,104 +9,150 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import MultiFileUpload from "@/components/input-11";
-// Schema & type
+import useCreateEquipment from "@/lib/services/hooks/useCreateEquipment";
+import { toast } from "sonner";
+import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { useEffect } from "react";
+
 // Schema & type
 const schema = yup.object({
-  // Basic Info
-  property_name: yup.string().required("Property name is required"),
-  category: yup.string().required("Category is required"),
-  sub_category: yup.string().required("Sub category is required"),
   brand_name: yup.string().required("Brand name is required"),
-  model_name: yup.string().required("Model name is required"),
+  name: yup.string().required("Model name is required"),
   serial_number: yup.string().required("Serial number is required"),
-  price: yup.string().required("Price is required"),
-  width: yup.string().required("Width is required"),
-  height: yup.string().required("Height is required"),
-  depth: yup.string().required("Depth is required"),
+  price: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .typeError("Price must be a number")
+    .positive("Price must be greater than 0")
+    .required("Price is required"),
+  width: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .typeError("Width must be a number")
+    .positive("Width must be greater than 0")
+    .required("Width is required"),
+  height: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .typeError("Height must be a number")
+    .positive("Height must be greater than 0")
+    .required("Height is required"),
+  depth: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .typeError("Depth must be a number")
+    .positive("Depth must be greater than 0")
+    .required("Depth is required"),
   installation_date: yup.string().required("Installation date is required"),
   warranty_expire_date: yup
     .string()
-    .required("Warranty expire date is required"),
-
-  // Uploads
-  companyStatutoryForm1: yup
-    .mixed()
-    .required("Warranty card image is required"),
+    .required("Warranty expire date is required")
+    .test(
+      "is-after-installation",
+      "Warranty expire date must be after installation date",
+      function (value) {
+        const { installation_date } = this.parent;
+        if (!value || !installation_date) return true;
+        return new Date(value) > new Date(installation_date);
+      }
+    ),
 
   // Remarks
-  remarks: yup.string().nullable(),
+  description: yup.string().nullable().default(null),
+  remarks: yup.string().nullable().default(null),
 
   // Service Reminder
   next_service_date: yup.string().required("Next service date is required"),
-  schedule_date: yup.string().required("Schedule date is required"),
-
-  // Facilities (booleans)
-  meeting_room: yup.boolean().default(false),
-  game_room: yup.boolean().default(false),
-  basketball_court: yup.boolean().default(false),
-  sauna: yup.boolean().default(false),
-  free_text: yup.boolean().default(false),
+  schedule_date: yup
+    .string()
+    .required("Schedule date is required")
+    .test(
+      "is-after-next-service",
+      "Schedule date must be after next service date",
+      function (value) {
+        const { next_service_date } = this.parent;
+        if (!value || !next_service_date) return true;
+        return new Date(value) >= new Date(next_service_date);
+      }
+    ),
 });
 
 type schemaType = yup.InferType<typeof schema>;
 
 interface Props {
   id: number;
+  type: "Room" | "Unit";
   open: boolean; // controlled open state
   onOpenChange: (open: boolean) => void;
 }
-const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
+const CreateEquipment = ({ id, type, onOpenChange, open }: Props) => {
+  const { mutate, isPending } = useCreateEquipment();
+  const { refetch } = useGetPropertiesList({});
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema),
+    defaultValues: {
+      brand_name: "",
+      name: "",
+      serial_number: "",
+      price: undefined as any,
+      width: undefined as any,
+      height: undefined as any,
+      depth: undefined as any,
+      installation_date: "",
+      warranty_expire_date: "",
+      description: null,
+      remarks: null,
+      next_service_date: "",
+      schedule_date: "",
+    },
   });
   const {
     setValue,
-    getValues,
     watch,
     reset,
-    control,
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open, reset]);
   const onSubmit: SubmitHandler<schemaType> = (data) => {
-    console.log("Form data:", data);
+    const payload = {
+      ...data,
+      ...(type === "Room" ? { room_id: id } : { unit_id: id }),
+    };
+
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Equipment created successfully!");
+        reset();
+        refetch();
+        onOpenChange(false);
+      },
+      onError: () => {
+        toast.error("Failed to create equipment. Please try again.");
+      },
+    });
+
+    console.log("Equipment form data:", payload);
   };
 
   return (
@@ -132,7 +178,7 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <HeaderSection title="Basic Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <CustomInput
+              {/* <CustomInput
                 id="property_name"
                 name="property_name"
                 type="text"
@@ -141,8 +187,8 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 onChange={(e) => setValue("property_name", e.target.value)}
                 errors={errors.property_name?.message}
                 placeholder="Enter Property Name"
-              />
-              <SelectWithForm<schemaType>
+              /> */}
+              {/* <SelectWithForm<schemaType>
                 name="category"
                 title="Category"
                 options={PartnerType}
@@ -151,7 +197,7 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 name="sub_category"
                 title="Sub Category"
                 options={PartnerType}
-              />
+              /> */}
               <CustomInput
                 id="brand_name"
                 name="brand_name"
@@ -163,13 +209,13 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 placeholder="Enter Brand Name"
               />
               <CustomInput
-                id="model_name"
-                name="model_name"
+                id="name"
+                name="name"
                 type="text"
                 label="Model Name"
-                value={watch("model_name")}
-                onChange={(e) => setValue("model_name", e.target.value)}
-                errors={errors.model_name?.message}
+                value={watch("name")}
+                onChange={(e) => setValue("name", e.target.value)}
+                errors={errors.name?.message}
                 placeholder="Enter Model Name"
               />
               <CustomInput
@@ -187,38 +233,94 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 name="price"
                 type="number"
                 label="Price"
-                value={watch("price")}
-                onChange={(e) => setValue("price", e.target.value)}
+                value={watch("price") ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setValue("price", undefined as any, {
+                      shouldValidate: true,
+                    });
+                  } else {
+                    const numValue = Number(value);
+                    if (!isNaN(numValue)) {
+                      setValue("price", numValue, {
+                        shouldValidate: true,
+                      });
+                    }
+                  }
+                }}
                 errors={errors.price?.message}
                 placeholder="Enter Price"
               />
               <CustomInput
                 id="width"
                 name="width"
-                type="text"
+                type="number"
                 label="Width (cm)"
-                value={watch("width")}
-                onChange={(e) => setValue("width", e.target.value)}
+                value={watch("width") ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setValue("width", undefined as any, {
+                      shouldValidate: true,
+                    });
+                  } else {
+                    const numValue = Number(value);
+                    if (!isNaN(numValue)) {
+                      setValue("width", numValue, {
+                        shouldValidate: true,
+                      });
+                    }
+                  }
+                }}
                 errors={errors.width?.message}
                 placeholder="Enter Width"
               />
               <CustomInput
                 id="height"
                 name="height"
-                type="text"
+                type="number"
                 label="Height (cm)"
-                value={watch("height")}
-                onChange={(e) => setValue("height", e.target.value)}
+                value={watch("height") ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setValue("height", undefined as any, {
+                      shouldValidate: true,
+                    });
+                  } else {
+                    const numValue = Number(value);
+                    if (!isNaN(numValue)) {
+                      setValue("height", numValue, {
+                        shouldValidate: true,
+                      });
+                    }
+                  }
+                }}
                 errors={errors.height?.message}
                 placeholder="Enter Height"
               />
               <CustomInput
-                id="Depth"
+                id="depth"
                 name="depth"
-                type="text"
+                type="number"
                 label="Depth (cm)"
-                value={watch("depth")}
-                onChange={(e) => setValue("depth", e.target.value)}
+                value={watch("depth") ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setValue("depth", undefined as any, {
+                      shouldValidate: true,
+                    });
+                  } else {
+                    const numValue = Number(value);
+                    if (!isNaN(numValue)) {
+                      setValue("depth", numValue, {
+                        shouldValidate: true,
+                      });
+                    }
+                  }
+                }}
                 errors={errors.depth?.message}
                 placeholder="Enter Depth"
               />
@@ -228,7 +330,11 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 type="date"
                 label="Installation Date"
                 value={watch("installation_date")}
-                onChange={(e) => setValue("installation_date", e.target.value)}
+                onChange={(e) => {
+                  setValue("installation_date", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
                 errors={errors.installation_date?.message}
                 placeholder="Enter Installation Date"
               />
@@ -236,11 +342,13 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 id="warranty_expire_date"
                 name="warranty_expire_date"
                 type="date"
-                label="Warrant Expire Date"
+                label="Warranty Expire Date"
                 value={watch("warranty_expire_date")}
-                onChange={(e) =>
-                  setValue("warranty_expire_date", e.target.value)
-                }
+                onChange={(e) => {
+                  setValue("warranty_expire_date", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
                 errors={errors.warranty_expire_date?.message}
                 placeholder="Enter Warranty Expire Date"
               />
@@ -269,15 +377,15 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
               </div> */}
               <div className="col-span-1 md:col-span-2">
                 <CustomInput
-                  id="remarks"
-                  label="Remarks"
+                  id="description"
+                  label="Description"
                   type="textArea"
-                  name="remarks"
-                  value={watch("remarks")}
-                  onChange={(e) => setValue("remarks", e.target.value)}
+                  name="description"
+                  value={watch("description")}
+                  onChange={(e) => setValue("description", e.target.value)}
                   placeholder="E.g describe more about the reason for change"
                   className="bg-gray-100"
-                  errors={errors.remarks?.message}
+                  errors={errors.description?.message}
                 />
               </div>
             </div>
@@ -290,7 +398,11 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 type="date"
                 value={watch("next_service_date")}
                 label="Next Service Date"
-                onChange={(e) => setValue("next_service_date", e.target.value)}
+                onChange={(e) => {
+                  setValue("next_service_date", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
                 errors={errors.next_service_date?.message}
                 placeholder="Enter Next Service Date"
               />
@@ -300,7 +412,11 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                 type="date"
                 value={watch("schedule_date")}
                 label="Schedule Date"
-                onChange={(e) => setValue("schedule_date", e.target.value)}
+                onChange={(e) => {
+                  setValue("schedule_date", e.target.value, {
+                    shouldValidate: true,
+                  });
+                }}
                 errors={errors.schedule_date?.message}
                 placeholder="Enter Schedule Date"
               />
@@ -325,8 +441,8 @@ const CreateEquipment = ({ id, onOpenChange, open }: Props) => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button type="submit" className="text-white" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>

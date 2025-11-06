@@ -19,6 +19,7 @@ import CreateTenancy from "../list-view/Actions/CreateTenancy";
 import { Unit } from "@/types/UnitType";
 import EditMeter from "@/app/smart-home/meter/EditMeter";
 import EditLock from "@/app/smart-home/lock/EditLock";
+import CreateEquipment from "../list-view/Actions/CreateEquipment";
 
 // Import dialogs for units
 
@@ -35,6 +36,7 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
     | "editLock"
     | "renameRoom"
     | "addCarpark"
+    | "createEquipment"
     | null
   >(null);
 
@@ -89,7 +91,9 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
               <MenuItem dialogKey="addRoomDetails">Add Room Details</MenuItem>
               <MenuItem dialogKey="addCarpark">Add Carpark</MenuItem>
             </>
-          ) : null}
+          ) : (
+            <MenuItem dialogKey="createEquipment">Add Equipment</MenuItem>
+          )}
           {unit.meters.length > 0 ? (
             <MenuItem dialogKey="editMeter">Edit Meter</MenuItem>
           ) : (
@@ -100,7 +104,6 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
           ) : (
             <MenuItem dialogKey="addLock">Add Lock</MenuItem>
           )}
-
           <MenuItem dialogKey="createTenancy">Add Tenancy</MenuItem>
           {/* <MenuItem dialogKey="renameRoom">Rename Room</MenuItem> */}
         </DropdownMenuContent>
@@ -155,7 +158,12 @@ export default function UnitDropdown({ unit }: { unit: Unit }) {
           onOpenChange={(open) => setOpenDialog(open ? "editLock" : null)}
         />
       ) : null}
-
+      <CreateEquipment
+        type="Unit"
+        id={unit.id}
+        open={openDialog === "createEquipment"}
+        onOpenChange={(open) => setOpenDialog(open ? "createEquipment" : null)}
+      />
       {/* For placeholders like SmartHome & RenameRoom, you can replace with actual components later */}
     </>
   );
