@@ -1,6 +1,7 @@
 import { AgreementType } from "./AgreementType";
 import { Invoice } from "./InvoiceType";
 import { Room } from "./RoomType";
+import { TenantType } from "./TenantType";
 import { Unit } from "./UnitType";
 
 export type Tenancy = {
@@ -20,11 +21,7 @@ export type Tenancy = {
   updated_at: string; // ISO datetime
   created_by: number;
   full_property_name: string;
-  tenant: {
-    id: number;
-    name: string;
-    avatar_url: string | null;
-  };
+  tenant: TenantType;
   creator: {
     id: number;
     name: string;

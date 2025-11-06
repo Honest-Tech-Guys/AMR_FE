@@ -251,7 +251,7 @@ const Page = () => {
   return (
     <div>
       {/* <HeaderPage title="Announcement" /> */}
-      <div className="w-full  rounded-[6px] p-3 bg-white">
+      <div className="w-full  rounded-[6px] p-3 mt-4 bg-white">
         {/* <ResponsiveFilter
           filters={[
             {
@@ -325,14 +325,14 @@ const Page = () => {
         </div> */}
         <div className="min-h-screen bg-gray-50 p-8">
           {/* Page Header */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Notifications
             </h1>
             <p className="text-sm text-gray-600">
               Stay updated with your property management activities
             </p>
-          </div>
+          </div> */}
 
           {/* Notification Controls */}
           <Card className="mb-6 p-6">
@@ -344,31 +344,37 @@ const Page = () => {
                 className="w-full md:w-auto"
               >
                 <TabsList className="grid w-full md:w-auto grid-cols-2 md:flex gap-2">
-                  <TabsTrigger value="all" className="gap-2">
+                  <TabsTrigger value="all" className="gap-2 cursor-pointer">
                     All{" "}
                     <Badge variant="secondary" className="ml-1">
                       {filterCounts.all}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="unread" className="gap-2">
+                  <TabsTrigger value="unread" className="gap-2 cursor-pointer">
                     Unread{" "}
                     <Badge variant="secondary" className="ml-1">
                       {filterCounts.unread}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="payments" className="gap-2">
+                  <TabsTrigger
+                    value="payments"
+                    className="gap-2 cursor-pointer"
+                  >
                     Payments{" "}
                     <Badge variant="secondary" className="ml-1">
                       {filterCounts.payments}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="maintenance" className="gap-2">
+                  <TabsTrigger
+                    value="maintenance"
+                    className="gap-2 cursor-pointer"
+                  >
                     Maintenance{" "}
                     <Badge variant="secondary" className="ml-1">
                       {filterCounts.maintenance}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="tenancy" className="gap-2">
+                  <TabsTrigger value="tenancy" className="gap-2 cursor-pointer">
                     Tenancy{" "}
                     <Badge variant="secondary" className="ml-1">
                       {filterCounts.tenancy}

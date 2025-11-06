@@ -163,7 +163,7 @@ const Page = () => {
   });
   return (
     <div>
-      <HeaderPage title="Pending Payout" />
+      {/* <HeaderPage title="Pending Payout" /> */}
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter
           filters={[

@@ -18,10 +18,11 @@ import MultiFileUpload from "@/components/input-11";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileData } from "@/types/FileData";
 import useCreateAgreement from "@/lib/services/hooks/useCreateAgreement";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
+import { Tenancy } from "@/types/TenancyType";
 export interface RentalAgreement {
   agreement_date: string;
   landlord_name: string;
@@ -130,11 +131,11 @@ export function fileDataToFileList(fileDataList: FileData[]): FileList {
 type schemaType = yup.InferType<typeof schema>;
 
 interface Props {
-  id: number;
+  tenancy: Tenancy;
   open: boolean; // controlled open state
   onOpenChange: (open: boolean) => void; // handler from parent
 }
-const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
+const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
   const form = useForm<schemaType>({
     mode: "onTouched",
     defaultValues: {
@@ -175,7 +176,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
     formState: { errors },
   } = form;
 
-  const { mutate, isPending } = useCreateAgreement(id);
+  const { mutate, isPending } = useCreateAgreement(tenancy.id);
   const { refetch } = useGetTenancyList();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log(data.attachments);
@@ -215,7 +216,46 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
       },
     });
   };
+  useEffect(() => {
+    if (tenancy) {
+      reset({
+        agreement_date: tenancy.created_at.split("T")[0],
+        start_date: tenancy.tenancy_period_start_date,
+        end_date: tenancy.tenancy_period_end_date,
+        rental_amount: tenancy.rental_fee,
+        landlord_name:
+          "unit" in tenancy.tenantable
+            ? tenancy.tenantable.unit.property.owner?.name
+            : tenancy.tenantable.property.owner?.name,
+        landlord_email:
+          "unit" in tenancy.tenantable
+            ? tenancy.tenantable.unit.property.owner?.email
+            : tenancy.tenantable.property.owner?.email,
+        landlord_phone:
+          "unit" in tenancy.tenantable
+            ? tenancy.tenantable.unit.property.owner?.owner_profile
+                .emergency_contact_phone
+            : tenancy.tenantable.property.owner?.owner_profile
+                .emergency_contact_phone,
 
+        landlord_address:
+          "unit" in tenancy.tenantable
+            ? tenancy.tenantable.unit.property.owner?.owner_profile
+                .address_line_1
+            : tenancy.tenantable.property.owner?.owner_profile.address_line_1,
+        landlord_identity_number:
+          "unit" in tenancy.tenantable
+            ? tenancy.tenantable.unit.property.owner?.owner_profile.nric_number
+            : tenancy.tenantable.property.owner?.owner_profile.nric_number,
+        tenant_name: tenancy.tenant.name,
+        tenant_email: tenancy.tenant.email,
+        tenant_phone: tenancy.tenant.tenant_profile
+          ?.emergency_contact_phone as string,
+        tenant_address: tenancy.tenant.tenant_profile?.address_line_1,
+        tenant_identity_number: tenancy.tenant.tenant_profile?.nric_number,
+      });
+    }
+  }, [tenancy, reset]);
   return (
     <div
       onClick={(e) => {
@@ -249,6 +289,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("agreement_date", e.target.value)}
                   errors={errors.agreement_date?.message}
                   placeholder="Select Agreement Date"
+                  disabled={true}
                 />
                 <CustomInput
                   id="start_date"
@@ -259,6 +300,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("start_date", e.target.value)}
                   errors={errors.start_date?.message}
                   placeholder="Select Start Date"
+                  disabled={true}
                 />
                 <CustomInput
                   id="end_date"
@@ -269,6 +311,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("end_date", e.target.value)}
                   errors={errors.end_date?.message}
                   placeholder="Select End Date"
+                  disabled={true}
                 />
                 <CustomInput
                   id="rental_amount"
@@ -279,6 +322,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("rental_amount", e.target.value)}
                   errors={errors.rental_amount?.message}
                   placeholder="Enter Rental Amount"
+                  disabled={true}
                 />
                 <CustomInput
                   id="payment_due_day"
@@ -335,6 +379,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("landlord_name", e.target.value)}
                   errors={errors.landlord_name?.message}
                   placeholder="Enter Landlord Name"
+                  disabled={true}
                 />
                 <CustomInput
                   id="landlord_email"
@@ -345,6 +390,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("landlord_email", e.target.value)}
                   errors={errors.landlord_email?.message}
                   placeholder="Enter Landlord Email"
+                  disabled={true}
                 />
                 <div>
                   <label className="block mb-1 text-sm font-medium">
@@ -357,6 +403,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                       <PhoneInput
                         {...field}
                         placeholder="Enter Landlord Phone"
+                        disabled={true}
                       />
                     )}
                   />
@@ -377,6 +424,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   }
                   errors={errors.landlord_identity_number?.message}
                   placeholder="Enter Landlord Identity Number"
+                  disabled={true}
                 />
                 <div className="col-span-2">
                   <CustomInput
@@ -390,6 +438,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                     }
                     errors={errors.landlord_address?.message}
                     placeholder="Enter Landlord Address"
+                    disabled={true}
                   />
                 </div>
               </div>
@@ -405,6 +454,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("tenant_name", e.target.value)}
                   errors={errors.tenant_name?.message}
                   placeholder="Enter Tenant Name"
+                  disabled={true}
                 />
                 <CustomInput
                   id="tenant_email"
@@ -415,6 +465,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   onChange={(e) => setValue("tenant_email", e.target.value)}
                   errors={errors.tenant_email?.message}
                   placeholder="Enter Tenant Email"
+                  disabled={true}
                 />
                 <div>
                   <label className="block mb-1 text-sm font-medium">
@@ -424,7 +475,11 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                     control={control}
                     name="tenant_phone"
                     render={({ field }) => (
-                      <PhoneInput {...field} placeholder="Enter Tenant Phone" />
+                      <PhoneInput
+                        {...field}
+                        placeholder="Enter Tenant Phone"
+                        disabled={true}
+                      />
                     )}
                   />
                   {errors.tenant_phone && (
@@ -444,6 +499,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                   }
                   errors={errors.tenant_identity_number?.message}
                   placeholder="Enter Tenant Identity Number"
+                  disabled={true}
                 />
                 <div className="col-span-2">
                   <CustomInput
@@ -455,6 +511,7 @@ const CreateAgreement = ({ id, open, onOpenChange }: Props) => {
                     onChange={(e) => setValue("tenant_address", e.target.value)}
                     errors={errors.tenant_address?.message}
                     placeholder="Enter Tenant Address"
+                    disabled={true}
                   />
                 </div>
               </div>

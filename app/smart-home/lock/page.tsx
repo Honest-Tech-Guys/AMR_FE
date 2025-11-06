@@ -94,7 +94,7 @@ const Page = () => {
   });
   return (
     <div>
-      <HeaderPage title="Lock" />
+      {/* <HeaderPage title="Lock" /> */}
       <div className="w-full mt-5 mb-10 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter
           filters={[

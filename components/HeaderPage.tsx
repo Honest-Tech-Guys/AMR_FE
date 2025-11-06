@@ -1,5 +1,6 @@
 "use client";
 
+import { capitalize } from "@/lib/utilities/Capitalize";
 import { ReactNode } from "react";
 
 interface Props {
@@ -8,8 +9,8 @@ interface Props {
 }
 const HeaderPage = ({ title, children }: Props) => {
   return (
-    <div className="w-full flex justify-between p-3 font-bold rounded-[6px] bg-white shadow-xs">
-      {title}
+    <div className="w-full flex justify-between p-3 font-bold rounded-[6px] bg-white ">
+      {capitalize(title)}
       {children}
     </div>
   );

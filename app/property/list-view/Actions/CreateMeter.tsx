@@ -39,32 +39,7 @@ const schema = yup.object({
   free_unit_refresh_on: yup.string().nullable(),
   remarks: yup.string().nullable(),
 });
-const treeDataDummy = [
-  {
-    label: "Fruits",
-    value: "fruits",
-    children: [
-      { label: "Apple", value: "apple" },
-      { label: "Banana", value: "banana" },
-      {
-        label: "Citrus",
-        value: "citrus",
-        children: [
-          { label: "Orange", value: "orange" },
-          { label: "Lemon", value: "lemon" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Vegetables",
-    value: "vegetables",
-    children: [
-      { label: "Carrot", value: "carrot" },
-      { label: "Potato", value: "potato" },
-    ],
-  },
-];
+
 type SchemaType = yup.InferType<typeof schema>;
 interface Props {
   id: number;

@@ -30,7 +30,7 @@ const Page = () => {
 
   return (
     <div>
-      <HeaderPage title="Beneficiaries" />
+      {/* <HeaderPage title="Beneficiaries" /> */}
 
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         {/* Filter Bar */}

@@ -29,7 +29,7 @@ function LayoutShell({ children }: { children: React.ReactNode }) {
       {user_role !== "Tenant" && <AppSidebar />}
       <SidebarInset className="bg-gray-100 ">
         <Navbar />
-        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 px-4">{children}</div>
       </SidebarInset>
     </>
   );

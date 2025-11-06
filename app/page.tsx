@@ -311,30 +311,51 @@ export default function DashboardPage() {
   // ✅ Tenancy expiry pipeline (convert to % of total)
   const totalExpiry =
     dashboard.tenancy_expiry.in_7_days + dashboard.tenancy_expiry.in_14_days;
+
+  function calculatePercentages(data: Record<string, number>) {
+    const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+
+    if (total === 0) {
+      // Avoid division by zero — return all 0%
+      return Object.fromEntries(Object.keys(data).map((key) => [key, 0]));
+    }
+
+    const percentages = Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [key, (value / total) * 100])
+    );
+
+    return percentages;
+  }
+  const tenancyDataPercentage = calculatePercentages(dashboard.tenancy_expiry);
   const tenancyData = [
     {
-      label: "0-7 Days",
-      value: dashboard.tenancy_expiry.in_7_days > 0 ? 50 : 0,
+      label: "in 7 Days",
+      value: dashboard.tenancy_expiry.in_7_days,
+      percentage: tenancyDataPercentage.in_7_days,
       color: "bg-orange-400",
     },
     {
-      label: "8-14 Days",
-      value: dashboard.tenancy_expiry.in_14_days > 0 ? 50 : 0,
+      label: "in 14 Days",
+      value: dashboard.tenancy_expiry.in_14_days,
+      percentage: tenancyDataPercentage.in_14_days,
       color: "bg-green-500",
     },
     {
-      label: "15-30 Days",
-      value: dashboard.tenancy_expiry.in_30_days > 0 ? 50 : 0,
+      label: "in 30 Days",
+      value: dashboard.tenancy_expiry.in_30_days,
+      percentage: tenancyDataPercentage.in_30_days,
       color: "bg-blue-500",
     },
     {
-      label: "31-60 Days",
-      value: dashboard.tenancy_expiry.in_60_days > 0 ? 50 : 0,
+      label: "in 60 Days",
+      value: dashboard.tenancy_expiry.in_60_days,
+      percentage: tenancyDataPercentage.in_60_days,
       color: "bg-purple-500",
     },
     {
-      label: "61-90 Days",
-      value: dashboard.tenancy_expiry.in_90_days > 0 ? 50 : 0,
+      label: "in 90 Days",
+      value: dashboard.tenancy_expiry.in_90_days,
+      percentage: tenancyDataPercentage.in_90_days,
       color: "bg-gray-500",
     },
   ];
@@ -360,14 +381,14 @@ export default function DashboardPage() {
   return (
     <div className="max-w-[1600px] mx-auto p-8 space-y-8">
       {/* Header */}
-      <header>
+      {/* <header>
         <h1 className="text-3xl font-bold text-gray-900">
           Property Management Dashboard
         </h1>
         <p className="text-gray-500 text-sm">
           Monitor your properties, tenancies, and rental collections
         </p>
-      </header>
+      </header> */}
 
       {/* Stats */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -569,15 +590,17 @@ export default function DashboardPage() {
                   {/* Filled section */}
                   {item.value > 0 && (
                     <div
-                      className={`${item.color} h-6 rounded-full transition-all duration-700 ease-in-out`}
-                      style={{ width: `${item.value}%` }}
-                    ></div>
+                      className={`${item.color} h-6 rounded-full text-white text-center transition-all duration-700 ease-in-out`}
+                      style={{ width: `${item.percentage}%` }}
+                    >
+                      {item.value}
+                    </div>
                   )}
                 </div>
 
                 {/* Percentage label (only if > 0) */}
                 <span className="text-sm font-semibold text-gray-700 w-12 text-right">
-                  {item.value > 0 ? `${item.value}%` : ""}
+                  {item.percentage > 0 ? `${item.percentage.toFixed(2)}%` : ""}
                 </span>
               </div>
             ))}

@@ -4,7 +4,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Image, Share2, Lock, Gauge } from "lucide-react";
+import { Image, Share2, Lock, Gauge, LoaderCircle } from "lucide-react";
 import { capitalize } from "@/lib/utilities/Capitalize";
 import { getStatus } from "@/components/General/GetStatus";
 import { FormProvider, useForm } from "react-hook-form";
@@ -16,6 +16,8 @@ import CreateTenancy from "../list-view/Actions/CreateTenancy";
 import { useState } from "react";
 import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
+import useGetTenancy from "@/lib/services/hooks/GetTenancy";
+import { Tenancy } from "@/types/TenancyType";
 const statusType = [
   { id: "1", name: "Not Applicable" },
   { id: "2", name: "To be Vacant , To acquire new tenant" },
@@ -28,6 +30,7 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
   const form = useForm({ defaultValues: { status: "" } });
   const { handleSubmit } = form;
   const [open, setOpen] = useState(false);
+  const { data, isPending } = useGetTenancy(unit?.last_active_tenancy?.[0]?.id);
   return (
     <Card className="w-full max-w-sm min-w-sm">
       <CardHeader>
@@ -93,7 +96,11 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
 
       <CardFooter className="flex-col gap-2">
         {unit?.last_active_tenancy?.[0] ? (
-          <ViewTenancy tenancy={unit.last_active_tenancy[0]} />
+          !isPending ? (
+            <ViewTenancy tenancy={data as Tenancy} />
+          ) : (
+            <LoaderCircle className="animate-spin text-primary w-10 h-10" />
+          )
         ) : (
           <Button
             className="text-white"

@@ -60,7 +60,7 @@ const TenantStatementPage = () => {
 
   return (
     <div>
-      <HeaderPage title="Tenant Statement Report" />
+      {/* <HeaderPage title="Tenant Statement Report" /> */}
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         {/* Filters */}
         <ResponsiveFilter

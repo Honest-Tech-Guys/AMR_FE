@@ -130,7 +130,7 @@ const Page = () => {
   });
   return (
     <div>
-      <HeaderPage title="Property Setting" />
+      {/* <HeaderPage title="Property Setting" /> */}
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter
           filters={[

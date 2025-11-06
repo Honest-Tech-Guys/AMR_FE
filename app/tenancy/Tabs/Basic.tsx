@@ -317,7 +317,7 @@ const BasicTap = ({ tenancy }: Props) => {
                     </span>
 
                     <CreateAgreement
-                      id={tenancy.id}
+                      tenancy={tenancy}
                       open={open}
                       onOpenChange={setOpen}
                     />

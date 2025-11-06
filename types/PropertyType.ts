@@ -1,3 +1,4 @@
+import OwnerType from "./OwnerType";
 import PaginationType from "./PaginationType";
 import { Unit } from "./UnitType";
 
@@ -24,7 +25,7 @@ export type Property = {
   facilities: string[];
   created_at: string;
   updated_at: string;
-  owner: OwnerOrCreator;
+  owner: OwnerType;
   creator: OwnerOrCreator;
   units: Unit[];
 };

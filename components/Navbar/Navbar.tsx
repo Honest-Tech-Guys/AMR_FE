@@ -17,13 +17,16 @@ import {
 import { Button } from "../ui/button";
 import UpdateProfile from "./updateProfile";
 import TopUp from "./TopUp";
+import HeaderPage from "../HeaderPage";
 
+import { usePathname } from "next/navigation";
 const Navbar = () => {
   const { logout, user_role } = useAuthStore();
   const { data } = useGetUser();
   const [isFullscreen, setIsFullscreen] = useState(false);
-
+  const pathname = usePathname();
   // Function to toggle fullscreen
+  console.log(pathname);
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
@@ -95,6 +98,22 @@ const Navbar = () => {
           Top Up
         </p>
       </div> */}
+      <HeaderPage
+        title={
+          pathname
+            ? pathname
+                .split("/") // ["", "smart-home", "meter"]
+                .filter(Boolean) // remove empty string → ["smart-home", "meter"]
+                .map(
+                  (segment) =>
+                    segment
+                      .replace(/-/g, " ") // "smart home"
+                      .replace(/\b\w/g, (c) => c.toUpperCase()) // "Smart Home"
+                )
+                .join(" / ")
+            : "Dashboard"
+        }
+      />
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan
           onClick={toggleFullscreen}

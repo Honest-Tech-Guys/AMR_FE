@@ -49,7 +49,7 @@ const Page = () => {
 
   return (
     <div>
-      <HeaderPage title="Property (Grid View)" />
+      {/* <HeaderPage title="Property (Grid View)" /> */}
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
