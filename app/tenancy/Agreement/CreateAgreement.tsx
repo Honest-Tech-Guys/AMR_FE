@@ -226,33 +226,35 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
         landlord_name:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.name
-            : tenancy.tenantable.property.owner?.name,
+            : tenancy.tenantable.property.owner?.name ?? null,
         landlord_email:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.email
-            : tenancy.tenantable.property.owner?.email,
+            : tenancy.tenantable.property.owner?.email ?? null,
         landlord_phone:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.owner_profile
                 .emergency_contact_phone
             : tenancy.tenantable.property.owner?.owner_profile
-                .emergency_contact_phone,
-
+                .emergency_contact_phone ?? null,
         landlord_address:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.owner_profile
                 .address_line_1
-            : tenancy.tenantable.property.owner?.owner_profile.address_line_1,
+            : tenancy.tenantable.property.owner?.owner_profile.address_line_1 ??
+              null,
         landlord_identity_number:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.owner_profile.nric_number
-            : tenancy.tenantable.property.owner?.owner_profile.nric_number,
-        tenant_name: tenancy.tenant.name,
-        tenant_email: tenancy.tenant.email,
-        tenant_phone: tenancy.tenant.tenant_profile
-          ?.emergency_contact_phone as string,
-        tenant_address: tenancy.tenant.tenant_profile?.address_line_1,
-        tenant_identity_number: tenancy.tenant.tenant_profile?.nric_number,
+            : tenancy.tenantable.property.owner?.owner_profile.nric_number ??
+              null,
+        tenant_name: tenancy.tenant.name ?? null,
+        tenant_email: tenancy.tenant.email ?? null,
+        tenant_phone:
+          tenancy.tenant.tenant_profile?.emergency_contact_phone ?? "",
+        tenant_address: tenancy.tenant.tenant_profile?.address_line_1 ?? null,
+        tenant_identity_number:
+          tenancy.tenant.tenant_profile?.nric_number ?? null,
       });
     }
   }, [tenancy, reset]);
