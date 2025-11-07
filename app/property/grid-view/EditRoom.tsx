@@ -456,7 +456,7 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
             />
           </TabsContent>
           <TabsContent value="setting">
-            {room?.setting ? (
+            {
               <FormProvider {...settingForm}>
                 <form onSubmit={handleSettingSubmit(onSettingSubmit)}>
                   <HeaderSection title="Property Settings" />
@@ -689,11 +689,7 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
                   </DialogFooter>
                 </form>
               </FormProvider>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No settings found for this unit.
-              </div>
-            )}
+            }
           </TabsContent>
         </Tabs>
       </DialogContent>

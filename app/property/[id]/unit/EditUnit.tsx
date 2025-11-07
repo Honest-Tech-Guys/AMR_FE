@@ -871,7 +871,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
             />
           </TabsContent>
           <TabsContent value="setting">
-            {unit?.setting ? (
+            {
               <FormProvider {...settingForm}>
                 <form onSubmit={handleSettingSubmit(onSettingSubmit)}>
                   <HeaderSection title="Property Settings" />
@@ -1104,11 +1104,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
                   </DialogFooter>
                 </form>
               </FormProvider>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No settings found for this unit.
-              </div>
-            )}
+            }
           </TabsContent>
         </Tabs>
       </DialogContent>
