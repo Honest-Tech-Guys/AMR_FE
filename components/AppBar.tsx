@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         { title: "List View", url: "/property/list-view" },
         { title: "Grid View", url: "/property/grid-view" },
-        { title: "Setting", url: "/booking/property-setting" },
+        // { title: "Setting", url: "/booking/property-setting" },
       ],
     },
     {
@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         { title: "List View", url: "/booking/list-view" },
         { title: "Grid View", url: "/booking/grid-view" },
-        { title: "Setting", url: "/booking/booking-setting" },
+        // { title: "Setting", url: "/booking/booking-setting" },
       ],
     },
     {
@@ -140,8 +140,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         { title: "Invoice", url: "/accounting/invoice" },
         { title: "Expenses", url: "/accounting/expenses" },
         { title: "Settlement", url: "/accounting/settlement" },
-        { title: "Daily Report", url: "/accounting/daily-report" },
-        { title: "Auto Collection", url: "/accounting/auto-collection" },
+        // { title: "Daily Report", url: "/accounting/daily-report" },
+        // { title: "Auto Collection", url: "/accounting/auto-collection" },
       ],
     },
     {
