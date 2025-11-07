@@ -576,7 +576,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
 
     // Convert string IDs from select components to numbers for numeric fields
     const updateData: UpdatePropertySettingInput = {
-      id: unit.setting.id,
+      unit_id: unit.setting.id,
       ...data,
       cooking_facilities:
         typeof data.cooking_facilities === "string"

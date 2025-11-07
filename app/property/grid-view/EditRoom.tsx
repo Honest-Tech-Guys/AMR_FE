@@ -59,14 +59,14 @@ const settingSchema = yup.object({
     .default(null),
   preferred_gender: yup.string().nullable().default(null),
   preferred_race: yup.string().nullable().default(null),
-  cooking_facilities: yup.number().required("Cooking facilities is required"),
-  fridge: yup.number().required("Fridge is required"),
-  wifi: yup.number().required("Wifi is required"),
-  washing_machine: yup.number().required("Washing machine is required"),
-  cleaning: yup.number().required("Cleaning is required"),
-  water_heater: yup.number().required("Water heater is required"),
-  dryer: yup.number().required("Dryer is required"),
-  balcony: yup.number().required("Balcony is required"),
+  cooking_facilities: yup.string().required("Cooking facilities is required"),
+  fridge: yup.string().required("Fridge is required"),
+  wifi: yup.string().required("Wifi is required"),
+  washing_machine: yup.string().required("Washing machine is required"),
+  cleaning: yup.string().required("Cleaning is required"),
+  water_heater: yup.string().required("Water heater is required"),
+  dryer: yup.string().required("Dryer is required"),
+  balcony: yup.string().required("Balcony is required"),
   room_image: yup.string().nullable().default(null),
   rental: yup.string().required("Rental is required"),
   bed_type: yup.string().required("Bed type is required"),
@@ -181,14 +181,6 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
       no_bath: null,
       preferred_gender: null,
       preferred_race: null,
-      cooking_facilities: 0,
-      fridge: 0,
-      wifi: 0,
-      washing_machine: 0,
-      cleaning: 0,
-      water_heater: 0,
-      dryer: 0,
-      balcony: 0,
       room_image: null,
       rental: "",
       bed_type: "",
@@ -249,8 +241,8 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
 
   // Settings form options
   const YES_NO_OPTIONS = [
-    { id: "0", name: "No" },
-    { id: "1", name: "Yes" },
+    { id: "No", name: "No" },
+    { id: "Yes", name: "Yes" },
   ];
 
   const GENDER_OPTIONS = [
@@ -331,30 +323,8 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
 
     // Convert string IDs from select components to numbers for numeric fields
     const updateData: UpdatePropertySettingInput = {
-      id: room.setting.id,
+      room_id: room.setting.id,
       ...data,
-      cooking_facilities:
-        typeof data.cooking_facilities === "string"
-          ? Number(data.cooking_facilities)
-          : data.cooking_facilities,
-      fridge:
-        typeof data.fridge === "string" ? Number(data.fridge) : data.fridge,
-      wifi: typeof data.wifi === "string" ? Number(data.wifi) : data.wifi,
-      washing_machine:
-        typeof data.washing_machine === "string"
-          ? Number(data.washing_machine)
-          : data.washing_machine,
-      cleaning:
-        typeof data.cleaning === "string"
-          ? Number(data.cleaning)
-          : data.cleaning,
-      water_heater:
-        typeof data.water_heater === "string"
-          ? Number(data.water_heater)
-          : data.water_heater,
-      dryer: typeof data.dryer === "string" ? Number(data.dryer) : data.dryer,
-      balcony:
-        typeof data.balcony === "string" ? Number(data.balcony) : data.balcony,
     } as any;
 
     const loadingToast = toast.loading("Updating settings...");
@@ -508,7 +478,7 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
                     <CustomInput
                       id="size_sqft"
                       name="size_sqft"
-                      type="text"
+                      type="number"
                       label="Size (sqft)"
                       value={watchSetting("size_sqft")}
                       onChange={(e) =>
@@ -688,7 +658,7 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
                     <CustomInput
                       id="electricity_rate"
                       name="electricity_rate"
-                      type="text"
+                      type="number"
                       label="Electricity Rate"
                       value={watchSetting("electricity_rate")}
                       onChange={(e) =>

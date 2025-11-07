@@ -6,14 +6,11 @@ import PropertySettingType from "@/types/PropertySetting";
 export type UpdatePropertySettingInput = Partial<
   Omit<
     PropertySettingType,
-    | "id"
-    | "settingable_type"
-    | "settingable_id"
-    | "created_at"
-    | "updated_at"
+    "id" | "settingable_type" | "settingable_id" | "created_at" | "updated_at"
   >
 > & {
-  id: number; // id is required for updates
+  room_id?: number;
+  unit_id?: number;
 };
 
 const useUpdatePropertySetting = () => {
@@ -22,10 +19,9 @@ const useUpdatePropertySetting = () => {
   return useMutation({
     mutationKey: ["UpdatePropertySetting"],
     mutationFn: async (updatedSetting: UpdatePropertySettingInput) => {
-      const { id, ...updateData } = updatedSetting;
-      const res = await axiosInstance.put<PropertySettingType>(
-        `/property-settings/${id}`,
-        updateData
+      const res = await axiosInstance.post<PropertySettingType>(
+        `/property-settings`,
+        updatedSetting
       );
       return res.data;
     },
@@ -41,4 +37,3 @@ const useUpdatePropertySetting = () => {
 };
 
 export default useUpdatePropertySetting;
-
