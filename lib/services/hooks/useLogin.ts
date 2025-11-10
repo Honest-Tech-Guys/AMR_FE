@@ -24,7 +24,6 @@ const useLogin = () => {
         })
         .catch((error) => {
           console.log(error);
-          // Handle different types of errors
           if (error.response && error.response.data) {
             throw error.response.data;
           } else if (error.message) {

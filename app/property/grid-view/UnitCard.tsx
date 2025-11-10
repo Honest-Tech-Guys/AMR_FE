@@ -76,7 +76,7 @@ const UnitCard = ({ unit }: { unit: any }) => {
 
       <AccordionContent>
         {unit.rental_type === "Room Rental" ? (
-          <Accordion type="multiple">
+          <Accordion type="single">
             {roomsStatus !== "No Rooms" && (
               <AccordionItem value="rooms">
                 <AccordionTrigger>Rooms</AccordionTrigger>

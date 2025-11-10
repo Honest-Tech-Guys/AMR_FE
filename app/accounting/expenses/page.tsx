@@ -17,6 +17,7 @@ import { useState } from "react";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Separator } from "@/components/ui/separator";
 import CreateExpenses from "./CreateExpenses";
+import GetExpensesList from "@/lib/services/hooks/GetExpensesList";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {
@@ -51,6 +52,7 @@ interface PaginationData {
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [actionIsOpen, setActionsIsOpen] = useState(false);
+  const { data } = GetExpensesList();
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,

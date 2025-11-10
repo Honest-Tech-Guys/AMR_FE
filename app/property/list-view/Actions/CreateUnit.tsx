@@ -39,9 +39,9 @@ import { useAuthStore } from "@/lib/stores/authStore";
 // 👇 Define the schema factory function so it can depend on user_role
 const createSchema = (user_role: string) =>
   yup.object({
-    tenant_management_operator: yup
-      .string()
-      .required("Tenant Management Operator is required"),
+    // tenant_management_operator: yup
+    //   .string()
+    //   .required("Tenant Management Operator is required"),
     unit_number: yup.string().required("Unit Number is required"),
     block: yup.string().required("Block  is required"),
     floor: yup.string().required("Floor  is required"),
@@ -115,7 +115,7 @@ const createSchema = (user_role: string) =>
         yup.object({
           id: yup.string().required(),
           name: yup.string().required("Room name is required"),
-          description: yup.string().required("Room description is required"),
+          description: yup.string().optional(),
         })
       )
       .default([]),
@@ -238,6 +238,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
     const payload: any = {
       property_id: id,
       unit_number: data.unit_number,
+      tenant_management_operator: user_role,
       block: data.block,
       floor: data.floor,
       rental_type: data.rental_type,
@@ -327,14 +328,6 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                   errors={errors.floor?.message}
                   placeholder="Enter Floor "
                 />{" "}
-                <div>
-                  {" "}
-                  <SelectWithForm<SchemaType>
-                    name="tenant_management_operator"
-                    title="Tenant management operator"
-                    options={PartnerType}
-                  />{" "}
-                </div>{" "}
                 <div>
                   {" "}
                   <Label className="mb-3">Rental Type</Label>{" "}
@@ -512,7 +505,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                   id="bedroom"
                   name="bedroom"
                   type="number"
-                  label="Bedroom"
+                  label="Bedroom NO"
                   value={watch("bedroom")}
                   onChange={(e) => setValue("bedroom", e.target.value)}
                   errors={errors.bedroom?.message}
@@ -522,7 +515,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                   id="bathroom"
                   name="bathroom"
                   type="number"
-                  label="Bathroom"
+                  label="Bathroom NO"
                   value={watch("bathroom")}
                   onChange={(e) => setValue("bathroom", e.target.value)}
                   errors={errors.bathroom?.message}
@@ -534,7 +527,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                     id="square_feet"
                     name="square_feet"
                     type="text"
-                    label="Square Feet"
+                    label="Total Square Feet"
                     value={watch("square_feet")}
                     onChange={(e) => setValue("square_feet", e.target.value)}
                     errors={errors.square_feet?.message}

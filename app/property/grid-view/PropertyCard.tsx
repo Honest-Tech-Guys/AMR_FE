@@ -12,7 +12,12 @@ import { getStatusBadge } from "@/components/General/StatusBadge";
 const PropertyCard = ({ property }: { property: any }) => {
   return (
     <div className="border rounded-2xl p-4 hover:shadow-md transition-shadow">
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion
+        defaultValue="property"
+        type="single"
+        collapsible
+        className="w-full"
+      >
         <AccordionItem value="property">
           <AccordionTrigger>
             <div className="w-full flex justify-between">
@@ -46,7 +51,11 @@ const PropertyCard = ({ property }: { property: any }) => {
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <Accordion type="single" collapsible>
+            <Accordion
+              type="single"
+              collapsible
+              defaultValue={property.units.map((u: any) => `${u.id}`)}
+            >
               {property.units.map((unit: any) => (
                 <UnitCard key={unit.id} unit={unit} />
               ))}

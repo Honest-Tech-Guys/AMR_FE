@@ -269,12 +269,14 @@ import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
 import { Home, Users, Grid, BedDouble, LoaderCircle } from "lucide-react";
 import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const COLORS = ["#7cb342", "#e9ecef"];
 
 export default function DashboardPage() {
   const { data, isPending } = useGetDashboard();
-
+  const router = useRouter();
   if (isPending) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -399,7 +401,22 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-2xl">
+            <Card
+              className={cn(
+                "hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-2xl",
+                stat.title === "Units" || stat.title === "Rooms"
+                  ? ""
+                  : "cursor-pointer"
+              )}
+              onClick={() => {
+                stat.title === "Properties"
+                  ? router.push(`/property/list-view`)
+                  : null;
+                stat.title === "Active Tenancies"
+                  ? router.push(`/tenancy?status=Active`)
+                  : null;
+              }}
+            >
               <div className="flex justify-between items-center px-6 ">
                 <div>
                   <h3 className="text-xs uppercase text-gray-500 font-semibold mb-1">
@@ -408,8 +425,15 @@ export default function DashboardPage() {
                   <p className="text-xl font-bold text-gray-900">
                     {stat.value}
                   </p>
-                  <p className="text-green-600 text-sm font-semibold mt-2 cursor-pointer">
-                    View →
+                  <p
+                    className={cn(
+                      " text-green-600 text-sm font-semibold mt-2 ",
+                      stat.title === "Units" || stat.title === "Rooms"
+                        ? "invisible"
+                        : ""
+                    )}
+                  >
+                    {"View"}
                   </p>
                 </div>
                 <div className="bg-green-50 rounded-xl p-4">

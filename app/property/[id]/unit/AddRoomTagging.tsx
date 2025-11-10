@@ -10,128 +10,108 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
-import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import MapWithPoints from "@/components/ImageMapper";
+import { FormProvider, useForm } from "react-hook-form";
 import { Room } from "@/types/RoomType";
 import { useEffect, useState } from "react";
-import MapWithSinglePoint from "@/components/MapwithSinglePoint";
 import useAddTagRoom from "@/lib/services/hooks/useAddTagRoom";
-// Schema & type
-const schema = yup.object({
-  room_id: yup.string().required("Property type is required"),
-  remark: yup.string().required("Owner name is required"),
-  x: yup.string().required("Owner name is required"),
-  y: yup.string().required("Owner name is required"),
-});
-type schemaType = yup.InferType<typeof schema>;
+import MapWithPoints from "@/components/MapwithSinglePoint";
+
 interface Props {
   unit_id: number;
   url: string;
   rooms: Room[];
-  open: boolean; // controlled open state
+  open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
-  const form = useForm<schemaType>({
-    mode: "onTouched",
-  });
-  const {
-    setValue,
-    getValues,
-    watch,
-    reset,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = form;
 
-  const [Rooms, setRooms] = useState([
-    { id: "1", name: "Room1" },
-    { id: "2", name: "Room2" },
-    { id: "3", name: "Room3 " },
-  ]);
+interface RoomPoint {
+  room_id: number;
+  x: number;
+  y: number;
+}
+
+const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
+  const form = useForm({ mode: "onTouched" });
+  const { setValue, watch, reset } = form;
+
+  const [Rooms, setRooms] = useState<{ id: string; name: string }[]>([]);
+  const [points, setPoints] = useState<RoomPoint[]>([]);
+
   useEffect(() => {
     if (rooms) {
-      const dataT = rooms.map((room) => {
-        return { id: `${room.id}`, name: room.name };
-      });
-      setRooms(dataT as never);
+      setRooms(rooms.map((room) => ({ id: `${room.id}`, name: room.name })));
     }
   }, [rooms]);
+
   const { mutate } = useAddTagRoom(unit_id);
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    mutate(data, {
+
+  const onPointChange = (point: { x: number; y: number }) => {
+    const room_id = Number(watch("room_id"));
+    const remark = watch("remark");
+    if (!room_id || !point) return;
+
+    // Replace any existing point for the same room
+    setPoints((prev) => {
+      const filtered = prev.filter((p) => p.room_id !== room_id);
+      return [...filtered, { room_id, x: point.x, y: point.y, remark }];
+    });
+  };
+
+  const onSubmit = () => {
+    if (points.length === 0) {
+      toast.error("Please add at least one point!");
+      return;
+    }
+    console.log(unit_id);
+    mutate(points, {
       onSuccess: () => {
-        toast.success("Add Room Tag successfully!");
+        toast.success("Added Room Tags successfully!");
         reset();
-        // refetch();
+        setPoints([]);
         onOpenChange(false);
       },
     });
-    console.log("Form data:", data);
+
+    console.log("Points list:", points);
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        className="md:max-w-[1000px] z-500 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+        className="md:max-w-[1000px] z-50 bg-white md:p-10 max-h-[95vh] overflow-y-auto"
       >
         <DialogHeader>
-          <div className="w-full text-center text-2xl font-bold rounded-[6px] bg-white ">
+          <div className="w-full text-center text-2xl font-bold rounded-[6px] bg-white">
             Add Room Tagging
           </div>
         </DialogHeader>
+
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="md:min-h-[78vh]">
+          <form
+            className="md:min-h-[78vh]"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
             <div className="w-full flex justify-center">
-              <MapWithSinglePoint
+              <div>
+                <SelectWithForm name="room_id" title="Room" options={Rooms} />
+              </div>
+              <MapWithPoints
                 url={url}
-                onChange={(point) => {
-                  if (point) {
-                    setValue("x", point.x.toFixed(2));
-                    setValue("y", point.y.toFixed(2));
-                  } else {
-                    setValue("x", "");
-                    setValue("y", "");
-                  }
+                points={points}
+                selectedRoomId={watch("room_id")}
+                onChange={(updatedPoints) => {
+                  // Only allow one point per selected room
+                  if (updatedPoints.length === 0) return;
+                  onPointChange(updatedPoints[updatedPoints.length - 1]);
                 }}
               />
             </div>
-            <div className="flex justify-center gap-5">
-              <div>
-                <SelectWithForm<schemaType>
-                  name="room_id"
-                  title="Room"
-                  options={Rooms}
-                />
-              </div>
-              <div>
-                <CustomInput
-                  id="remark"
-                  name="remark"
-                  type="text"
-                  label="Remark"
-                  value={watch("remark")}
-                  onChange={(e) => setValue("remark", e.target.value)}
-                  errors={errors.remark?.message}
-                  placeholder="Enter Remark"
-                />
-              </div>
-            </div>
-            <DialogFooter className="mt-6">
+            <DialogFooter className="mt-6 flex justify-between">
               <DialogClose asChild>
                 <Button variant="outline" type="button">
                   Cancel

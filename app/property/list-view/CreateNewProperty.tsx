@@ -5,7 +5,6 @@ import { SelectWithForm } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -27,67 +26,78 @@ import { toast } from "sonner";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { useAuthStore } from "@/lib/stores/authStore";
-// Schema & type - Factory function for conditional validation
-const createSchema = (user_role: string) =>
-  yup.object({
-    postcode: yup.string().required("Country is required"),
-    city: yup.string().required("Country is required"),
-    state: yup.string().required("Country is required"),
-    property_name: yup.string().required("Property name is required"),
-    property_type: yup.string().required("Property type is required"),
-    owner_id: yup.string().when([], {
-      is: () => user_role !== "Owner",
-      then: (schema) => schema.required("Owner is required"),
-      otherwise: (schema) => schema.optional().nullable(),
-    }),
-    owner_phone_number: yup.string().when([], {
-      is: () => user_role !== "Owner",
-      then: (schema) => schema.required("Owner phone number is required"),
-      otherwise: (schema) => schema.optional().nullable(),
-    }),
-    contact_name: yup.string().required("Contact name is required"),
-    contact_phone_number: yup
-      .string()
-      .required("Contact phone number is required"),
-    remarks: yup.string().nullable().optional(),
-    address: yup.string().required("Address is required"),
-    meeting_room: yup.boolean().default(false),
-    game_room: yup.boolean().default(false),
-    basketball_court: yup.boolean().default(false),
-    sauna: yup.boolean().default(false),
-    free_text: yup.boolean().default(false),
-  });
-type schemaType = yup.InferType<ReturnType<typeof createSchema>>;
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 const CreateNewProperty = () => {
-  const [owners, setOwners] = useState([]);
+  const [owners, setOwners] = useState<{ id: string; name: string }[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [sameInformation, setSameInformation] = useState(false);
+
   const { user_role } = useAuthStore();
-  const schema = useMemo(() => createSchema(user_role || ""), [user_role]);
-  const form = useForm<schemaType>({
+
+  // ✅ Define the schema creator before using it
+  const createSchema = (role: string, sameInfo: boolean) =>
+    yup.object({
+      postcode: yup.string().required("Postcode is required"),
+      city: yup.string().required("City is required"),
+      state: yup.string().required("State is required"),
+      property_name: yup.string().required("Property name is required"),
+      property_type: yup.string().required("Property type is required"),
+      owner_id:
+        role !== "Owner"
+          ? yup.string().required("Owner is required")
+          : yup.string().nullable(),
+      owner_phone_number:
+        role !== "Owner"
+          ? yup.string().required("Owner phone number is required")
+          : yup.string().optional(),
+      contact_name: !sameInfo
+        ? yup.string().required("Contact name is required")
+        : yup.string().nullable(),
+      contact_phone_number: !sameInfo
+        ? yup.string().required("Contact phone number is required")
+        : yup.string().optional(),
+      remarks: yup.string().nullable(),
+      address: yup.string().required("Address is required"),
+      facilities: yup.string().nullable(),
+    });
+
+  type SchemaType = yup.InferType<ReturnType<typeof createSchema>>;
+
+  // ✅ Memoize schema correctly (depends on role + sameInformation)
+  const schema = useMemo(
+    () => createSchema(user_role || "", sameInformation),
+    [user_role, sameInformation]
+  );
+
+  const form = useForm<Partial<SchemaType>>({
     mode: "onTouched",
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as any, // Type override: schema shape may have optional fields
   });
+
   const {
-    setValue,
-    getValues,
-    watch,
-    reset,
     control,
     handleSubmit,
+    setValue,
+    watch,
+    reset,
     formState: { errors },
   } = form;
+
   const { mutate, error, isPending } = useAddProperty();
   const { data } = useGetOwnersSelection();
   const { refetch } = useGetPropertiesList({});
+
   useEffect(() => {
     if (data) {
-      const dataT = data.map((owner) => {
-        return { id: `${owner.id}`, name: owner.name };
-      });
-      setOwners(dataT as never);
+      const ownersData = data.map((owner) => ({
+        id: `${owner.id}`,
+        name: owner.name,
+      }));
+      setOwners(ownersData);
     }
   }, [data]);
+
   const cities = [
     { id: "johor", name: "Johor" },
     { id: "kedah", name: "Kedah" },
@@ -104,30 +114,19 @@ const CreateNewProperty = () => {
     { id: "sarawak", name: "Sarawak" },
     { id: "kualaLumpur", name: "Kuala Lumpur" },
     { id: "putrajaya", name: "Putrajaya" },
-  ];
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   const PartnerType = [
-    { id: "Apartment1", name: "Apartment" },
+    { id: "Apartment", name: "Apartment" },
     { id: "Condominium", name: "Condominium" },
     { id: "Flat", name: "Flat" },
     { id: "Landed", name: "Landed" },
     { id: "Townhouse", name: "Townhouse" },
   ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-  ] as const;
-  type FacilityId = (typeof facilities)[number]["id"];
-  const onSubmit: SubmitHandler<schemaType> = (data) => {
-    // Map facilities
-    const facilitiesList = facilities
-      .filter((f) => (data as any)[f.id])
-      .map((f) => f.id);
-    // Compose payload for AddPropertyInput
+
+  const onSubmit: SubmitHandler<SchemaType> = (data) => {
     const payload = {
-      property_name: data.property_name,
+      // property_name: data.property_name,
       owner_id: data.owner_id,
       owner_phone: data.owner_phone_number,
       contact_name: data.contact_name || null,
@@ -135,18 +134,22 @@ const CreateNewProperty = () => {
       property_type: data.property_type,
       remarks: data.remarks || "",
       address_line_1: data.address || null,
-      country: "soso",
+      country: "Malaysia",
       city: data.city,
       state: data.state,
       postcode: data.postcode,
-      facilities: facilitiesList,
+      facilities: data.facilities || "",
     };
+
     mutate(payload, {
       onSuccess: () => {
         toast.success("Property created successfully!");
         reset();
         refetch();
         setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };
@@ -161,14 +164,12 @@ const CreateNewProperty = () => {
 
       <DialogContent className="md:max-w-[1000px] bg-white md:p-10 max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <div className="w-full text-2xl font-bold rounded-[6px] bg-white ">
-            Create New Property
-          </div>
+          <div className="w-full text-2xl font-bold">Create New Property</div>
         </DialogHeader>
         <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit as any)}>
             <HeaderSection title="Basic Information" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               <CustomInput
                 id="property_name"
                 name="property_name"
@@ -179,19 +180,21 @@ const CreateNewProperty = () => {
                 errors={errors.property_name?.message}
                 placeholder="Enter Property Name"
               />
-              <SelectWithForm<schemaType>
+
+              <SelectWithForm<SchemaType>
                 name="property_type"
                 title="Property Type"
                 options={PartnerType}
               />
-              {user_role !== "Owner" ? (
+
+              {user_role !== "Owner" && (
                 <>
-                  {" "}
-                  <SelectWithForm<schemaType>
+                  <SelectWithForm<SchemaType>
                     name="owner_id"
                     title="Owner"
                     options={owners}
                   />
+
                   <div>
                     <label className="block mb-1 text-sm font-medium">
                       Owner Phone Number
@@ -213,36 +216,72 @@ const CreateNewProperty = () => {
                     )}
                   </div>
                 </>
-              ) : null}
+              )}
 
-              <CustomInput
-                id="contact_name"
-                name="contact_name"
-                type="text"
-                value={watch("contact_name")}
-                label="Contact Name"
-                onChange={(e) => setValue("contact_name", e.target.value)}
-                errors={errors.contact_name?.message}
-                placeholder="Enter Contact Name"
-              />
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Contact Phone Number
-                </label>
-                <Controller
-                  control={control}
-                  name="contact_phone_number"
-                  render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Contact Number" />
-                  )}
+              <div className="col-span-2">
+                <CustomInput
+                  id="sameInformation"
+                  name="sameInformation"
+                  label="Contact The Same"
+                  type="checkbox"
+                  checkboxDefaultValue={sameInformation}
+                  onCheckedChange={(checked) => {
+                    setSameInformation(checked as boolean);
+                    if (checked) {
+                      const owner = data?.find(
+                        (item) =>
+                          item.id === parseInt(watch("owner_id") as string)
+                      );
+                      setValue("contact_name", owner?.name || "");
+                      setValue(
+                        "contact_phone_number",
+                        watch("owner_phone_number") || ""
+                      );
+                    } else {
+                      setValue("contact_name", null);
+                      setValue("contact_phone_number", undefined);
+                    }
+                  }}
                 />
-                {errors.contact_phone_number && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.contact_phone_number.message}
-                  </p>
-                )}
               </div>
-              <div className="col-span-1 md:col-span-2">
+
+              {!sameInformation && (
+                <>
+                  <CustomInput
+                    id="contact_name"
+                    name="contact_name"
+                    type="text"
+                    value={watch("contact_name")}
+                    label="Contact Name"
+                    onChange={(e) => setValue("contact_name", e.target.value)}
+                    errors={errors.contact_name?.message}
+                    placeholder="Enter Contact Name"
+                  />
+
+                  <div>
+                    <label className="block mb-1 text-sm font-medium">
+                      Contact Phone Number
+                    </label>
+                    <Controller
+                      control={control}
+                      name="contact_phone_number"
+                      render={({ field }) => (
+                        <PhoneInput
+                          {...field}
+                          placeholder="Enter Contact Number"
+                        />
+                      )}
+                    />
+                    {errors.contact_phone_number && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.contact_phone_number.message}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <div className="col-span-2">
                 <CustomInput
                   id="remarks"
                   label="Remarks"
@@ -251,29 +290,28 @@ const CreateNewProperty = () => {
                   value={watch("remarks")}
                   onChange={(e) => setValue("remarks", e.target.value)}
                   placeholder="E.g describe more about the reason for change"
-                  className="bg-gray-100"
                   errors={errors.remarks?.message}
                 />
               </div>
             </div>
-            <HeaderSection title="Address Information" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <SelectWithForm<schemaType>
-                name="city"
-                title="City"
+            {/* ====== Address ====== */}
+            <HeaderSection title="Address Information" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 items-start">
+              <SelectWithForm<SchemaType>
+                name="state"
+                title="State"
                 options={cities}
               />
-
               <CustomInput
-                id="state"
-                name="state"
+                id="city"
+                name="city"
                 type="text"
-                value={watch("state")}
-                label="State"
-                onChange={(e) => setValue("state", e.target.value)}
-                errors={errors.state?.message}
-                placeholder="Enter State"
+                value={watch("city")}
+                label="City"
+                onChange={(e) => setValue("city", e.target.value)}
+                errors={errors.city?.message}
+                placeholder="Enter City"
               />
               <CustomInput
                 id="address"
@@ -296,8 +334,10 @@ const CreateNewProperty = () => {
                 placeholder="Enter Postcode"
               />
             </div>
+
+            {/* ====== Facilities ====== */}
             <HeaderSection title="Facilities & Amenities" />
-            <div className="flex gap-4 mt-4">
+            {/* <div className="flex gap-4 mt-4 flex-wrap">
               {facilities.map((facility) => (
                 <CustomInput
                   key={facility.id}
@@ -313,8 +353,20 @@ const CreateNewProperty = () => {
                   }
                 />
               ))}
+            </div> */}
+            <div className="col-span-2">
+              <CustomInput
+                id="facilities"
+                label=""
+                type="textArea"
+                name="facilities"
+                value={watch("facilities")}
+                onChange={(e) => setValue("facilities", e.target.value)}
+                placeholder="Enter Facilities Property"
+                errors={errors.facilities?.message}
+              />
             </div>
-            {/* Toast notifications are handled by 'sonner', so no need for local success/error display here */}
+
             <DialogFooter className="mt-6">
               <Button
                 variant="outline"
