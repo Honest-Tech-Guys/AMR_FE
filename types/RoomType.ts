@@ -1,5 +1,6 @@
 import EquipmentType from "./EquipmentType";
 import PropertySettingType from "./PropertySetting";
+import { Tenancy } from "./TenancyType";
 import { Unit } from "./UnitType";
 
 export type Room = {
@@ -14,6 +15,7 @@ export type Room = {
   description: string;
   equipment?: EquipmentType[];
   setting?: PropertySettingType;
+  last_active_tenancy: Tenancy[];
   remarks: string;
   created_at: string;
   updated_at: string;

@@ -13,6 +13,8 @@ import {
 import UnitDropdown from "./UnitDropDown";
 import RoomCard from "./RoomCard";
 import CarParkCard from "./CarParkCard";
+import { Card } from "@/components/ui/card";
+import MapRoomViewer from "@/components/MapRoomViewer";
 const UnitCard = ({ unit }: { unit: any }) => {
   const roomsStatus = getUnitStatus(unit.rooms);
   const { label, badgeClass } = unitStatusConfig[roomsStatus];
@@ -82,6 +84,12 @@ const UnitCard = ({ unit }: { unit: any }) => {
                 <AccordionTrigger>Rooms</AccordionTrigger>
                 <AccordionContent>
                   <div className="flex w-full overflow-x-scroll gap-3">
+                    <Card className="border-0 shadow-none">
+                      <MapRoomViewer
+                        rooms={unit?.rooms ?? []}
+                        url={unit?.floor_plan_image_url ?? ""}
+                      />
+                    </Card>
                     {unit.rooms.map((room: any) => (
                       <RoomCard key={room.id} room={room} unit={unit} />
                     ))}

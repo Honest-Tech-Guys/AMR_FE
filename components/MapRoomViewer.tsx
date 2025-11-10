@@ -22,11 +22,11 @@ export default function MapRoomViewer({ url, rooms }: Props) {
         .map((room, index) => {
           const x = parseFloat(room.coordinates!.x);
           const y = parseFloat(room.coordinates!.y);
-          const color = room.status === "Vacant" ? "green" : "red";
+          const color = room.status === "Vacant" ? "red" : "green";
           return (
             <div
               key={room.id}
-              className="absolute z-3000 flex flex-col items-center"
+              className="absolute  flex flex-col items-center"
               style={{
                 left: `${x}%`,
                 top: `${y}%`,

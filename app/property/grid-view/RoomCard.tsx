@@ -30,7 +30,9 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
   const form = useForm({ defaultValues: { status: "" } });
   const { handleSubmit } = form;
   const [open, setOpen] = useState(false);
-  const { data, isPending } = useGetTenancy(unit?.last_active_tenancy?.[0]?.id);
+  const { data, isPending } = useGetTenancy(
+    unit?.last_active_tenancy?.[0]?.id ?? room?.last_active_tenancy?.[0]?.id
+  );
   return (
     <Card className="w-full max-w-sm min-w-sm">
       <CardHeader>
@@ -89,13 +91,35 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
                   </div>
                 </div>
               )}
+              {room?.last_active_tenancy?.[0] && (
+                <div className="flex justify-between">
+                  <div>
+                    <p>{room.last_active_tenancy[0].tenant?.name}</p>
+                    <p className="text-primary">
+                      {room.last_active_tenancy[0].code}
+                    </p>
+                    <p>
+                      RM {room.last_active_tenancy[0].rental_fee} /{" "}
+                      {room.last_active_tenancy[0].rental_payment_frequency}
+                    </p>
+                  </div>
+                  <div>
+                    <p>Tenancy Start:</p>
+                    <p>
+                      {room.last_active_tenancy[0].tenancy_period_start_date}
+                    </p>
+                    <p>Tenancy End:</p>
+                    <p>{room.last_active_tenancy[0].tenancy_period_end_date}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </FormProvider>
       </CardContent>
 
       <CardFooter className="flex-col gap-2">
-        {unit?.last_active_tenancy?.[0] ? (
+        {unit?.last_active_tenancy?.[0] || room?.last_active_tenancy?.[0] ? (
           !isPending ? (
             <ViewTenancy tenancy={data as Tenancy} />
           ) : (
