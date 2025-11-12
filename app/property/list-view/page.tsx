@@ -177,18 +177,7 @@ const Page = () => {
     {
       title: "Facilities",
       key: "facilities",
-      render: (property) => (
-        <div>
-          {property.facilities
-            ?.map((f: string) =>
-              f
-                .split("_")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")
-            )
-            .join(", ")}
-        </div>
-      ),
+      render: (property) => <div>{property?.facilities}</div>,
     },
     {
       title: "Actions",

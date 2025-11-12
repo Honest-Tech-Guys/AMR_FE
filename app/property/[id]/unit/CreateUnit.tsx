@@ -123,11 +123,6 @@ const CreateUnit = () => {
   const form = useForm<schemaType>({
     mode: "onTouched",
     defaultValues: {
-      meeting_room: false,
-      game_room: false,
-      basketball_court: false,
-      sauna: false,
-      free_text: false,
       is_activated: false,
       rental_type: "whole",
       rooms: [],
@@ -192,7 +187,7 @@ const CreateUnit = () => {
       currentCarparks.filter((carpark) => carpark.id !== carparkId)
     );
   };
-  const { data } = useGetBeneficiariesSelection();
+
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload: any = {
       property_id: parseInt(id as string),

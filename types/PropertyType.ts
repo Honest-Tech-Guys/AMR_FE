@@ -22,7 +22,7 @@ export type Property = {
   postcode: string;
   state: string;
   country: string;
-  facilities: string[];
+  facilities: string;
   created_at: string;
   updated_at: string;
   owner: OwnerType;
