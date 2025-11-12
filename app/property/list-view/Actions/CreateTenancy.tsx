@@ -32,6 +32,7 @@ import useGetSelection, {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
 import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
+import { TenantSelect } from "@/components/TenantSelect";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property name is required"),
@@ -189,11 +190,12 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
                   treeData={treeData}
                 />
               </div>
-              <SelectWithForm<schemaType>
+              <TenantSelect<schemaType>
                 name="tenant"
                 title="Tenant"
                 options={tenantData}
               />
+
               <CustomInput
                 id="date_of_agreement"
                 name="date_of_agreement"

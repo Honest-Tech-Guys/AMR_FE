@@ -33,6 +33,7 @@ import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { TenantSelect } from "@/components/TenantSelect";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -226,7 +227,7 @@ const CreateBulk = ({ setPayload }: Props) => {
                   </span>
                 )}
               </div>
-              <SelectWithForm<schemaType>
+              <TenantSelect<schemaType>
                 name="tenant"
                 title="Tenant"
                 options={tenantData}

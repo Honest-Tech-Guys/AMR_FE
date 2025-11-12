@@ -1,8 +1,9 @@
 import axios from "axios";
 export const baseUrl = "http://43.217.80.136:8015/api";
-import { toast } from "sonner";
+
 const axiosInstance = axios.create({
   baseURL: baseUrl,
+  withCredentials: true,
 });
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -23,7 +24,6 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(error);
     if (error.response && error.response.status === 401) {
       localStorage.clear();
       sessionStorage.clear();
@@ -32,5 +32,4 @@ axiosInstance.interceptors.response.use(
     throw error;
   }
 );
-axiosInstance.defaults.withCredentials = true;
 export default axiosInstance;

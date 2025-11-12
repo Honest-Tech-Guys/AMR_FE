@@ -28,6 +28,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useAddTenant from "@/lib/services/hooks/useAddTenant";
 import { toast } from "sonner";
 import { useState } from "react";
+import { COUNTRIES, NATIONALITIES } from "@/lib/utilities/Countries";
 
 // Schema & type
 const schema = yup.object({
@@ -72,30 +73,17 @@ const CreateNewTenant = () => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const COUNTRIES = [
-    { id: "us", name: "United States" },
-    { id: "uk", name: "United Kingdom" },
-    { id: "ca", name: "Canada" },
-    { id: "au", name: "Australia" },
-    { id: "fr", name: "France" },
-    { id: "de", name: "Germany" },
-    { id: "jp", name: "Japan" },
-    { id: "br", name: "Brazil" },
-  ];
-  const PartnerType = [
-    { id: "1", name: "Apartment" },
-    { id: "2", name: "Condominium" },
-    { id: "3", name: "Flat " },
-    { id: "4", name: "Landed" },
-    { id: "5", name: "Townhouse" },
-  ];
-  const facilities = [
-    { id: "meeting_room", label: "Meeting Room" },
-    { id: "game_room", label: "Game Room" },
-    { id: "basketball_court", label: "Basketball Court" },
-    { id: "sauna", label: "Sauna" },
-    { id: "free_text", label: "Free Text" },
-  ];
+  // const COUNTRIES = [
+  //   { id: "us", name: "United States" },
+  //   { id: "uk", name: "United Kingdom" },
+  //   { id: "ca", name: "Canada" },
+  //   { id: "au", name: "Australia" },
+  //   { id: "fr", name: "France" },
+  //   { id: "de", name: "Germany" },
+  //   { id: "jp", name: "Japan" },
+  //   { id: "br", name: "Brazil" },
+  // ];
+
   const { mutate, isPending } = useAddTenant();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     mutate(data as never, {
@@ -203,82 +191,6 @@ const CreateNewTenant = () => {
                   </p>
                 )}
               </div>
-              <CustomInput
-                id="nationality"
-                name="nationality"
-                type="text"
-                label="Nationality"
-                value={watch("nationality")}
-                onChange={(e) => setValue("nationality", e.target.value)}
-                errors={errors.nationality?.message}
-                placeholder="Enter Nationality"
-              />
-              <CustomInput
-                id="identity_number"
-                name="identity_number"
-                type="text"
-                label="Identity Number"
-                value={watch("identity_number")}
-                onChange={(e) => setValue("identity_number", e.target.value)}
-                errors={errors.identity_number?.message}
-                placeholder="Enter Identity Number"
-              />
-              <div>
-                <Label className="mb-5">Gender</Label>
-                <RadioGroup
-                  value={watch("gender")}
-                  onValueChange={(val) => setValue("gender", val)}
-                  className="flex items-center gap-3"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Male" id="gender-male" />
-                    <Label htmlFor="gender-male">Male</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Female" id="gender-female" />
-                    <Label htmlFor="gender-female">Female</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Other" id="gender-other" />
-                    <Label htmlFor="gender-other">Other</Label>
-                  </div>
-                </RadioGroup>
-                {errors.gender && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.gender.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="mb-5">Race</Label>
-                <RadioGroup
-                  value={watch("race")}
-                  onValueChange={(val) => setValue("race", val)}
-                  className="flex items-center gap-3"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Malay" id="race-malay" />
-                    <Label htmlFor="race-malay">Malay</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Chinese" id="race-chinese" />
-                    <Label htmlFor="race-chinese">Chinese</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Indian" id="race-indian" />
-                    <Label htmlFor="race-indian">Indian</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Others" id="race-others" />
-                    <Label htmlFor="race-others">Others</Label>
-                  </div>
-                </RadioGroup>
-                {errors.race && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.race.message}
-                  </p>
-                )}
-              </div>
               <div>
                 <Label className="mb-5">Identity Type</Label>
                 <RadioGroup
@@ -300,11 +212,114 @@ const CreateNewTenant = () => {
                     {errors.identity_type.message}
                   </p>
                 )}
+              </div>
+              <CustomInput
+                id="identity_number"
+                name="identity_number"
+                type="text"
+                label="Identity NO / Passport NO "
+                value={watch("identity_number")}
+                onChange={(e) => setValue("identity_number", e.target.value)}
+                errors={errors.identity_number?.message}
+                placeholder="Enter Identity Number"
+              />{" "}
+              <div>
+                <Label className="mb-5">Race</Label>
+                <RadioGroup
+                  value={watch("race")}
+                  onValueChange={(val) => setValue("race", val)}
+                  className="flex items-center gap-3"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Malay" id="malay" />
+                    <Label htmlFor="malay">Malay</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Chinese" id="chinese" />
+                    <Label htmlFor="chinese">Chinese</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Indian" id="indian" />
+                    <Label htmlFor="indian">Indian</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="International" id="international" />
+                    <Label htmlFor="international">International</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Other" id="other" />
+                    <Label htmlFor="other">Other</Label>
+                  </div>
+                </RadioGroup>
+                {errors.race && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.race.message}
+                  </p>
+                )}
               </div>{" "}
+              <SelectWithForm<schemaType>
+                name="nationality"
+                title="Nationality"
+                options={NATIONALITIES}
+              />
+              <div>
+                <Label className="mb-5">Gender</Label>
+                <RadioGroup
+                  value={watch("gender")}
+                  onValueChange={(val) => setValue("gender", val)}
+                  className="flex items-center gap-3"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Male" id="gender-male" />
+                    <Label htmlFor="male">Male</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Female" id="female" />
+                    <Label htmlFor="female">Female</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value="Prefer Not To Say"
+                      id="Prefer Not To Say"
+                    />
+                    <Label htmlFor="Prefer Not To Say">Prefer Not To Say</Label>
+                  </div>
+                </RadioGroup>
+                {errors.gender && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.gender.message}
+                  </p>
+                )}
+              </div>
             </div>
             <HeaderSection title="Emergency Address Information" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <SelectWithForm<schemaType>
+                name="country"
+                title="Country"
+                options={COUNTRIES}
+              />
+              <CustomInput
+                id="state"
+                name="state"
+                type="text"
+                value={watch("state")}
+                label="State"
+                onChange={(e) => setValue("state", e.target.value)}
+                errors={errors.state?.message}
+                placeholder="Enter state"
+              />
+              <CustomInput
+                id="city"
+                name="city"
+                type="text"
+                value={watch("city")}
+                label="City"
+                onChange={(e) => setValue("city", e.target.value)}
+                errors={errors.city?.message}
+                placeholder="Enter city"
+              />{" "}
               <CustomInput
                 id="address_line_1"
                 name="address_line_1"
@@ -324,21 +339,6 @@ const CreateNewTenant = () => {
                 onChange={(e) => setValue("postcode", e.target.value)}
                 errors={errors.postcode?.message}
                 placeholder="Enter Postcode"
-              />
-              <SelectWithForm<schemaType>
-                name="country"
-                title="Country"
-                options={COUNTRIES}
-              />
-              <SelectWithForm<schemaType>
-                name="city"
-                title="City"
-                options={COUNTRIES}
-              />
-              <SelectWithForm<schemaType>
-                name="state"
-                title="State"
-                options={COUNTRIES}
               />
             </div>
             <HeaderSection title="Emergency Contact Information" />

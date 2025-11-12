@@ -59,6 +59,9 @@ const createSchema = (user_role: string) =>
     square_feet: yup.string().required("Square Feet is required"),
     is_activated: yup.boolean().default(false),
     rental_type: yup.string().required("Rental type is required"),
+    rental_payment_frequency: yup
+      .string()
+      .required("Rental payment frequency is required"),
     // ✅ Conditionally required based on user_role
     beneficiary: yup.string().when([], {
       is: () => user_role !== "Owner",
@@ -157,6 +160,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       free_text: false,
       is_activated: false,
       rental_type: "Whole Unit",
+      rental_payment_frequency: "Monthly",
       rooms: [],
       carparks: [],
     },
@@ -242,6 +246,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       block: data.block,
       floor: data.floor,
       rental_type: data.rental_type,
+      rental_payment_frequency: data.rental_payment_frequency,
       square_feet: parseInt(data.square_feet),
       bedroom_count: Number(data.bedroom),
       bathroom_count: Number(data.bathroom),
@@ -370,6 +375,32 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                     </span>
                   )}{" "}
                 </div>{" "}
+                <div>
+                  <Label className="mb-3">Rental Payment Frequency</Label>
+                  <ToggleGroup
+                    variant="outline"
+                    type="single"
+                    value={watch("rental_payment_frequency")}
+                    onValueChange={(val) =>
+                      setValue("rental_payment_frequency", val)
+                    }
+                  >
+                    <ToggleGroupItem value="Monthly" aria-label="Monthly">
+                      Monthly
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="Daily" aria-label="Daily">
+                      Daily
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="One Time" aria-label="One Time">
+                      One Time
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                  {errors.rental_payment_frequency && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.rental_payment_frequency.message}
+                    </p>
+                  )}
+                </div>
               </div>{" "}
               {watch("rental_type") === "Room Rental" && (
                 <>
