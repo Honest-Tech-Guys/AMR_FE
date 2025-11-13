@@ -1,65 +1,37 @@
 "use client";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 import RadioCardsDemo from "@/components/RaidoTab";
-import Datatable, { Column } from "@/components/datatable";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Property } from "@/types/PropertyType";
-import { Calendar, Search } from "lucide-react";
+import { 
+  Calendar, 
+  Search, 
+  ChevronDown, 
+  ChevronUp, 
+  Home, 
+  Users, 
+  DollarSign, 
+  CheckCircle, 
+  XCircle,
+  Plus,
+  ArrowUpDown
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import PropertyDropdown from "../grid-view/PropertyDropDown";
 import EditProperty from "./Actions/EditProperty";
 import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
 import CreateNewProperty from "./CreateNewProperty";
-
-// Import Property type
-// type Property = {
-//   id: number;
-//   property_name: string;
-//   property_type: string;
-//   status: string;
-//   owner_id: number;
-//   created_by: number;
-//   contact_name: string;
-//   contact_phone: string;
-//   remarks: string;
-//   address_line_1: string;
-//   city: string;
-//   postcode: string;
-//   state: string;
-//   country: string;
-//   facilities: string[];
-//   created_at: string;
-//   updated_at: string;
-//   owner: { id: number; name: string };
-//   creator: { id: number; name: string };
-//   units: any[];
-// };
-
-// const options = [
-//   {
-//     value: "all",
-//     label: "ALL",
-//     count: "",
-//   },
-//   {
-//     value: "Vacant",
-//     label: "Vacant ",
-//     count: "50",
-//   },
-//   {
-//     value: "Occupied",
-//     label: "Occupied ",
-//     count: "50",
-//   },
-//   {
-//     value: "Deactivated ",
-//     label: "Deactivated ",
-//     count: "50",
-//   },
-// ];
 
 interface PaginationData {
   page: number;
@@ -100,9 +72,9 @@ const Page = () => {
       count: "",
     },
   ]);
+  
   const router = useRouter();
-  const [isFilter, setIsFilter] = useState(false);
-  const [actionIsOpen, setActionsIsOpen] = useState(false);
+  const [expandedPropertyId, setExpandedPropertyId] = useState<number | null>(null);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,
@@ -111,77 +83,11 @@ const Page = () => {
   });
   const [selectedProperty, setSelectedProperty] = useState<Property>();
   const [openView, setOpenView] = useState(false);
-  const propertyColumns: Column<Property>[] = [
-    {
-      title: "Property",
-      key: "property_name",
-      sortable: true,
-      className: "pl-6 py-4",
-      render: (property) => (
-        <div key={property.id}>
-          <div
-            className="pl-4 text-primary font-medium cursor-pointer"
-            onClick={() => {
-              setSelectedProperty(property);
-              setOpenView(true);
-            }}
-          >
-            {property.property_name}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Type",
-      key: "property_type",
-      sortable: true,
-      render: (property) => <div>{property.property_type}</div>,
-    },
-    {
-      title: "Owner",
-      key: "owner.name",
-      sortable: true,
-      render: (property) => <div>{property.owner.name}</div>,
-    },
-    {
-      title: "Address",
-      key: "city",
-      render: (property) => (
-        <div className=" break-words whitespace-normal">
-          {property.city},{property.state},{property.address_line_1}
-        </div>
-      ),
-    },
-    {
-      title: "Facilities",
-      key: "facilities",
-      render: (property) => <div>{property?.facilities}</div>,
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (order) => (
-        <div>
-          {" "}
-          <PropertyDropdown property={order} />
-        </div>
-      ),
-    },
-  ];
 
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
+  const togglePropertyExpansion = (propertyId: number) => {
+    setExpandedPropertyId(expandedPropertyId === propertyId ? null : propertyId);
+  };
 
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
   const [formFilters, setFormFilters] = useState({
     property_name: "",
     unit_name: "",
@@ -195,6 +101,7 @@ const Page = () => {
 
   const [appliedFilters, setAppliedFilters] = useState({});
   const { data, isLoading, error } = useGetPropertiesList(appliedFilters);
+
   useEffect(() => {
     if (data) {
       setPagination((prev) => ({
@@ -233,6 +140,7 @@ const Page = () => {
       ]);
     }
   }, [data]);
+
   useEffect(() => {
     setAppliedFilters({
       ...formFilters,
@@ -240,13 +148,49 @@ const Page = () => {
       per_page: pagination.per_page.toString(),
     });
   }, [pagination.page, pagination.per_page]);
-  // Map API data to table format
+
   const tableData: Property[] =
     data?.properties.data.map((item: Property) => item) ?? [];
 
+  // Pagination component
+  const PaginationControls = () => {
+    const handlePageChange = (newPage: number) => {
+      if (newPage >= 1 && newPage <= (pagination.last_page || 1)) {
+        setPagination((prev) => ({ ...prev, page: newPage }));
+      }
+    };
+
+    return (
+      <div className="flex items-center justify-between px-4 py-3 border-t">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">
+            Page {pagination.page} of {pagination.last_page}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={pagination.page === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={pagination.page === pagination.last_page}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
-      {/* <HeaderPage title="Property" /> */}
       <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
         <ResponsiveFilter
           filters={[
@@ -296,6 +240,7 @@ const Page = () => {
           formFilters={formFilters}
           setFormFilters={setFormFilters as never}
         />
+
         {/* Actions */}
         <div className="flex w-full justify-end my-3">
           <div className="flex flex-wrap space-x-3">
@@ -303,7 +248,8 @@ const Page = () => {
             <CreateNewProperty />
           </div>
         </div>
-        <div className="flex items-end justify-between">
+
+        <div className="flex items-end justify-between mb-4">
           <RadioCardsDemo
             options={options}
             value={(appliedFilters as { status?: string })?.status || ""}
@@ -311,36 +257,228 @@ const Page = () => {
               setAppliedFilters((prev) => ({ ...prev, status: val }))
             }
           />
-          {/* <div className=" flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsFilter((prev) => !prev)}
-              className="rounded-[6px] h-6 m-0 cursor-pointer"
-            >
-              <Funnel className="mr-2" />
-              Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}
-            </Button>
-          </div> */}
         </div>
-        <Datatable<Property>
-          columns={propertyColumns}
-          data={tableData}
-          isPending={isLoading}
-          pagination={pagination}
-          setPagination={setPagination}
-          rowKey={(item: Property) => item.id}
-          // isFilter={isFilter}
-        />
+
+        {/* Table */}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12"></TableHead>
+                <TableHead>
+                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
+                    Property
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
+                    Type
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
+                    Owner
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Facilities</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : tableData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    No properties found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                tableData.map((property) => (
+                  <>
+                    {/* Property Row */}
+                    <TableRow
+                      key={property.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => togglePropertyExpansion(property.id)}
+                    >
+                      <TableCell>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            togglePropertyExpansion(property.id);
+                          }}
+                          className="p-1 hover:bg-gray-200 rounded transition-colors"
+                        >
+                          {expandedPropertyId === property.id ? (
+                            <ChevronUp className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <div
+                          className="flex items-center gap-2 text-primary font-medium cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedProperty(property);
+                            setOpenView(true);
+                          }}
+                        >
+                          <Home className="w-5 h-5 text-primary" />
+                          {property.property_name}
+                        </div>
+                      </TableCell>
+                      <TableCell>{property.property_type}</TableCell>
+                      <TableCell>{property.owner.name}</TableCell>
+                      <TableCell>
+                        <div className="break-words whitespace-normal max-w-xs">
+                          {property.city},{property.state},{property.address_line_1}
+                        </div>
+                      </TableCell>
+                      <TableCell>{property?.facilities}</TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <PropertyDropdown property={property} />
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Expandable Units Row */}
+                    {expandedPropertyId === property.id && (
+                      <TableRow>
+                        <TableCell colSpan={7} className="bg-gradient-to-r from-green-50 to-blue-50 p-0">
+                          <div className="px-12 py-6">
+                            <div className="mb-4 flex items-center justify-between">
+                              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <Home className="w-5 h-5 text-primary" />
+                                Units in {property.property_name}
+                                <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                                  {property.units?.length || 0} units
+                                </span>
+                              </h3>
+                              <Button className="flex items-center gap-2 text-sm">
+                                <Plus className="w-4 h-4" />
+                                Add Unit
+                              </Button>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                              {!property.units || property.units.length === 0 ? (
+                                <div className="p-8 text-center text-gray-500">
+                                  No units available for this property
+                                </div>
+                              ) : (
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Unit Name</TableHead>
+                                      <TableHead>Status</TableHead>
+                                      <TableHead>Tenant</TableHead>
+                                      <TableHead>Rental Type</TableHead>
+                                      <TableHead>Monthly Rent</TableHead>
+                                      <TableHead>Actions</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {property.units.map((unit: any) => (
+                                      <TableRow key={unit.id} className="hover:bg-gray-50">
+                                        <TableCell className="font-medium">
+                                          {unit.unit_name || unit.name || '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                          {unit.status === 'Occupied' || unit.status === 'occupied' ? (
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                              <CheckCircle className="w-3 h-3" />
+                                              Occupied
+                                            </span>
+                                          ) : (
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                              <XCircle className="w-3 h-3" />
+                                              Vacant
+                                            </span>
+                                          )}
+                                        </TableCell>
+                                        <TableCell>
+                                          <div className="flex items-center gap-2">
+                                            <Users className="w-4 h-4 text-gray-400" />
+                                            <span className="text-sm">
+                                              {unit.tenant_name || unit.tenant || '-'}
+                                            </span>
+                                          </div>
+                                        </TableCell>
+                                        <TableCell>
+                                          {unit.rental_type || '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                          <div className="flex items-center gap-2">
+                                            <DollarSign className="w-4 h-4 text-gray-400" />
+                                            <span className="font-medium">
+                                              RM {unit.monthly_rent || unit.rent || '0'}
+                                            </span>
+                                          </div>
+                                        </TableCell>
+                                        <TableCell>
+                                          <div className="flex gap-2">
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="text-xs"
+                                              onClick={() => {
+                                                console.log('View unit:', unit.id);
+                                              }}
+                                            >
+                                              View
+                                            </Button>
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              className="text-xs"
+                                              onClick={() => {
+                                                console.log('Edit unit:', unit.id);
+                                              }}
+                                            >
+                                              Edit
+                                            </Button>
+                                          </div>
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {/* Pagination */}
+          {!isLoading && tableData.length > 0 && <PaginationControls />}
+        </div>
+
         {error && (
           <div className="text-red-500 mt-2">Error loading properties.</div>
         )}
       </div>
+
       <EditProperty
         onOpenChange={setOpenView}
         open={openView}
         property={selectedProperty}
       />
-      {/* <MapWithPoints /> */}
     </div>
   );
 };
