@@ -51,7 +51,7 @@ interface Props {
 
 const EditMeter = ({ meter, open, onOpenChange }: Props) => {
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(open);
 
   function mapToTreeData(properties: PropertySelection[]): TreeNode[] {
     return properties.map((property) => ({

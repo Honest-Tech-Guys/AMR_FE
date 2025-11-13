@@ -12,10 +12,6 @@ const useCreateBulkBooking = () => {
       });
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Bulk Booking error:", error);
-    },
   });
 };
 

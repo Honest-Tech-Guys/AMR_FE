@@ -32,10 +32,6 @@ const useCreateTenancy = () => {
       );
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create tenancy error:", error);
-    },
   });
 };
 

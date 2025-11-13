@@ -2,28 +2,13 @@
 
 import CustomInput from "@/components/CustomInput";
 import { SelectWithForm } from "@/components/CustomSelect";
-import { Button } from "@/components/ui/button";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import MultiFileUpload from "@/components/input-11";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
-import useAddUnit from "@/lib/services/hooks/useAddUnit";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import AddRoomTagging from "./AddRoomTagging";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -32,10 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AddRoom from "./AddRoom";
-import AddCarPark from "./AddCarpark";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useAddUnit from "@/lib/services/hooks/useAddUnit";
+import { Plus, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import useGetBeneficiariesSelection from "@/lib/services/hooks/useGetbeneficiariesSelection";
+import { useState } from "react";
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { toast } from "sonner";
+import * as yup from "yup";
+import AddCarPark from "./AddCarpark";
+import AddRoom from "./AddRoom";
 
 // Schema & type
 const schema = yup.object({
@@ -216,6 +212,9 @@ const CreateUnit = () => {
         toast.success("Unit created successfully!");
         reset();
         setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

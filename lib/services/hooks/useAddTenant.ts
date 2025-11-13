@@ -19,10 +19,6 @@ const useAddTenant = () => {
       });
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Add tenant error:", error);
-    },
   });
 };
 

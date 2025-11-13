@@ -17,10 +17,6 @@ const useCreateBulkProperty = () => {
       });
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Add property error:", error);
-    },
   });
 };
 

@@ -28,6 +28,7 @@ import Datatable from "@/components/datatable";
 import EquipmentType from "@/types/EquipmentType";
 import { equipmentColumns } from "../[id]/unit/EditUnit";
 import { PaginationData } from "@/components/ui/pagination";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // Schema & type
 const schema = yup.object({
@@ -159,10 +160,8 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
         // Close the dialog
         onOpenChange(false);
       },
-      onError: (error) => {
-        console.error("Update room error:", error);
-        toast.dismiss(loadingToast);
-        toast.error("Failed to update room. Please try again.");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };
@@ -335,10 +334,8 @@ const EditRoom = ({ room, onSuccess, open, onOpenChange }: EditRoomProps) => {
         toast.dismiss(loadingToast);
         toast.success("Settings updated successfully!");
       },
-      onError: (error) => {
-        console.error("Update setting error:", error);
-        toast.dismiss(loadingToast);
-        toast.error("Failed to update settings. Please try again.");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

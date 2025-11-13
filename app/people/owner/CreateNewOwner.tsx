@@ -29,6 +29,7 @@ import useCreateOwner from "@/lib/services/hooks/useCreateOwner";
 import { toast } from "sonner";
 import { useState } from "react";
 import { COUNTRIES, NATIONALITIES } from "@/lib/utilities/Countries";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // Schema & type
 const schema = yup.object({
@@ -99,7 +100,7 @@ const CreateNewOwner = () => {
         setIsOpen(false);
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Failed to create owner.");
+        ErrorToastHandel(err);
       },
     });
   };

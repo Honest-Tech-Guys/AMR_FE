@@ -23,6 +23,7 @@ import { FileData } from "@/types/FileData";
 import useCreateAgreement from "@/lib/services/hooks/useCreateAgreement";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { Tenancy } from "@/types/TenancyType";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 export interface RentalAgreement {
   agreement_date: string;
   landlord_name: string;
@@ -213,6 +214,9 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
         reset();
         refetch();
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

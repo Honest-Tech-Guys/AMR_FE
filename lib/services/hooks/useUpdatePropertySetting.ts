@@ -30,9 +30,6 @@ const useUpdatePropertySetting = () => {
       queryClient.invalidateQueries({ queryKey: ["GetUnitsList"] });
       queryClient.invalidateQueries({ queryKey: ["GetUnit"] });
     },
-    onError: (error) => {
-      console.error("Update property setting error:", error);
-    },
   });
 };
 

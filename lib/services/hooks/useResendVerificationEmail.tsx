@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import { toast } from "sonner";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 const useResendVerificationEmail = () => {
   return useMutation({
     mutationKey: ["useResendVerificationEmail"],
@@ -21,11 +22,8 @@ const useResendVerificationEmail = () => {
         icon: <ShieldCheck className="text-green-700" />,
       });
     },
-    onError: (error) => {
-      console.error("Resend Verification Email", error);
-      toast.error("Failed to Resend Verification Email", {
-        icon: <ShieldAlert className="text-red-500" />,
-      });
+    onError: (err: any) => {
+      ErrorToastHandel(err);
     },
   });
 };

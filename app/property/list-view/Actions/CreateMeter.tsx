@@ -22,6 +22,7 @@ import useGetSelection, {
 import { useEffect, useState } from "react";
 import useAddMeter from "@/lib/services/hooks/useAddMeter";
 import { toast } from "sonner";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // ✅ Schema based on `Meter` type
 const schema = yup.object({
   property_id: yup.string().required("Meter name is required"),
@@ -64,7 +65,7 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
         })),
       }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(open);
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));
@@ -116,6 +117,9 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
         toast.success("Meter created successfully!");
         reset();
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Meter form data:", data);

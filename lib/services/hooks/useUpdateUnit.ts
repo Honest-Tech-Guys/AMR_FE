@@ -34,10 +34,6 @@ const useUpdateUnit = () => {
         }
       );
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Update unit error:", error);
-    },
   });
 };
 

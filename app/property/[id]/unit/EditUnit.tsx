@@ -40,6 +40,7 @@ import { Room } from "@/types/RoomType";
 import { Unit } from "@/types/UnitType";
 import MapRoomViewer from "@/components/MapRoomViewer";
 import EquipmentType from "@/types/EquipmentType";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // Schema & type
 const schema = yup.object({
@@ -560,10 +561,8 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         // Close the dialog
         onOpenChange(false);
       },
-      onError: (error) => {
-        console.error("Update unit error:", error);
-        toast.dismiss(loadingToast);
-        toast.error("Failed to update unit. Please try again.");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };
@@ -610,10 +609,8 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         toast.dismiss(loadingToast);
         toast.success("Settings updated successfully!");
       },
-      onError: (error) => {
-        console.error("Update setting error:", error);
-        toast.dismiss(loadingToast);
-        toast.error("Failed to update settings. Please try again.");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

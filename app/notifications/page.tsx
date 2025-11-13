@@ -1,50 +1,24 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { InputWithIcon } from "@/components/InpuWithIcon";
+import { Button } from "@/components/ui/button";
 import {
   AlertCircle,
   BarChart3,
   Bell,
   Calendar,
   Check,
-  ChevronDown,
-  ChevronUp,
   DollarSign,
-  Ellipsis,
   FileText,
-  Funnel,
   Home,
   Search,
-  Settings,
   User,
   Wrench,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
-import Datatable, { Column } from "@/components/datatable";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import MapWithPoints from "@/components/ImageMapper";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 // import CreateMeter from "./CreateMeter";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import ViewNotification from "./ViewNotification";
-import CheckRole from "@/lib/CheckRole";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useGetNotificationList from "@/lib/services/hooks/useGetNotificationList";

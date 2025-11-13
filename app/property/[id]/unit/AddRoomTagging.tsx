@@ -16,6 +16,7 @@ import { Room } from "@/types/RoomType";
 import { useEffect, useState } from "react";
 import useAddTagRoom from "@/lib/services/hooks/useAddTagRoom";
 import MapWithPoints from "@/components/MapwithSinglePoint";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 interface Props {
   unit_id: number;
@@ -70,6 +71,9 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
         reset();
         setPoints([]);
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
 

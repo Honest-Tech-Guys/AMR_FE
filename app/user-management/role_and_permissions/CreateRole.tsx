@@ -34,6 +34,7 @@ import { useEffect, useState } from "react";
 import useCreateRole from "@/lib/services/hooks/useCreateRole";
 import useGetRole from "@/lib/services/hooks/useGetRole";
 import { toast } from "sonner";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 interface Permission {
   id: number;
   name: string;
@@ -131,6 +132,9 @@ const CreateNewRole = () => {
         reset();
         refetch();
         setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

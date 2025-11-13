@@ -23,6 +23,7 @@ import { FileData } from "@/types/FileData";
 import useUpdateAgreement from "@/lib/services/hooks/useUpdateAgreement";
 import { AgreementType } from "@/types/AgreementType";
 import { fileDataToFileList, schema } from "../CreateAgreement";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 type schemaType = yup.InferType<typeof schema>;
 interface Props {
@@ -114,6 +115,9 @@ const Basic = ({ id, initialData }: Props) => {
     mutate(payload, {
       onSuccess: () => {
         toast.success("Agreement updated successfully!");
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

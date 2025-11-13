@@ -18,9 +18,6 @@ const useUpdateAgreement = (tenancyId: number, agreementId: number) => {
       );
       return res.data;
     },
-    onError: (error) => {
-      console.error("Update agreement error:", error);
-    },
   });
 };
 

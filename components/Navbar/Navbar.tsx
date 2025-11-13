@@ -107,7 +107,8 @@ const Navbar = () => {
                 .map(
                   (segment) =>
                     segment
-                      .replace(/-/g, " ") // "smart home"
+                      .replace(/-/g, " ")
+                      .replace(/_/g, " ") // "smart home"
                       .replace(/\b\w/g, (c) => c.toUpperCase()) // "Smart Home"
                 )
                 .join(" / ")

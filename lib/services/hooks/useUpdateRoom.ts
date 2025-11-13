@@ -27,10 +27,6 @@ const useUpdateRoom = () => {
       queryClient.invalidateQueries({ queryKey: ["GetUnitsList"] });
       queryClient.invalidateQueries({ queryKey: ["GetUnit"] });
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Update room error:", error);
-    },
   });
 };
 

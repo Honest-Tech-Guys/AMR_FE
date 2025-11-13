@@ -61,7 +61,7 @@ const EditLock = ({ lock, open, onOpenChange }: EditLockProps) => {
   } = form;
 
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(open);
 
   useEffect(() => {
     if (data) setTreeData(mapToTreeData(data));

@@ -25,6 +25,7 @@ import { SelectWithForm } from "@/components/CustomSelect";
 import PhoneInput from "@/components/phone-input";
 import { toast } from "sonner";
 import useCreateBeneficiary from "@/lib/services/hooks/useCreateBeneficiary";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // <-- your API hook
 const cities = [
   { id: "johor", name: "Johor" },
@@ -105,7 +106,7 @@ const CreateNewBeneficiary = () => {
         setIsOpen(false);
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Failed to create beneficiary.");
+        ErrorToastHandel(err);
       },
     });
   };

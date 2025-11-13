@@ -1,24 +1,13 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Ellipsis,
-  Funnel,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
-import { useEffect, useState } from "react";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Tenancy } from "@/types/TenancyType";
-import { formatDate } from "@/lib/utils";
 import useGetSummaryInvoiceList from "@/lib/services/hooks/useGetSummaryInvoiceList";
+import { formatDate } from "@/lib/utils";
+import { Tenancy } from "@/types/TenancyType";
+import { Calendar, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 // import CreateInvoice from "./CreateInvoice";
 const options = [
   {

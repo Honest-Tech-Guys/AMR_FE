@@ -10,10 +10,6 @@ const useCreateEquipment = () => {
       const res = await axiosInstance.post("/equipment", newEquipment);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Equipment error:", error);
-    },
   });
 };
 

@@ -35,6 +35,8 @@ import useGetSelection, {
 import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import useCreateBooking from "@/lib/services/hooks/useCreateBooking";
+import { TenantSelect } from "@/components/TenantSelect";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -94,7 +96,7 @@ const CreateNewBooking = () => {
 
   const [tenantData, setTenantData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const { data: tenants } = useGetTenantsList();
+  const { data: tenants } = useGetTenantsList(isOpen);
   useEffect(() => {
     if (tenants) {
       const dataT = tenants.map((t) => {
@@ -118,7 +120,7 @@ const CreateNewBooking = () => {
       })),
     }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(isOpen);
   const { refetch } = useGetBooksList();
   useEffect(() => {
     if (data) {
@@ -160,6 +162,9 @@ const CreateNewBooking = () => {
         refetch();
         setIsOpen(false);
       },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
+      },
     });
     console.log("Form data:", data);
   };
@@ -199,7 +204,7 @@ const CreateNewBooking = () => {
                   </span>
                 )}
               </div>
-              <SelectWithForm<schemaType>
+              <TenantSelect<schemaType>
                 name="tenant"
                 title="Tenant"
                 options={tenantData}

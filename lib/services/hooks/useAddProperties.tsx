@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import { Property } from "@/types/PropertyType";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ export type AddPropertyInput = Omit<
 >;
 
 const useAddProperty = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["AddProperty"],
     mutationFn: async (newProperty: object) => {
@@ -17,6 +18,12 @@ const useAddProperty = () => {
         newProperty
       );
       return res.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch units list
+      queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
+
+      // Optionally update the cache directly for better UX
     },
   });
 };

@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import { toast } from "sonner";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 const useMarkNotification = () => {
   return useMutation({
     mutationKey: ["useMarkNotification"],
@@ -21,11 +22,8 @@ const useMarkNotification = () => {
         icon: <ShieldCheck className="text-green-700" />,
       });
     },
-    onError: (error) => {
-      console.error(" Notification Read", error);
-      toast.error("Failed to  Notification Read", {
-        icon: <ShieldAlert className="text-red-500" />,
-      });
+    onError: (err: any) => {
+      ErrorToastHandel(err);
     },
   });
 };

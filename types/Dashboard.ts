@@ -12,7 +12,8 @@ type Dashboard = {
   rentable_space: {
     total: number;
     vacant: number;
-    occupied: number;
+    partial_occupied: number;
+    fully_occupied: number;
   };
   tenancy_expiry: {
     in_7_days: number;

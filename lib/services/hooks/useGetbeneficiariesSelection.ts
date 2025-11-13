@@ -3,9 +3,10 @@ import axiosInstance from "../ApiCore";
 import OwnerType from "@/types/OwnerType";
 import ResponseType from "@/types/ResponseType";
 
-const useGetBeneficiariesSelection = () => {
+const useGetBeneficiariesSelection = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetBeneficiariesSelection"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/beneficiaries-list";
       {

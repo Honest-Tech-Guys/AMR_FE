@@ -29,6 +29,7 @@ import useAddTenant from "@/lib/services/hooks/useAddTenant";
 import { toast } from "sonner";
 import { useState } from "react";
 import { COUNTRIES, NATIONALITIES } from "@/lib/utilities/Countries";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // Schema & type
 const schema = yup.object({
@@ -93,7 +94,7 @@ const CreateNewTenant = () => {
         setIsOpen(false);
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Failed to create tenant.");
+        ErrorToastHandel(err);
       },
     });
   };

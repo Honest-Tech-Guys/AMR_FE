@@ -3,37 +3,19 @@
 import CustomInput from "@/components/CustomInput";
 import { SelectWithForm } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState, useRef } from "react";
-import { toast } from "sonner";
-import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
-import useGetProfile from "@/lib/services/hooks/useGetProfile";
-import { useAuthStore } from "@/lib/stores/authStore";
-import useUpdateAvatar from "@/lib/services/hooks/useUpdateAvatar";
-import useGetUser from "@/lib/services/hooks/useGetUser";
-import useUpdateProfile from "@/lib/services/hooks/useUpdateProfile";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import useGetUser from "@/lib/services/hooks/useGetUser";
+import useUpdateAvatar from "@/lib/services/hooks/useUpdateAvatar";
+import useUpdateProfile from "@/lib/services/hooks/useUpdateProfile";
 // Schema & type
 const schema = yup.object({
   name: yup.string().optional(),
@@ -57,7 +39,7 @@ const Page = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data } = useGetUser();
+  const { data, refetch } = useGetUser();
   const form = useForm<schemaType>({
     mode: "onTouched",
     defaultValues: {
@@ -109,8 +91,6 @@ const Page = () => {
     }
   }, [data, reset]);
   const { mutate, isPending } = useUpdateProfile();
-
-  const { refetch } = useGetPropertiesList({});
 
   const cities = [
     { id: "johor", name: "Johor" },

@@ -1,31 +1,15 @@
 "use client";
 
-import CustomInput from "@/components/CustomInput";
-import { SelectWithForm } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
-import * as yup from "yup";
+import { FormProvider, useForm } from "react-hook-form";
 // import { yupResolver } from "@hookform/resolvers/yup";
-import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import {
   Table,
   TableBody,
@@ -34,10 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2 } from "lucide-react";
-import useCreateBulkProperty from "@/lib/services/hooks/useCreateBulkProperty";
-import CreateBulk from "./CreateBulk";
 import useCreateBulkBooking from "@/lib/services/hooks/useCreateBulkBooking";
+import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import CreateBulk from "./CreateBulk";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 
 const CreateBulkPropertyModal = () => {
@@ -69,6 +56,9 @@ const CreateBulkPropertyModal = () => {
         refetch();
         setBookings([]);
         setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

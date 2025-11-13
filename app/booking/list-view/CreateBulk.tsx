@@ -109,7 +109,7 @@ const CreateBulk = ({ setPayload }: Props) => {
     []
   );
   const [isOpen, setIsOpen] = useState(false);
-  const { data: tenants } = useGetTenantsList();
+  const { data: tenants } = useGetTenantsList(isOpen);
   useEffect(() => {
     if (tenants) {
       const dataT = tenants.map((t) => {
@@ -133,7 +133,7 @@ const CreateBulk = ({ setPayload }: Props) => {
       })),
     }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(isOpen);
   const { refetch } = useGetBooksList();
   useEffect(() => {
     if (data) {

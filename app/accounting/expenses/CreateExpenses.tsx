@@ -50,6 +50,7 @@ const schema = yup.object({
 type schemaType = yup.InferType<typeof schema>;
 
 const CreateExpenses = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -61,7 +62,7 @@ const CreateExpenses = () => {
     formState: { errors },
   } = form;
 
-  const { data: tenancies } = useGetTenancyFieldList();
+  const { data: tenancies } = useGetTenancyFieldList(isOpen);
   const [tenancyData, setTenancyData] = useState([]);
   const [items, setItems] = useState<any[]>([]);
 
@@ -104,7 +105,7 @@ const CreateExpenses = () => {
   const total = subtotal + tax;
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">
           Create New Expenses

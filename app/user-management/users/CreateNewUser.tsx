@@ -1,6 +1,9 @@
 "use client";
 
 import CustomInput from "@/components/CustomInput";
+import { SelectWithForm } from "@/components/CustomSelect";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
+import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,22 +13,21 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import useCreateNewUser from "@/lib/services/hooks/useCreateNewUser";
+import useGetRoleSelection from "@/lib/services/hooks/useGetRoleSelection";
+import useGetUserList from "@/lib/services/hooks/useGetUserList";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useState } from "react";
 import {
   Controller,
   FormProvider,
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import * as yup from "yup";
-import HeaderSection from "@/components/HeaderSection";
-import useGetRoleSelection from "@/lib/services/hooks/useGetRoleSelection";
-import { useEffect, useState } from "react";
-import { SelectWithForm } from "@/components/CustomSelect";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import useCreateNewUser from "@/lib/services/hooks/useCreateNewUser";
-import useGetUnitsList from "@/lib/services/hooks/useGetUnit";
 import { toast } from "sonner";
+import * as yup from "yup";
 // Schema & type
 const schema = yup.object({
   username: yup.string().required("User name is required"),
@@ -46,6 +48,8 @@ const CreateNewUser = () => {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema) as any,
+    defaultValues: { status: "true" },
   });
   const {
     setValue,
@@ -55,9 +59,9 @@ const CreateNewUser = () => {
     control,
     formState: { errors },
   } = form;
-
+  console.log(errors);
   const [roles, setRoles] = useState([]);
-  const { data } = useGetRoleSelection();
+  const { data } = useGetRoleSelection(isOpen);
   useEffect(() => {
     if (data) {
       const dataT = data.map((role) => {
@@ -65,9 +69,10 @@ const CreateNewUser = () => {
       });
       setRoles(dataT as never);
     }
-  }, [data]);
+  }, [data, setRoles]);
+  console.log(roles);
   const { mutate, isPending } = useCreateNewUser();
-  const { refetch } = useGetUnitsList();
+  const { refetch } = useGetUserList();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload = {
       name: data.username,
@@ -82,6 +87,9 @@ const CreateNewUser = () => {
         reset();
         refetch();
         setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Form data:", data);
@@ -145,11 +153,11 @@ const CreateNewUser = () => {
                 placeholder="Re-enter password"
               />
 
-              {/* <SelectWithForm<schemaType>
+              <SelectWithForm<schemaType>
                 name="role_id"
                 title="Role"
                 options={roles}
-              /> */}
+              />
 
               <div className="flex flex-col  space-y-3">
                 <Label htmlFor="auto_create_passcode">Active</Label>

@@ -10,9 +10,6 @@ const useCreateBooking = () => {
       const res = await axiosInstance.post<Property>("/bookings", newBooking);
       return res.data;
     },
-    onError: (error) => {
-      console.error("Create Booking error:", error);
-    },
   });
 };
 

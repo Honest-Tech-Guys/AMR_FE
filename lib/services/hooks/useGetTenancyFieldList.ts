@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-const useGetTenancyFieldList = () => {
+const useGetTenancyFieldList = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetTenancyFieldList"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/tenancies-list";
       {

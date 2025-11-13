@@ -1,11 +1,11 @@
+import { PropertyApi } from "@/types/PropertyType";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import ResponseType from "@/types/ResponseType";
-import PaginationType from "@/types/PaginationType";
-import { PropertyApi } from "@/types/PropertyType";
 const useGetPropertiesList = (params: Object) => {
+  const isParamsValid = Object.keys(params).length > 0;
   return useQuery({
     queryKey: ["GetPropertiesList", params],
+    enabled: isParamsValid,
     queryFn: () => {
       const url = "/properties";
       {

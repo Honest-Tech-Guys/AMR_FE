@@ -3,9 +3,10 @@ import axiosInstance from "../ApiCore";
 import { TenantType } from "@/types/TenantType";
 import ResponseType from "@/types/ResponseType";
 
-const useGetTenantsList = () => {
+const useGetTenantsList = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetTenantsList"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/tenants-list";
       {

@@ -29,10 +29,6 @@ const useRegister = () => {
           }
         });
     },
-    onSuccess: () => {},
-    onError: (error) => {
-      console.error("Login error:", error);
-    },
   });
 };
 export default useRegister;

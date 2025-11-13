@@ -29,6 +29,7 @@ import useGetSelection, {
 } from "@/lib/services/hooks/useGetSelection";
 import { toast } from "sonner";
 import useAddLock from "@/lib/services/hooks/useAddLock";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property id is required"),
@@ -77,7 +78,7 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
         })),
       }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(open);
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));
@@ -124,6 +125,9 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
         reset();
         // setIsOpen(false);
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Lock form data:", data);

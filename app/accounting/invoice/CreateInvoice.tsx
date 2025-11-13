@@ -47,6 +47,7 @@ const schema = yup.object({
 });
 type schemaType = yup.InferType<typeof schema>;
 const CreateInvoice = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -68,7 +69,7 @@ const CreateInvoice = () => {
     { id: "5", name: "Townhouse" },
   ];
 
-  const { data: tenancies } = useGetTenancyFieldList();
+  const { data: tenancies } = useGetTenancyFieldList(isOpen);
   const [tenancyData, setTenancyData] = useState([]);
   const [items, setItems] = useState<any[]>([]);
   const onSubmit: SubmitHandler<schemaType> = (data) => {
@@ -99,7 +100,7 @@ const CreateInvoice = () => {
     }
   }, [tenancies, watch("tenancy"), setValue]);
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">Create New Invoice</Button>
       </DialogTrigger>

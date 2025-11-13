@@ -12,10 +12,6 @@ const useCreateNewUser = () => {
       const res = await axiosInstance.post("/admins/users", newUser);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create New User error:", error);
-    },
   });
 };
 

@@ -14,9 +14,6 @@ const useCreateTenancyDocument = (id: number) => {
       });
       return res.data;
     },
-    onError: (error) => {
-      console.error("Add property error:", error);
-    },
   });
 };
 

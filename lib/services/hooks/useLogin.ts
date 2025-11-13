@@ -33,10 +33,6 @@ const useLogin = () => {
           }
         });
     },
-    onSuccess: () => {},
-    onError: (error) => {
-      console.error("Login error:", error.message);
-    },
   });
 };
 export default useLogin;

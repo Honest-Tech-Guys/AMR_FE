@@ -22,6 +22,7 @@ import useGetSelection, {
 import { useEffect, useState } from "react";
 import useAddMeter from "@/lib/services/hooks/useAddMeter";
 import { toast } from "sonner";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // ✅ Schema based on `Meter` type
 const schema = yup.object({
   property_id: yup.string().required("Meter name is required"),
@@ -68,6 +69,7 @@ const treeDataDummy = [
 type SchemaType = yup.InferType<typeof schema>;
 
 const CreateMeter = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
   function mapToTreeData(properties: PropertySelection[]): TreeNode[] {
     return properties.map((property) => ({
@@ -83,7 +85,7 @@ const CreateMeter = () => {
       })),
     }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(isOpen);
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));
@@ -134,14 +136,17 @@ const CreateMeter = () => {
       onSuccess: () => {
         toast.success("Unit created successfully!");
         reset();
-        // setIsOpen(false);
+        setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Meter form data:", data);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <Button className="rounded-[6px] text-white">Create New Meter</Button>
       </DialogTrigger>

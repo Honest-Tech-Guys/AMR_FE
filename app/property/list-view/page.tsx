@@ -1,39 +1,18 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Ellipsis,
-  Funnel,
-  Gauge,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ResponsiveFilter } from "@/components/responsive-filter";
 import RadioCardsDemo from "@/components/RaidoTab";
 import Datatable, { Column } from "@/components/datatable";
-import { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import CreateNewProperty from "./CreateNewProperty";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import EditProperty from "./Actions/EditProperty";
-import CreateUnit from "./Actions/CreateUnit";
-import CreateTenancy from "./Actions/CreateTenancy";
-import CreateMeter from "./Actions/CreateMeter";
-import CreateEquipment from "./Actions/CreateEquipment";
-import MapWithPoints from "@/components/ImageMapper";
-import CreateInvoice from "./Actions/CreateInvoice";
+import { ResponsiveFilter } from "@/components/responsive-filter";
+import { Button } from "@/components/ui/button";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import PropertyDropdown from "../grid-view/PropertyDropDown";
-import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
 import { Property } from "@/types/PropertyType";
+import { Calendar, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import PropertyDropdown from "../grid-view/PropertyDropDown";
+import EditProperty from "./Actions/EditProperty";
+import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
+import CreateNewProperty from "./CreateNewProperty";
 
 // Import Property type
 // type Property = {
@@ -130,6 +109,7 @@ const Page = () => {
     last_page: 1,
     links: [],
   });
+  const [selectedProperty, setSelectedProperty] = useState<Property>();
   const [openView, setOpenView] = useState(false);
   const propertyColumns: Column<Property>[] = [
     {
@@ -141,15 +121,13 @@ const Page = () => {
         <div key={property.id}>
           <div
             className="pl-4 text-primary font-medium cursor-pointer"
-            onClick={() => setOpenView(true)}
+            onClick={() => {
+              setSelectedProperty(property);
+              setOpenView(true);
+            }}
           >
             {property.property_name}
           </div>
-          <EditProperty
-            onOpenChange={setOpenView}
-            open={openView}
-            property={property}
-          />
         </div>
       ),
     },
@@ -357,6 +335,11 @@ const Page = () => {
           <div className="text-red-500 mt-2">Error loading properties.</div>
         )}
       </div>
+      <EditProperty
+        onOpenChange={setOpenView}
+        open={openView}
+        property={selectedProperty}
+      />
       {/* <MapWithPoints /> */}
     </div>
   );

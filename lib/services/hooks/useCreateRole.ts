@@ -13,10 +13,6 @@ const useCreateRole = () => {
       const res = await axiosInstance.post("/roles", newRole);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Role error:", error);
-    },
   });
 };
 

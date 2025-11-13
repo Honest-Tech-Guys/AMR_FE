@@ -39,6 +39,7 @@ import useGetTenancyFieldList from "@/lib/services/hooks/useGetTenancyFieldList"
 import useCreateInvoice from "@/lib/services/hooks/useCreateInvoice";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   tenant: yup.string().required("Tenant is required"),
@@ -57,7 +58,7 @@ interface Props {
 const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
   const [tenancyData, setTenancyData] = useState([]);
   const [items, setItems] = useState<any[]>([]);
-  const { data: tenancies } = useGetTenancyFieldList();
+  const { data: tenancies } = useGetTenancyFieldList(open);
   const { mutate, isPending } = useCreateInvoice();
   const form = useForm<schemaType>({
     mode: "onTouched",
@@ -112,6 +113,9 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
         toast.success("Invoice created successfully!");
         reset();
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Form data:", api_data);

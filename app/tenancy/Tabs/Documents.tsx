@@ -28,6 +28,7 @@ import DragAndDropFiles from "@/components/input-12";
 import useCreateTenancyDocument from "@/lib/services/hooks/useCreateTenancyDocument";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { fileDataToFileList } from "../Agreement/CreateAgreement";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 const getAuthToken = () => {
   // Try different token storage methods
   return (
@@ -125,6 +126,9 @@ const DocumentsTap = ({ tenancy }: Props) => {
         toast.success("Rental agreement created successfully!");
         reset();
         refetch();
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

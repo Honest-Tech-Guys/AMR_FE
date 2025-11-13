@@ -2,6 +2,9 @@
 
 import CustomInput from "@/components/CustomInput";
 import { SelectWithForm } from "@/components/CustomSelect";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
+import HeaderSection from "@/components/HeaderSection";
+import PhoneInput from "@/components/phone-input";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,23 +13,19 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useAddProperty from "@/lib/services/hooks/useAddProperties";
+import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
+import { useAuthStore } from "@/lib/stores/authStore";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useMemo, useState } from "react";
 import {
   Controller,
   FormProvider,
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
-import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import { useAuthStore } from "@/lib/stores/authStore";
-import ErrorToastHandel from "@/components/ErrorToastHandel";
+import * as yup from "yup";
 
 const CreateNewProperty = () => {
   const [owners, setOwners] = useState<{ id: string; name: string }[]>([]);
@@ -85,8 +84,7 @@ const CreateNewProperty = () => {
   } = form;
 
   const { mutate, error, isPending } = useAddProperty();
-  const { data } = useGetOwnersSelection();
-  const { refetch } = useGetPropertiesList({});
+  const { data } = useGetOwnersSelection(isOpen);
 
   useEffect(() => {
     if (data) {
@@ -126,7 +124,7 @@ const CreateNewProperty = () => {
 
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     const payload = {
-      // property_name: data.property_name,
+      property_name: data.property_name,
       owner_id: data.owner_id,
       owner_phone: data.owner_phone_number,
       contact_name: data.contact_name || null,
@@ -145,7 +143,6 @@ const CreateNewProperty = () => {
       onSuccess: () => {
         toast.success("Property created successfully!");
         reset();
-        refetch();
         setIsOpen(false);
       },
       onError: (err: any) => {

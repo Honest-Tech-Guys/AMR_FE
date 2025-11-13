@@ -31,6 +31,7 @@ import { PaginationData } from "@/components/ui/pagination";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import { Property } from "@/types/PropertyType";
 import { Unit } from "@/types/UnitType";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 const unitColumns: Column<Unit>[] = [
   {
@@ -107,7 +108,7 @@ const EditProperty = ({
     per_page: 10,
   });
   const [owners, setOwners] = useState<{ id: string; name: string }[]>([]);
-  const { data: ownersData } = useGetOwnersSelection();
+  const { data: ownersData } = useGetOwnersSelection(open);
 
   const form = useForm<SchemaType>({
     mode: "onTouched",
@@ -230,9 +231,8 @@ const EditProperty = ({
         onSuccess?.();
         onOpenChange(false);
       },
-      onError: () => {
-        toast.dismiss(loadingToast);
-        toast.error("Failed to update property");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

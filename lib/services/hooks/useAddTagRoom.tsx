@@ -25,10 +25,6 @@ const useAddTagRoom = (unit_id: number) => {
 
       // Optionally update the cache directly for better UX
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Add Tag error:", error);
-    },
   });
 };
 

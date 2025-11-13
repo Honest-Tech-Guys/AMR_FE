@@ -24,11 +24,11 @@ const useUpdateProperty = () => {
     },
     onSuccess: (updatedProperty) => {
       // Invalidate and refetch properties list
-      queryClient.invalidateQueries({ queryKey: ["GetProperties"] });
+      queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
 
       // Optionally update the cache directly for better UX
       queryClient.setQueryData(
-        ["GetProperties"],
+        ["GetPropertiesList"],
         (oldData: Property[] | undefined) => {
           if (!oldData) return [updatedProperty];
           return oldData.map((property) =>

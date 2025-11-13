@@ -12,11 +12,13 @@ import CreateNewTenant from "./CreateNewTenant";
 
 import useGetTenantList from "@/lib/services/hooks/useGetTenantsList";
 import EditTenant from "./EditTenant";
+import { TenantType } from "@/types/TenantType";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const { data, isLoading, error } = useGetTenantList();
   const [open, setOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState<TenantType>();
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
@@ -118,8 +120,11 @@ const Page = () => {
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
                 <label
-                  className="font-bold text-[#337AB7] text-lg"
-                  onClick={() => setOpen(true)}
+                  className="font-bold text-[#337AB7] text-lg cursor-pointer"
+                  onClick={() => {
+                    setSelectedTenant(tenant);
+                    setOpen(true);
+                  }}
                 >
                   {tenant.name}
                 </label>
@@ -177,11 +182,15 @@ const Page = () => {
                     </Badge>
                   </p>
                 </div>
-                <EditTenant tenant={tenant} isOpen={open} setIsOpen={setOpen} />
               </div>
             ))}
           </div>
         )}
+        <EditTenant
+          tenant={selectedTenant as TenantType}
+          isOpen={open}
+          setIsOpen={setOpen}
+        />
 
         {!isLoading && !error && (!data || data.length === 0) && (
           <div className="text-center py-8">

@@ -35,6 +35,7 @@ import useGetBeneficiariesSelection from "@/lib/services/hooks/useGetbeneficiari
 import { FileData } from "@/types/FileData";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/lib/stores/authStore";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // 👇 Define the schema factory function so it can depend on user_role
 const createSchema = (user_role: string) =>
@@ -211,7 +212,7 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       currentCarparks.filter((c) => c.id !== carparkId)
     );
 
-  const { data } = useGetBeneficiariesSelection();
+  const { data } = useGetBeneficiariesSelection(open);
   const [beneficiaries, setBeneficiaries] = useState<
     { id: string; name: string }[]
   >([]);
@@ -276,6 +277,9 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
         queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         reset();
         onOpenChange(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

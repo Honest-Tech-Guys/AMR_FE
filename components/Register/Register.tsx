@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import useRegister from "@/lib/services/hooks/useRegister";
 
 import { toast } from "sonner";
+import ErrorToastHandel from "../ErrorToastHandel";
 interface RegisterModel {
   name: string;
   email: string;
@@ -57,6 +58,9 @@ const Register = ({ setStatus }: Props) => {
         toast.success("Register successfully!");
         reset();
         setStatus("Login");
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
   };

@@ -14,10 +14,6 @@ const useUpdateRole = () => {
       const res = await axiosInstance.put(`/roles/${Role.id}`, Role);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Role error:", error);
-    },
   });
 };
 

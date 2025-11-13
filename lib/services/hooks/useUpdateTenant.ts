@@ -4,10 +4,8 @@ import { TenantType } from "@/types/TenantType";
 
 // The input type for updating tenants - includes id and omits auto-generated fields
 export type UpdateTenantInput = Partial<
-  Omit<TenantType, "id" | "created_at" | "updated_at">
-> & {
-  id: number; // id is required for updates
-};
+  Omit<TenantType, "created_at" | "updated_at">
+>;
 
 const useUpdateTenant = () => {
   const queryClient = useQueryClient();
@@ -16,10 +14,11 @@ const useUpdateTenant = () => {
     mutationKey: ["UpdateTenant"],
     mutationFn: async (updatedTenant: UpdateTenantInput) => {
       const { id, ...updateData } = updatedTenant;
-      const res = await axiosInstance.put<TenantType>(
-        `/tenants/${id}`,
-        updateData
-      );
+      const res = await axiosInstance.put<TenantType>(`/tenants/${id}`, {
+        name: updateData.name,
+        email: updateData.email,
+        tenant_profile: updateData,
+      });
       return res.data;
     },
     onSuccess: (updatedTenant) => {
@@ -36,10 +35,6 @@ const useUpdateTenant = () => {
           );
         }
       );
-    },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Update tenant error:", error);
     },
   });
 };

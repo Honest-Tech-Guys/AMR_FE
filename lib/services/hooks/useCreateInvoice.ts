@@ -10,10 +10,6 @@ const useCreateInvoice = () => {
       const res = await axiosInstance.post("/invoices", newInvoice);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Invoice error:", error);
-    },
   });
 };
 

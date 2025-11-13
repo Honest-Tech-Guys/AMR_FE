@@ -19,10 +19,6 @@ const useAddMeter = () => {
       const res = await axiosInstance.post<Meter>("/meters", newMeter);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Add meter error:", error);
-    },
   });
 };
 

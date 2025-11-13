@@ -18,6 +18,7 @@ import useCreateEquipment from "@/lib/services/hooks/useCreateEquipment";
 import { toast } from "sonner";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { useEffect } from "react";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 // Schema & type
 const schema = yup.object({
@@ -147,8 +148,8 @@ const CreateEquipment = ({ id, type, onOpenChange, open }: Props) => {
         refetch();
         onOpenChange(false);
       },
-      onError: () => {
-        toast.error("Failed to create equipment. Please try again.");
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
 

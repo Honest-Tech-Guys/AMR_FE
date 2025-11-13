@@ -30,6 +30,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as yup from "yup";
 import { Eye } from "lucide-react";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 interface Permission {
   id: number;
   name: string;
@@ -141,6 +142,9 @@ const EditRole = ({ role }: Props) => {
           reset();
           refetch();
           setIsOpen(false);
+        },
+        onError: (err: any) => {
+          ErrorToastHandel(err);
         },
       }
     );

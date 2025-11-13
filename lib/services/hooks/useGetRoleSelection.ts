@@ -4,16 +4,17 @@ import OwnerType from "@/types/OwnerType";
 import ResponseType from "@/types/ResponseType";
 import User from "@/types/UserType";
 
-const useGetRoleSelection = () => {
+const useGetRoleSelection = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetRoleSelection"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/roles/selection-list";
       {
         return axiosInstance
-          .get<ResponseType<User[]>>(url)
+          .get<User[]>(url)
           .then((res) => {
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

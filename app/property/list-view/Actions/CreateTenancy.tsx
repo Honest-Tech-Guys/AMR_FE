@@ -1,38 +1,29 @@
 "use client";
 
 import CustomInput from "@/components/CustomInput";
-import { SelectWithForm } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
+import { TenantSelect } from "@/components/TenantSelect";
 import { TreeNode, TreeSelect } from "@/components/TreeSelect";
+import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
 import useGetSelection, {
   PropertySelection,
 } from "@/lib/services/hooks/useGetSelection";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
-import useCreateTenancy from "@/lib/services/hooks/useCreateTenancy";
-import { TenantSelect } from "@/components/TenantSelect";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property name is required"),
@@ -74,7 +65,7 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
   const { mutate, isPending } = useCreateTenancy();
   console.log(errors);
   const [tenantData, setTenantData] = useState([]);
-  const { data: tenants } = useGetTenantsList();
+  const { data: tenants } = useGetTenantsList(open);
   useEffect(() => {
     if (tenants) {
       const dataT = tenants.map((t) => {
@@ -127,6 +118,9 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
         reset();
         onOpenChange(false);
       },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
+      },
     });
   };
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
@@ -147,7 +141,7 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
         }))
       );
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(open);
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));

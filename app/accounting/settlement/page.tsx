@@ -1,45 +1,12 @@
 "use client";
 import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  CircleArrowDown,
-  Ellipsis,
-  Funnel,
-  PenLine,
-  Plus,
-  Search,
-  Share2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Column } from "@/components/datatable";
 import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
-import Datatable, { Column } from "@/components/datatable";
+import { Button } from "@/components/ui/button";
+import { Calendar, Search } from "lucide-react";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import SettlementTable from "./TableData";
 const options = [
   {

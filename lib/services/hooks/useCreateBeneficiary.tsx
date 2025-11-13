@@ -11,10 +11,6 @@ const useCreateBeneficiary = () => {
       const res = await axiosInstance.post("/beneficiaries", newBeneficiary);
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Beneficiary error:", error);
-    },
   });
 };
 

@@ -14,10 +14,6 @@ const useCreateExpenses = () => {
       );
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Create Invoice error:", error);
-    },
   });
 };
 

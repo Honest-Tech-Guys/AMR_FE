@@ -28,10 +28,6 @@ const useAddUnit = () => {
       });
       return res.data;
     },
-    onError: (error) => {
-      // Optionally handle error globally
-      console.error("Add unit error:", error);
-    },
   });
 };
 

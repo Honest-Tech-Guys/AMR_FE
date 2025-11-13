@@ -2,15 +2,20 @@
 
 import CustomInput from "@/components/CustomInput";
 import { SelectWithForm } from "@/components/CustomSelect";
+import HeaderSection from "@/components/HeaderSection";
+import PhoneInput from "@/components/phone-input";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   Controller,
   FormProvider,
@@ -18,15 +23,6 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import HeaderSection from "@/components/HeaderSection";
-import PhoneInput from "@/components/phone-input";
-import useAddProperty from "@/lib/services/hooks/useAddProperties";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import { Plus } from "lucide-react";
 // Schema & type
 const schema = yup.object({
   postcode: yup.string().required("Country is required"),
@@ -85,7 +81,7 @@ const CreateBulk = ({ payload, setPayload }: Props) => {
     handleSubmit,
     formState: { errors },
   } = form;
-  const { data } = useGetOwnersSelection();
+  const { data } = useGetOwnersSelection(isOpen);
   useEffect(() => {
     if (data) {
       const dataT = data.map((owner) => {

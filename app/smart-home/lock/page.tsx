@@ -1,39 +1,13 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { InputWithIcon } from "@/components/InpuWithIcon";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Ellipsis,
-  Funnel,
-  Search,
-  User,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
-import RadioCardsDemo from "@/components/RaidoTab";
-import Datatable, { Column } from "@/components/datatable";
+import { Button } from "@/components/ui/button";
+import { Calendar, Search, User } from "lucide-react";
 import { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import MapWithPoints from "@/components/ImageMapper";
-import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import { Badge } from "@/components/ui/badge";
-import CreateLock from "./CreateLock";
 import useGetLocksList from "@/lib/services/hooks/useGetLockList";
+import CreateLock from "./CreateLock";
 import EditLock from "./EditLock";
 const options = [
   {

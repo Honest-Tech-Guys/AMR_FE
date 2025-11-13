@@ -3,9 +3,10 @@ import axiosInstance from "../ApiCore";
 import OwnerType from "@/types/OwnerType";
 import ResponseType from "@/types/ResponseType";
 
-const useGetOwnersSelection = () => {
+const useGetOwnersSelection = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetOwnersListSelection"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/owners-list";
       {

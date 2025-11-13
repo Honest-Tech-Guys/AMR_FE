@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 
 interface TopUp {
   message: string;
@@ -21,8 +22,8 @@ const useTopUp = () => {
         window.open(data.payment_url, "_blank");
       }
     },
-    onError: (error) => {
-      console.error("Top-up error:", error);
+    onError: (err: any) => {
+      ErrorToastHandel(err);
     },
   });
 };

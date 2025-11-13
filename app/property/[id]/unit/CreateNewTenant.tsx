@@ -27,6 +27,7 @@ import MultiFileUpload from "@/components/input-11";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useAddTenant from "@/lib/services/hooks/useAddTenant";
 import { toast } from "sonner";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   type: yup.string().required("Type is required"),
@@ -101,7 +102,7 @@ const CreateNewTenant = () => {
         reset();
       },
       onError: (err: any) => {
-        toast.error(err?.message || "Failed to create tenant.");
+        ErrorToastHandel(err);
       },
     });
   };

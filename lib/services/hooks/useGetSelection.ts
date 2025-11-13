@@ -21,9 +21,10 @@ export type PropertySelection = {
 
 type PropertiesResponse = PropertySelection[];
 
-const useGetSelection = () => {
+const useGetSelection = (isGet: boolean) => {
   return useQuery({
     queryKey: ["GetSelection"],
+    enabled: !!isGet,
     queryFn: () => {
       const url = "/properties/selection-list";
       {

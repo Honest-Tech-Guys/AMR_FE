@@ -17,7 +17,7 @@ import {
   useForm,
 } from "react-hook-form";
 import * as yup from "yup";
-// import { yupResolver } from "@hookform/resolvers/yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import HeaderSection from "@/components/HeaderSection";
 import PhoneInput from "@/components/phone-input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,7 @@ import useGetSelection, {
 } from "@/lib/services/hooks/useGetSelection";
 import { toast } from "sonner";
 import useAddLock from "@/lib/services/hooks/useAddLock";
+import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property id is required"),
@@ -41,8 +42,13 @@ type SchemaType = yup.InferType<typeof schema> & {
   [key: string]: any; // allow dynamic fields
 };
 const CreateLock = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const form = useForm<SchemaType>({
     mode: "onTouched",
+    resolver: yupResolver(schema),
+    defaultValues: {
+      auto_create_passcode: "false",
+    },
   });
   const {
     setValue,
@@ -68,7 +74,7 @@ const CreateLock = () => {
       })),
     }));
   }
-  const { data } = useGetSelection();
+  const { data } = useGetSelection(isOpen);
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));
@@ -104,7 +110,7 @@ const CreateLock = () => {
       .map((f) => f.id);
     const payload: any = {
       serial_number: data.serial_number,
-      auto_create_passcode: data.auto_create_passcode,
+      auto_create_passcode: Boolean(data.auto_create_passcode),
       self_check_options: self_check_options,
       ...parseValue(data.property_id),
     };
@@ -113,14 +119,17 @@ const CreateLock = () => {
       onSuccess: () => {
         toast.success("Lock created successfully!");
         reset();
-        // setIsOpen(false);
+        setIsOpen(false);
+      },
+      onError: (err: any) => {
+        ErrorToastHandel(err);
       },
     });
     console.log("Lock form data:", data);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-[6px] text-white">Create New Lock</Button>
       </DialogTrigger>
@@ -152,7 +161,12 @@ const CreateLock = () => {
                   name="property_id"
                   placeholder="Choose item..."
                   treeData={treeData}
-                />
+                />{" "}
+                {errors.property_id && (
+                  <span className="text-red-500 text-sm">
+                    {errors.property_id.message}
+                  </span>
+                )}
               </div>
               <div>
                 <div className="flex flex-col  space-y-3">
