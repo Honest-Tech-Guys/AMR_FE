@@ -45,7 +45,7 @@ const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
+    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
     <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
     <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
     <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
@@ -80,7 +80,7 @@ const Page = () => {
             },
             {
               name: "unit_name",
-              placeholder: "Unit Name",
+              placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },

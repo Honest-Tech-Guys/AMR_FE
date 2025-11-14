@@ -9,7 +9,7 @@ interface Props {
 }
 const HeaderPage = ({ title, children }: Props) => {
   return (
-    <div className="w-full flex justify-between p-3 font-bold rounded-[6px] bg-white ">
+    <div className="w-full flex justify-between p-3 font-bold rounded-[6px] bg-white  normal-case ">
       {capitalize(title)}
       {children}
     </div>

@@ -200,9 +200,9 @@ export default function DashboardPage() {
             {/* <span className="text-green-600 text-sm font-semibold cursor-pointer hover:bg-green-50 rounded-md px-2 py-1">
               Details
             </span> */}
-            <h3 className="font-semibold text-gray-800 ">
+            {/* <h3 className="font-semibold text-gray-800 ">
               Current Tenancy Status
-            </h3>
+            </h3> */}
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -262,7 +262,7 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {[
                   {
-                    label: "Full Occupied",
+                    label: "Fully Occupied",
                     value: fully_occupied,
                     color: "bg-green-500",
                   },
@@ -277,6 +277,13 @@ export default function DashboardPage() {
                   <div
                     key={item.label}
                     className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg hover:bg-gray-100 transition hover:cursor-pointer"
+                    onClick={() => {
+                      item.label === "Total"
+                        ? router.push(`/property/list-view`)
+                        : router.push(
+                            `/property/list-view?status=${item.label}`
+                          );
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -303,12 +310,6 @@ export default function DashboardPage() {
             {/* <span className="text-green-600 text-sm font-semibold cursor-pointer hover:bg-green-50 rounded-md px-2 py-1">
               Details
             </span> */}
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-2">
-                Paid vs Unpaid
-              </h3>
-              <p className="text-gray-500 text-sm mb-6">{month}</p>
-            </div>
           </CardHeader>
           <CardContent>
             <div className="text-center mb-8">
@@ -401,7 +402,7 @@ export default function DashboardPage() {
             {/* <span className="text-green-600 text-sm font-semibold cursor-pointer hover:bg-green-50 rounded-md px-2 py-1">
               Details
             </span> */}
-            <p className="text-gray-600 text-sm">{month}</p>
+            {/* <p className="text-gray-600 text-sm">{month}</p> */}
           </CardHeader>
           <CardContent className="text-center ">
             <div className="grid md:grid-cols-2 gap-10 items-center">

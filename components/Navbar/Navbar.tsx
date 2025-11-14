@@ -25,8 +25,7 @@ const Navbar = () => {
   const { data } = useGetUser();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const pathname = usePathname();
-  // Function to toggle fullscreen
-  console.log(pathname);
+
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
@@ -76,6 +75,23 @@ const Navbar = () => {
       {children}
     </DropdownMenuItem>
   );
+  const formatted = pathname
+    ? pathname
+        .split("/") // ["", "smart-home", "meter"]
+        .filter(Boolean) // ["smart-home", "meter"]
+        .map(
+          (segment) =>
+            segment
+              .replace(/[-_]/g, " ") // smart home
+              .split(" ") // ["smart", "home"]
+              .map(
+                (word) =>
+                  word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+              )
+              .join(" ") // Smart Home
+        )
+        .join(" / ")
+    : "Dashboard";
   return (
     <header className="bg-background sticky z-1 top-0 flex h-12 shrink-0 items-center ml-1  gap-2 border-b px-8">
       {user_role !== "Tenant" && <SidebarTrigger className="-ml-1" />}
@@ -98,23 +114,9 @@ const Navbar = () => {
           Top Up
         </p>
       </div> */}
-      <HeaderPage
-        title={
-          pathname
-            ? pathname
-                .split("/") // ["", "smart-home", "meter"]
-                .filter(Boolean) // remove empty string → ["smart-home", "meter"]
-                .map(
-                  (segment) =>
-                    segment
-                      .replace(/-/g, " ")
-                      .replace(/_/g, " ") // "smart home"
-                      .replace(/\b\w/g, (c) => c.toUpperCase()) // "Smart Home"
-                )
-                .join(" / ")
-            : "Dashboard"
-        }
-      />
+      <div className="w-full flex justify-between p-3 font-bold rounded-[6px] bg-white normal-case ">
+        {formatted}
+      </div>
       <div className="flex gap-3 items-center justify-end w-full">
         <Scan
           onClick={toggleFullscreen}

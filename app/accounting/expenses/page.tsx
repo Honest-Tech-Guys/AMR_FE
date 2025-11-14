@@ -163,7 +163,7 @@ const Page = () => {
             },
             {
               name: "unit_name",
-              placeholder: "Unit Name",
+              placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },

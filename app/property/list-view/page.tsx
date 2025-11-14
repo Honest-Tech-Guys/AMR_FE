@@ -13,25 +13,32 @@ import {
 } from "@/components/ui/table";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { Property } from "@/types/PropertyType";
-import { 
-  Calendar, 
-  Search, 
-  ChevronDown, 
-  ChevronUp, 
-  Home, 
-  Users, 
-  DollarSign, 
-  CheckCircle, 
+import {
+  Calendar,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  Users,
+  DollarSign,
+  CheckCircle,
   XCircle,
   Plus,
-  ArrowUpDown
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Grid,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import PropertyDropdown from "../grid-view/PropertyDropDown";
 import EditProperty from "./Actions/EditProperty";
 import CreateBulkPropertyModal from "./CreateBulkPropertyModal";
 import CreateNewProperty from "./CreateNewProperty";
+import { Unit } from "@/types/UnitType";
+import CreateUnit from "./Actions/CreateUnit";
+import { Input } from "@/components/ui/input";
+import UnitDropdown from "../grid-view/UnitDropDown";
 
 interface PaginationData {
   page: number;
@@ -46,35 +53,16 @@ interface PaginationData {
 
 const Page = () => {
   const [options, setOptions] = useState([
-    {
-      value: "",
-      label: "ALL",
-      count: "",
-    },
-    {
-      value: "Vacant",
-      label: "Vacant ",
-      count: "",
-    },
-    {
-      value: "Fully Occupied",
-      label: "Fully Occupied ",
-      count: "",
-    },
-    {
-      value: "Partially Occupied",
-      label: "Partially Occupied",
-      count: "",
-    },
-    {
-      value: "Deactivated",
-      label: "Deactivated",
-      count: "",
-    },
+    { value: "", label: "ALL", count: "" },
+    { value: "Vacant", label: "Vacant ", count: "" },
+    { value: "Fully Occupied", label: "Fully Occupied ", count: "" },
+    { value: "Partially Occupied", label: "Partially Occupied", count: "" },
+    { value: "Deactivated", label: "Deactivated", count: "" },
   ]);
-  
   const router = useRouter();
-  const [expandedPropertyId, setExpandedPropertyId] = useState<number | null>(null);
+  const [expandedPropertyId, setExpandedPropertyId] = useState<number | null>(
+    null
+  );
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,
@@ -83,9 +71,12 @@ const Page = () => {
   });
   const [selectedProperty, setSelectedProperty] = useState<Property>();
   const [openView, setOpenView] = useState(false);
+  const [openAddUnit, setOpenAddUnit] = useState(false);
 
   const togglePropertyExpansion = (propertyId: number) => {
-    setExpandedPropertyId(expandedPropertyId === propertyId ? null : propertyId);
+    setExpandedPropertyId(
+      expandedPropertyId === propertyId ? null : propertyId
+    );
   };
 
   const [formFilters, setFormFilters] = useState({
@@ -98,6 +89,17 @@ const Page = () => {
     page: "1",
     per_page: "10",
   });
+  const searchParams = useSearchParams();
+  const query = Object.fromEntries(searchParams.entries());
+
+  useEffect(() => {
+    if (query.status) {
+      setFormFilters((prev) => ({
+        ...prev,
+        status: query.status,
+      }));
+    }
+  }, [query.status]);
 
   const [appliedFilters, setAppliedFilters] = useState({});
   const { data, isLoading, error } = useGetPropertiesList(appliedFilters);
@@ -112,24 +114,16 @@ const Page = () => {
         links: data?.properties.links ?? prev.links,
       }));
       setOptions([
-        {
-          value: "",
-          label: "ALL",
-          count: "",
-        },
-        {
-          value: "Vacant",
-          label: "Vacant ",
-          count: `${data.counters.Vacant}`,
-        },
+        { value: "", label: "ALL", count: "" },
+        { value: "Vacant", label: "Vacant ", count: `${data.counters.Vacant}` },
         {
           value: "Fully Occupied",
           label: "Fully Occupied ",
           count: `${data.counters["Fully Occupied"]}`,
         },
         {
-          value: "Partially Occupied ",
-          label: "Partially Occupied ",
+          value: "Partially Occupied",
+          label: "Partially Occupied",
           count: `${data.counters["Partially Occupied"]}`,
         },
         {
@@ -141,16 +135,73 @@ const Page = () => {
     }
   }, [data]);
 
+  // --- SEARCH / SORT STATE ---
+  // Keys use actual data fields:
+  // property_name, property_type, owner (owner.name), address (composed), facilities
+  const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortOrder("asc");
+    }
+  };
+
+  // helper to extract searchable string / nested fields
+  const getValueForSearch = (item: any, key: string) => {
+    if (!item) return "";
+    if (key === "owner") return (item.owner?.name ?? "").toString();
+    if (key === "address") {
+      // compose address fields (adjust fields to your model)
+      const parts = [
+        item.city,
+        item.state,
+        item.address_line_1,
+        item.address_line_2,
+      ].filter(Boolean);
+      return parts.join(" ");
+    }
+    // default: direct field (property_name, property_type, facilities, ...)
+    const val = item[key];
+    if (val == null) return "";
+    if (typeof val === "object") return JSON.stringify(val);
+    return String(val);
+  };
+
+  // prepare base array safely
+  const propertiesArray: any[] = data?.properties?.data ?? [];
+
+  const filteredData = propertiesArray
+    .filter((item) =>
+      // for every search term key -> must match
+      Object.entries(searchTerms).every(([key, value]) => {
+        if (!value) return true;
+        const source = getValueForSearch(item, key);
+        return source.toLowerCase().includes(value.toLowerCase());
+      })
+    )
+    .sort((a, b) => {
+      if (!sortKey || !sortOrder) return 0;
+      const aVal = getValueForSearch(a, sortKey).toLowerCase();
+      const bVal = getValueForSearch(b, sortKey).toLowerCase();
+      if (sortOrder === "asc") return aVal.localeCompare(bVal);
+      return bVal.localeCompare(aVal);
+    });
+
   useEffect(() => {
     setAppliedFilters({
       ...formFilters,
       page: pagination.page.toString(),
       per_page: pagination.per_page.toString(),
     });
-  }, [pagination.page, pagination.per_page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page, formFilters]);
 
-  const tableData: Property[] =
-    data?.properties.data.map((item: Property) => item) ?? [];
+  const tableData: Property[] = filteredData ?? [];
 
   // Pagination component
   const PaginationControls = () => {
@@ -159,7 +210,6 @@ const Page = () => {
         setPagination((prev) => ({ ...prev, page: newPage }));
       }
     };
-
     return (
       <div className="flex items-center justify-between px-4 py-3 border-t">
         <div className="flex items-center gap-2">
@@ -202,17 +252,18 @@ const Page = () => {
             },
             {
               name: "unit_name",
-              placeholder: "Unit Name",
+              placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },
             {
               name: "rental_type",
-              placeholder: "Rental Type",
+              placeholder: "Unit Type",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Whole Unit", value: "Whole Unit" },
+                { label: "Room", value: "Room" },
+                { label: "Car Park", value: "Car Park" },
               ],
               icon: Search,
             },
@@ -263,31 +314,155 @@ const Page = () => {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="p-2 bg-gray-50 text-xs">
+                {/* Empty column for checkbox or icons */}
                 <TableHead className="w-12"></TableHead>
-                <TableHead>
-                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
-                    Property
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
+
+                {/* Property */}
+                <TableHead className="text-gray-600 py-4">
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-x-2">
+                      <span>Property</span>
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleSort("property_name")}
+                      >
+                        {sortKey === "property_name" ? (
+                          sortOrder === "asc" ? (
+                            <ArrowUp size={12} />
+                          ) : (
+                            <ArrowDown size={12} />
+                          )
+                        ) : (
+                          <ArrowUpDown size={12} />
+                        )}
+                      </span>
+                    </div>
+                    <Input
+                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                      placeholder="Search Property"
+                      value={searchTerms.property_name ?? ""}
+                      onChange={(e) =>
+                        setSearchTerms((prev) => ({
+                          ...prev,
+                          property_name: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </TableHead>
-                <TableHead>
-                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
-                    Type
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
+
+                {/* Type */}
+                <TableHead className="text-gray-600 py-4">
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-x-2">
+                      <span>Type</span>
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleSort("property_type")}
+                      >
+                        {sortKey === "property_type" ? (
+                          sortOrder === "asc" ? (
+                            <ArrowUp size={12} />
+                          ) : (
+                            <ArrowDown size={12} />
+                          )
+                        ) : (
+                          <ArrowUpDown size={12} />
+                        )}
+                      </span>
+                    </div>
+                    <Input
+                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                      placeholder="Search Type"
+                      value={searchTerms.property_type ?? ""}
+                      onChange={(e) =>
+                        setSearchTerms((prev) => ({
+                          ...prev,
+                          property_type: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </TableHead>
-                <TableHead>
-                  <Button variant="ghost" className="h-8 p-0 hover:bg-transparent">
-                    Owner
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
+
+                {/* Owner */}
+                <TableHead className="text-gray-600 py-4">
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-x-2">
+                      <span>Owner</span>
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleSort("owner")}
+                      >
+                        {sortKey === "owner" ? (
+                          sortOrder === "asc" ? (
+                            <ArrowUp size={12} />
+                          ) : (
+                            <ArrowDown size={12} />
+                          )
+                        ) : (
+                          <ArrowUpDown size={12} />
+                        )}
+                      </span>
+                    </div>
+                    <Input
+                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                      placeholder="Search Owner"
+                      value={searchTerms.owner ?? ""}
+                      onChange={(e) =>
+                        setSearchTerms((prev) => ({
+                          ...prev,
+                          owner: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 </TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Facilities</TableHead>
-                <TableHead>Actions</TableHead>
+
+                {/* Address */}
+                <TableHead className="text-gray-600 py-4">
+                  <div className="flex flex-col items-center">
+                    <span>Address</span>
+                    <Input
+                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                      placeholder="Search Address"
+                      value={searchTerms.address ?? ""}
+                      onChange={(e) =>
+                        setSearchTerms((prev) => ({
+                          ...prev,
+                          address: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </TableHead>
+
+                {/* Facilities */}
+                <TableHead className="text-gray-600 py-4">
+                  <div className="flex flex-col items-center">
+                    <span>Facilities</span>
+                    <Input
+                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                      placeholder="Search Facilities"
+                      value={searchTerms.facilities ?? ""}
+                      onChange={(e) =>
+                        setSearchTerms((prev) => ({
+                          ...prev,
+                          facilities: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </TableHead>
+
+                {/* Actions */}
+                <TableHead className="text-gray-600 text-center pr-6">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {isLoading ? (
                 <TableRow>
@@ -339,10 +514,11 @@ const Page = () => {
                         </div>
                       </TableCell>
                       <TableCell>{property.property_type}</TableCell>
-                      <TableCell>{property.owner.name}</TableCell>
+                      <TableCell>{property.owner?.name}</TableCell>
                       <TableCell>
                         <div className="break-words whitespace-normal max-w-xs">
-                          {property.city},{property.state},{property.address_line_1}
+                          {property.city},{property.state},
+                          {property.address_line_1}
                         </div>
                       </TableCell>
                       <TableCell>{property?.facilities}</TableCell>
@@ -354,24 +530,33 @@ const Page = () => {
                     {/* Expandable Units Row */}
                     {expandedPropertyId === property.id && (
                       <TableRow>
-                        <TableCell colSpan={7} className="bg-gradient-to-r from-green-50 to-blue-50 p-0">
+                        <TableCell
+                          colSpan={7}
+                          className="bg-gradient-to-r from-green-50 to-blue-50 p-0"
+                        >
                           <div className="px-12 py-6">
                             <div className="mb-4 flex items-center justify-between">
                               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <Home className="w-5 h-5 text-primary" />
+                                <Grid className="w-5 h-5 text-primary" />
                                 Units in {property.property_name}
                                 <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
                                   {property.units?.length || 0} units
                                 </span>
                               </h3>
-                              <Button className="flex items-center gap-2 text-sm">
+                              <Button
+                                className="flex items-center gap-2 text-sm text-white"
+                                onClick={() => {
+                                  setOpenAddUnit(true);
+                                }}
+                              >
                                 <Plus className="w-4 h-4" />
                                 Add Unit
                               </Button>
                             </div>
 
                             <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                              {!property.units || property.units.length === 0 ? (
+                              {!property.units ||
+                              property.units.length === 0 ? (
                                 <div className="p-8 text-center text-gray-500">
                                   No units available for this property
                                 </div>
@@ -388,19 +573,23 @@ const Page = () => {
                                     </TableRow>
                                   </TableHeader>
                                   <TableBody>
-                                    {property.units.map((unit: any) => (
-                                      <TableRow key={unit.id} className="hover:bg-gray-50">
+                                    {property.units.map((unit: Unit) => (
+                                      <TableRow
+                                        key={unit.id}
+                                        className="hover:bg-gray-50"
+                                      >
                                         <TableCell className="font-medium">
-                                          {unit.unit_name || unit.name || '-'}
+                                          {unit.block_floor_unit_number || "-"}
                                         </TableCell>
                                         <TableCell>
-                                          {unit.status === 'Occupied' || unit.status === 'occupied' ? (
+                                          {unit.status === "Occupied" ||
+                                          unit.status === "occupied" ? (
                                             <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                               <CheckCircle className="w-3 h-3" />
                                               Occupied
                                             </span>
                                           ) : (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                               <XCircle className="w-3 h-3" />
                                               Vacant
                                             </span>
@@ -410,44 +599,26 @@ const Page = () => {
                                           <div className="flex items-center gap-2">
                                             <Users className="w-4 h-4 text-gray-400" />
                                             <span className="text-sm">
-                                              {unit.tenant_name || unit.tenant || '-'}
+                                              {unit?.last_active_tenancy[0]
+                                                ?.tenant.name || "-"}
                                             </span>
                                           </div>
                                         </TableCell>
                                         <TableCell>
-                                          {unit.rental_type || '-'}
+                                          {unit.rental_type || "-"}
                                         </TableCell>
                                         <TableCell>
                                           <div className="flex items-center gap-2">
                                             <DollarSign className="w-4 h-4 text-gray-400" />
                                             <span className="font-medium">
-                                              RM {unit.monthly_rent || unit.rent || '0'}
+                                              RM{" "}
+                                              {unit.last_active_tenancy[0]
+                                                ?.rental_fee || "0"}
                                             </span>
                                           </div>
                                         </TableCell>
                                         <TableCell>
-                                          <div className="flex gap-2">
-                                            <Button
-                                              variant="outline"
-                                              size="sm"
-                                              className="text-xs"
-                                              onClick={() => {
-                                                console.log('View unit:', unit.id);
-                                              }}
-                                            >
-                                              View
-                                            </Button>
-                                            <Button
-                                              variant="outline"
-                                              size="sm"
-                                              className="text-xs"
-                                              onClick={() => {
-                                                console.log('Edit unit:', unit.id);
-                                              }}
-                                            >
-                                              Edit
-                                            </Button>
-                                          </div>
+                                          <UnitDropdown unit={unit} />
                                         </TableCell>
                                       </TableRow>
                                     ))}
@@ -473,7 +644,11 @@ const Page = () => {
           <div className="text-red-500 mt-2">Error loading properties.</div>
         )}
       </div>
-
+      <CreateUnit
+        id={expandedPropertyId as number}
+        open={openAddUnit}
+        onOpenChange={setOpenAddUnit}
+      />
       <EditProperty
         onOpenChange={setOpenView}
         open={openView}

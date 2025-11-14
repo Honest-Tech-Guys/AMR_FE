@@ -47,7 +47,7 @@ const schema = yup.object({
   property_id: yup.string().required("Property ID is required"),
   block_number: yup.string().required("Block number is required"),
   floor: yup.string().required("Floor is required"),
-  unit_number: yup.string().required("Unit number is required"),
+  unit_number: yup.string().required("Unit Number is required"),
   rental_type: yup.string().required("Rental type is required"),
   square_feet: yup.string().required("Square feet is required"),
   business_partner_id: yup.string().required("Business partner ID is required"),

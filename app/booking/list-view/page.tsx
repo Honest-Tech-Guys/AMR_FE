@@ -91,10 +91,10 @@ const mapBooksToTable = (books: Book[]): PropertyTableRow[] => {
   });
 };
 
-const invoiceColumns: Column<Book>[] = [
+const bookingColumns: Column<Book>[] = [
   {
     title: "Property",
-    key: "bookable.unit.property.property_name",
+    key: "bookable.property.property_name",
     sortable: true,
     className: "pl-6 py-4",
     render: (row) => (
@@ -107,7 +107,7 @@ const invoiceColumns: Column<Book>[] = [
   },
   {
     title: "Unit",
-    key: "unit",
+    key: "bookable.block_floor_unit_number",
     sortable: true,
     render: (row) => (
       <div>
@@ -120,24 +120,24 @@ const invoiceColumns: Column<Book>[] = [
   },
   {
     title: "Room",
-    key: "room",
+    key: "bookable.name",
     render: (row) => (
       <div> {"unit" in row.bookable ? (row.bookable as Room).name : "-"}</div>
     ),
   },
   {
     title: "Tenant Name",
-    key: "tenant_name",
+    key: "tenant.name",
     render: (row) => <div>{row.tenant.name}</div>,
   },
   {
     title: "Rental",
-    key: "rental",
+    key: "rental_fee",
     render: (row) => <div>{row.rental_fee}</div>,
   },
   {
     title: "Rental Frequency",
-    key: "rental_frequency",
+    key: "rental_payment_frequency",
     render: (row) => <div>{row.rental_payment_frequency}</div>,
   },
   {
@@ -171,7 +171,7 @@ const Page = () => {
 
   const filters = [
     <InputWithIcon key="booking" icon={Search} placeholder="Booking" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Name" />,
+    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
     <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
     <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
     <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
@@ -206,7 +206,7 @@ const Page = () => {
             },
             {
               name: "unit_name",
-              placeholder: "Unit Name",
+              placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },
@@ -253,21 +253,9 @@ const Page = () => {
         </div>
 
         {/* Filter toggle */}
-        <div className="flex items-end justify-end">
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsFilter((prev) => !prev)}
-              className="rounded-[6px] h-6 m-0"
-            >
-              <Funnel className="mr-2" />
-              Fast Filter {isFilter ? <ChevronUp /> : <ChevronDown />}
-            </Button>
-          </div>
-        </div>
 
         <Datatable<Book>
-          columns={invoiceColumns}
+          columns={bookingColumns}
           data={data ?? []}
           isPending={isLoading}
           pagination={pagination}
