@@ -54,9 +54,9 @@ const Navbar = () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
-  const [openDialog, setOpenDialog] = useState<"editProfile" | "topUp" | null>(
-    null
-  );
+  const [openDialog, setOpenDialog] = useState<
+    "editProfile" | "topUp" | "logout" | null
+  >(null);
   const MenuItem = ({
     children,
     dialogKey,
@@ -146,7 +146,7 @@ const Navbar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
             <MenuItem dialogKey="editProfile">Edit Profile</MenuItem>
-            <MenuItem dialogKey="editProfile">
+            <MenuItem dialogKey="logout">
               <div onClick={logout} className="flex ">
                 <LogOut
                   className="size-5 text-primary cursor-pointer"
