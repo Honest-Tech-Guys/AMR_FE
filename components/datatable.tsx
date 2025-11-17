@@ -254,7 +254,7 @@ function Datatable<T>({
           </div>
         )}
 
-        {!isPending && (
+        {/* {!isPending && (
           <Pagination className="mt-4">
             <PaginationContent className="flex justify-between w-full">
               <PaginationItem className="text-xs text-gray-600">
@@ -282,7 +282,7 @@ function Datatable<T>({
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-        )}
+        )} */}
       </div>
     </div>
   );

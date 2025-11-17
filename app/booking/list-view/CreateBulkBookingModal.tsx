@@ -27,7 +27,7 @@ import CreateBulk from "./CreateBulk";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
 // Schema & type
 
-const CreateBulkPropertyModal = () => {
+const CreateBulkBookModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm({
     mode: "onTouched",
@@ -146,4 +146,4 @@ const CreateBulkPropertyModal = () => {
   );
 };
 
-export default CreateBulkPropertyModal;
+export default CreateBulkBookModal;

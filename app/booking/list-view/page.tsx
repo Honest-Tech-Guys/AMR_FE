@@ -13,7 +13,7 @@ import { Book } from "@/types/BookType";
 import { Badge } from "@/components/ui/badge";
 import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
-import CreateBulkPropertyModal from "./CreateBulkBookingModal";
+import CreateBulkBookModal from "./CreateBulkBookingModal";
 import {
   Pagination,
   PaginationContent,
@@ -331,7 +331,7 @@ const Page = () => {
             )}
           </div>
           <div className="flex flex-wrap space-x-3">
-            <CreateBulkPropertyModal />
+            <CreateBulkBookModal />
             <CreateNewBooking />
           </div>
         </div>
