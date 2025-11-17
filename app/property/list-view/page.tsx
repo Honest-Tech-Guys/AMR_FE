@@ -675,9 +675,11 @@ const Page = () => {
                                         </TableCell>
                                         <TableCell>
                                           <div className="flex items-center gap-2">
-                                            <DollarSign className="w-4 h-4 text-gray-400" />
+                                            <span className="text-gray-400">
+                                              RM
+                                            </span>
                                             <span className="font-medium">
-                                              RM{" "}
+                                              {" "}
                                               {unit.last_active_tenancy[0]
                                                 ?.rental_fee || "0"}
                                             </span>
