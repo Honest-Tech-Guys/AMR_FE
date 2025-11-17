@@ -273,8 +273,7 @@ const Page = () => {
               type: "select",
               selectItems: [
                 { label: "Whole Unit", value: "Whole Unit" },
-                { label: "Room", value: "Room" },
-                { label: "Car Park", value: "Car Park" },
+                { label: "Room Rental", value: "Room Rental" },
               ],
               icon: Search,
             },
