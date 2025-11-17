@@ -650,13 +650,13 @@ const Page = () => {
                                         <TableCell>
                                           {unit.status === "Occupied" ||
                                           unit.status === "occupied" ? (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                              <CheckCircle className="w-3 h-3" />
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                              <XCircle className="w-3 h-3" />
                                               Occupied
                                             </span>
                                           ) : (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                              <XCircle className="w-3 h-3" />
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                              <CheckCircle className="w-3 h-3" />
                                               Vacant
                                             </span>
                                           )}
