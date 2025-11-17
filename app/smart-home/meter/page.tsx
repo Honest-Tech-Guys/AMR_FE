@@ -21,41 +21,63 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import CreateMeter from "./CreateMeter";
 import useGetMetersList from "@/lib/services/hooks/useGetMeterList";
 import EditMeter from "./EditMeter";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Page = () => {
-  const { data, isLoading } = useGetMetersList();
   const [isFilter, setIsFilter] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Meter>();
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    per_page: 10,
+    last_page: 1,
+    links: [],
+  });
   const [formFilters, setFormFilters] = useState({
     property_name: "",
     unit_name: "",
     rental_type: "",
-    Meter_and_lock: "",
+    Meter_and_lock: [],
     data_range: "",
     status: "all",
     page: "1",
     per_page: "10",
   });
-
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
-
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, isPending } = useGetMetersList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    console.log(pagination.per_page);
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -103,7 +125,7 @@ const Page = () => {
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -113,14 +135,70 @@ const Page = () => {
           setFormFilters={setFormFilters as never}
         />
         {/* Actions */}
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {" "}
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full items-center">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             <CreateMeter />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {data?.map((meter) => (
+          {data?.data.map((meter) => (
             <div key={meter.id} className="border rounded-2xl p-3">
               {/* Title */}
               <label

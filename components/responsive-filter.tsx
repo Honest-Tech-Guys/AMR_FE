@@ -2,8 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { Funnel, ChevronDown, ChevronUp, LucideIcon } from "lucide-react";
-import React from "react";
+import {
+  Funnel,
+  ChevronDown,
+  ChevronUp,
+  LucideIcon,
+  ChevronsUpDown,
+  Check,
+  X,
+} from "lucide-react";
+import React, { useState } from "react";
 import { InputWithIcon } from "./InpuWithIcon";
 import { cn } from "@/lib/utils";
 import {
@@ -14,11 +22,20 @@ import {
   SelectValue,
 } from "@/components/ui/select"; // import the responsive date range picker
 import DateRangePicker from "./DatePickerRanger";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
 
 interface FilterConfig {
   name: keyof FormFilters;
   type?: "input" | "select" | "date";
   icon: LucideIcon;
+  isMulti?: boolean;
   iconPosition?: "left" | "right";
   placeholder?: string;
   selectItems?: { label: string; value: string }[];
@@ -30,7 +47,7 @@ interface FormFilters {
   owner_name?: string;
   unit_name?: string;
   rental_type?: string;
-  Meter_and_lock?: string;
+  Meter_and_lock?: string[];
   status?: string;
   date_range?: string; // store as stringified JSON or formatted string
   page: string;
@@ -40,6 +57,7 @@ interface FormFilters {
 interface ResponsiveFilterProps {
   filters: FilterConfig[];
   actionButton?: React.ReactNode;
+
   formFilters: FormFilters;
   setFormFilters: React.Dispatch<React.SetStateAction<FormFilters>>;
 }
@@ -65,30 +83,17 @@ export const ResponsiveFilter = ({
         <div key={i} className="w-full relative">
           <filter.icon
             className={cn(
-              "absolute top-1/2 h-3 w-3 text-muted-foreground -translate-y-1/2",
+              "absolute z-2 top-1/2 h-3 w-3 text-muted-foreground -translate-y-1/2",
               filter.iconPosition === "right" ? "right-3" : "left-3"
             )}
           />
-          <Select
-            value={formFilters[filter.name] ?? ""}
-            onValueChange={(val) => handleChange(filter.name, val)}
-          >
-            <SelectTrigger
-              className={cn(
-                "w-full pl-10 bg-gray-100 rounded-[6px]",
-                filter.iconPosition === "right" ? "pr-10" : ""
-              )}
-            >
-              <SelectValue placeholder={filter.placeholder ?? "Select..."} />
-            </SelectTrigger>
-            <SelectContent>
-              {filter.selectItems.map((item, idx) => (
-                <SelectItem key={idx} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SmartSelect
+            isMulti={filter.isMulti}
+            value={formFilters[filter.name] as never}
+            onChange={(val) => handleChange(filter.name, val as never)}
+            selectItems={filter.selectItems}
+            placeholder={filter.placeholder}
+          />
         </div>
       );
     }
@@ -166,3 +171,107 @@ export const ResponsiveFilter = ({
     </div>
   );
 };
+export interface SelectItemType {
+  label: string;
+  value: string;
+}
+
+export interface SelectItemType {
+  label: string;
+  value: string;
+}
+
+export interface SmartSelectProps {
+  isMulti?: boolean;
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
+  selectItems: SelectItemType[];
+  placeholder?: string;
+}
+
+export function SmartSelect({
+  isMulti = false,
+  value,
+  onChange,
+  selectItems,
+  placeholder = "Select...",
+}: SmartSelectProps) {
+  const currentValue = Array.isArray(value) ? value : value ? [value] : [];
+  const [open, setOpen] = useState(false);
+
+  const toggle = (val: string) => {
+    if (!isMulti) {
+      onChange(val);
+      setOpen(false);
+      return;
+    }
+    if (currentValue.includes(val)) {
+      onChange(currentValue.filter((x) => x !== val));
+    } else {
+      onChange([...currentValue, val]);
+    }
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild className=" rounded-[6px]">
+        <Button
+          variant="outline"
+          className="w-full pl-10 justify-between bg-gray-100"
+        >
+          {currentValue.length > 0 ? (
+            <div className="flex pl-5 gap-1">
+              {currentValue.map((item) => (
+                <span
+                  key={item}
+                  className="px-2 py-1 text-xs bg-gray-200 text-gray-500 rounded flex items-center gap-1"
+                >
+                  {selectItems.find((x) => x.value === item)?.label}
+
+                  {/* Remove tag */}
+                  <button
+                    type="button"
+                    onPointerDownCapture={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onChange(currentValue.filter((x) => x !== item));
+                    }}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span className="pl-8 text-gray-500 font-normal">
+              {placeholder}
+            </span>
+          )}
+
+          <ChevronsUpDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent className="w-full p-0">
+        <Command>
+          <CommandInput placeholder="Search..." />
+          <CommandEmpty>No results.</CommandEmpty>
+          <CommandList>
+            {selectItems.map((item) => (
+              <CommandItem key={item.value} onSelect={() => toggle(item.value)}>
+                <Check
+                  className={`mr-2 h-4 w-4 ${
+                    currentValue.includes(item.value)
+                      ? "opacity-100"
+                      : "opacity-0"
+                  }`}
+                />
+                {item.label}
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}

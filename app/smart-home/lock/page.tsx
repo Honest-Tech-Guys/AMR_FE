@@ -60,7 +60,7 @@ const Page = () => {
     property_name: "",
     unit_name: "",
     rental_type: "",
-    Meter_and_lock: "",
+    Meter_and_lock: [],
     data_range: "",
     status: "all",
     page: "1",

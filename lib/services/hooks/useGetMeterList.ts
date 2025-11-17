@@ -1,18 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import ResponseType from "@/types/ResponseType";
 import PaginationType from "@/types/PaginationType";
-const useGetMetersList = () => {
+const useGetMetersList = (params: Object) => {
+  const isParamsValid = Object.keys(params).length > 0;
   return useQuery({
-    queryKey: ["GetMetersList"],
+    queryKey: ["GetMetersList", params],
+    enabled: isParamsValid,
     queryFn: () => {
       const url = "/meters";
       {
         return axiosInstance
-          .get<PaginationType<Meter[]>>(url)
+          .get<PaginationType<Meter[]>>(url, { params })
           .then((res) => {
             console.log("SS");
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

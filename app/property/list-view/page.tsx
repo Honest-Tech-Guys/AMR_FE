@@ -91,7 +91,7 @@ const Page = () => {
     property_name: "",
     unit_name: "",
     rental_type: "",
-    Meter_and_lock: "",
+    Meter_and_lock: [],
     data_range: "",
     status: "",
     page: "1",
@@ -99,16 +99,6 @@ const Page = () => {
   });
   const searchParams = useSearchParams();
   const query = Object.fromEntries(searchParams.entries());
-
-  // useEffect(() => {
-  //   if (query.status) {
-  //     setFormFilters((prev) => ({
-  //       ...prev,
-  //       status: query.status,
-  //     }));
-  //   }
-  // }, [query.status]);
-
   const [appliedFilters, setAppliedFilters] = useState({});
   const { data, isLoading, isPending, error } =
     useGetPropertiesList(appliedFilters);
@@ -215,40 +205,6 @@ const Page = () => {
   const tableData: Property[] = filteredData ?? [];
 
   // Pagination component
-  const PaginationControls = () => {
-    const handlePageChange = (newPage: number) => {
-      if (newPage >= 1 && newPage <= (pagination.last_page || 1)) {
-        setPagination((prev) => ({ ...prev, page: newPage }));
-      }
-    };
-    return (
-      <div className="flex items-center justify-between px-4 py-3 border-t">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">
-            Page {pagination.page} of {pagination.last_page}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page === pagination.last_page}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div>
@@ -269,7 +225,7 @@ const Page = () => {
             },
             {
               name: "rental_type",
-              placeholder: "Unit Type",
+              placeholder: "Rental Type",
               type: "select",
               selectItems: [
                 { label: "Whole Unit", value: "Whole Unit" },
@@ -277,11 +233,17 @@ const Page = () => {
               ],
               icon: Search,
             },
+
             {
               name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
-              type: "input",
+              placeholder: "Meter and lock",
+              type: "select",
+              selectItems: [
+                { label: "Has Meter", value: "Has Meter" },
+                { label: "Has Lock", value: "Has Lock" },
+              ],
               icon: Search,
+              isMulti: true,
             },
             {
               name: "date_range",

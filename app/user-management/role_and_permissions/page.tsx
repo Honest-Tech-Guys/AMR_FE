@@ -66,7 +66,7 @@ const Page = () => {
     property_name: "",
     unit_name: "",
     rental_type: "",
-    Meter_and_lock: "",
+    Meter_and_lock: [],
     data_range: "",
     page: "1",
     per_page: "10",
