@@ -166,15 +166,17 @@ function PaginationControl({
             </div>
           </SelectTrigger>
           <SelectContent>
-            {[1, 2, 3, 4, 5].map((page) => (
-              <SelectItem
-                key={page}
-                value={page.toString()}
-                className={"text-xs"}
-              >
-                {`Page-${page}`}
-              </SelectItem>
-            ))}
+            {pagination?.links
+              ?.filter((item) => item.label.match(/\d+/)?.[0])
+              .map((page) => (
+                <SelectItem
+                  key={page.label}
+                  value={page?.label}
+                  className={"text-xs"}
+                >
+                  {`Page-${page.label}`}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>

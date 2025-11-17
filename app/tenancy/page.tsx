@@ -14,22 +14,21 @@ import OwnerType from "@/types/OwnerType";
 import { Separator } from "@/components/ui/separator";
 import ViewTenancy from "./ViewTenancy";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
-import { PaginationData } from "@/components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
+import CreateNewTenancy from "./CreateNewTenancy";
+import { useSearchParams } from "next/navigation";
 
 const Page = () => {
-  const [isFilter, setIsFilter] = useState(false);
-  const { data } = useGetTenancyList();
-
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
-
   const actionButton = (
     <Button key="search" className="rounded-[6px]">
       <Search className="size-4 text-white" strokeWidth={2.5} />
@@ -37,20 +36,35 @@ const Page = () => {
   );
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
-    per_page: 15,
+    per_page: 10,
     last_page: 1,
     links: [],
   });
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: "",
+    tenant_name: "",
+    owner_name: "",
+    status: "",
     data_range: "",
+    te: "",
     page: "1",
     per_page: "10",
   });
+  const searchParams = useSearchParams();
+  const query = Object.fromEntries(searchParams.entries());
+  useEffect(() => {
+    if (query.te) {
+      setFormFilters((prev) => ({
+        ...prev,
+        te: query.te,
+      }));
+    }
+  }, [query.te]);
+
+  console.log(query);
   const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, isPending, error } =
+    useGetTenancyList(appliedFilters);
   useEffect(() => {
     if (data) {
       setPagination((prev) => ({
@@ -62,6 +76,14 @@ const Page = () => {
       }));
     }
   }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
   function getStatusColor(status: string): string {
     switch (status) {
       case "Upcoming":
@@ -89,25 +111,28 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Number",
+              name: "tenant_name",
+              placeholder: "Tenant Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
+              name: "owner_name",
+              placeholder: "Owner Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "status",
+              placeholder: "Status",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Active", value: "Active" },
+                { label: "Inactive", value: "Inactive" },
+                { label: "Expiring Soon", value: "Expiring Soon" },
+                { label: "Last Month", value: "Last Month" },
+                { label: "Upcoming", value: "Upcoming" },
               ],
-              icon: Search,
-            },
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
-              type: "input",
               icon: Search,
             },
             {
@@ -119,7 +144,7 @@ const Page = () => {
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -129,24 +154,79 @@ const Page = () => {
           setFormFilters={setFormFilters as never}
         />
         {/* Actions */}
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
-            {/* <CreateNewOwner /> */}
+            <CreateNewTenancy />
           </div>
         </div>
-        {/* 
+        {/*
+         */}
         {isLoading && (
           <div className="text-center py-8">
-            <div className="text-gray-500">Loading owners...</div>
+            <div className="text-gray-500">Loading tenancy...</div>
           </div>
         )}
 
         {error && (
           <div className="text-center py-8">
-            <div className="text-red-500">Error loading owners.</div>
+            <div className="text-red-500">Error loading tenancy.</div>
           </div>
-        )} */}
-
+        )}
         {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data?.data.map((tenancy) => (
@@ -227,15 +307,16 @@ const Page = () => {
                   <div className="flex justify-between items-center">
                     <div className=" flex  flex-col gap-2">
                       <p className="text-sm text-gray-600">
+                        <p className="font-medium">Owner</p>{" "}
+                        {(tenancy?.tenantable as Unit)?.property?.owner?.name ??
+                          ""}
+                        {(tenancy?.tenantable as Room)?.unit?.property?.owner
+                          ?.name ?? ""}
+                      </p>
+                      <p className="text-sm text-gray-600">
                         <p className="font-medium">Smart Meter</p>{" "}
                         {tenancy.meters ? "" : "no smart meter"}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Balance</span>{" "}
-                        {/* {tenancy.balance} */}
-                        unit
-                      </p>
-                      <p className="text-primary text-sm ">Sync Balance</p>
                     </div>
                     <div>
                       {" "}

@@ -33,6 +33,7 @@ const RoomCard = ({ room, unit }: { room?: Room; unit?: Unit }) => {
   const { data, isPending } = useGetTenancy(
     unit?.last_active_tenancy?.[0]?.id ?? room?.last_active_tenancy?.[0]?.id
   );
+  console.log(room?.status || (unit?.status as never));
   return (
     <Card className="w-full max-w-sm min-w-sm">
       <CardHeader>

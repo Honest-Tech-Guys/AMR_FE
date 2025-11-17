@@ -178,7 +178,7 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
   } = form;
 
   const { mutate, isPending } = useCreateAgreement(tenancy.id);
-  const { refetch } = useGetTenancyList();
+  const { refetch } = useGetTenancyList({});
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log(data.attachments);
     const payload: RentalAgreement = {

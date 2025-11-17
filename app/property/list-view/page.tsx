@@ -39,6 +39,14 @@ import { Unit } from "@/types/UnitType";
 import CreateUnit from "./Actions/CreateUnit";
 import { Input } from "@/components/ui/input";
 import UnitDropdown from "../grid-view/UnitDropDown";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface PaginationData {
   page: number;
@@ -102,7 +110,8 @@ const Page = () => {
   }, [query.status]);
 
   const [appliedFilters, setAppliedFilters] = useState({});
-  const { data, isLoading, error } = useGetPropertiesList(appliedFilters);
+  const { data, isLoading, isPending, error } =
+    useGetPropertiesList(appliedFilters);
 
   useEffect(() => {
     if (data) {
@@ -199,7 +208,7 @@ const Page = () => {
       per_page: pagination.per_page.toString(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.per_page, formFilters]);
+  }, [pagination.page, pagination.per_page]);
 
   const tableData: Property[] = filteredData ?? [];
 
@@ -293,7 +302,62 @@ const Page = () => {
         />
 
         {/* Actions */}
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full items-center">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             <CreateBulkPropertyModal />
             <CreateNewProperty />
@@ -637,7 +701,7 @@ const Page = () => {
           </Table>
 
           {/* Pagination */}
-          {!isLoading && tableData.length > 0 && <PaginationControls />}
+          {/* {!isLoading && tableData.length > 0 && <PaginationControls />} */}
         </div>
 
         {error && (

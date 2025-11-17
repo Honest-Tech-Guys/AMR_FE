@@ -1,18 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
-import ResponseType from "@/types/ResponseType";
 import { Book } from "@/types/BookType";
-const useGetBooksList = () => {
+import PaginationType from "@/types/PaginationType";
+const useGetBooksList = (params: Object) => {
+  const isParamsValid = Object.keys(params).length > 0;
   return useQuery({
-    queryKey: ["GetBooksList"],
+    queryKey: ["GetBooksList", params],
+    enabled: isParamsValid,
     queryFn: () => {
       const url = "/bookings";
       {
         return axiosInstance
-          .get<ResponseType<Book[]>>(url)
+          .get<PaginationType<Book[]>>(url, { params })
           .then((res) => {
-            console.log("SS");
-            return res.data.data;
+            return res.data;
           })
           .catch((error) => {
             console.log(error);

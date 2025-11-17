@@ -13,8 +13,13 @@ import { Home, Users, Grid, BedDouble, LoaderCircle } from "lucide-react";
 import useGetDashboard from "@/lib/services/hooks/useGetDashboard";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-
-const COLORS = ["#22c55e", "#3b82f6", "#e5e7eb"];
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+const COLORS = ["#FA2C37", "#3b82f6", "#22c55e"];
 
 export default function DashboardPage() {
   const { data, isPending } = useGetDashboard();
@@ -215,7 +220,7 @@ export default function DashboardPage() {
                       cy="50%"
                       innerRadius={70}
                       outerRadius={100}
-                      paddingAngle={5}
+                      paddingAngle={0}
                       dataKey="value"
                     >
                       {occupancyData.map((_, index) => (
@@ -264,14 +269,14 @@ export default function DashboardPage() {
                   {
                     label: "Fully Occupied",
                     value: fully_occupied,
-                    color: "bg-green-500",
+                    color: "bg-red-500",
                   },
                   {
                     label: "Partially Occupied",
                     value: partial_occupied,
                     color: "bg-blue-500",
                   },
-                  { label: "Vacant", value: vacant, color: "bg-gray-300" },
+                  { label: "Vacant", value: vacant, color: "bg-green-500" },
                   { label: "Total", value: total },
                 ].map((item) => (
                   <div
@@ -329,7 +334,7 @@ export default function DashboardPage() {
                 {
                   label: "Unpaid",
                   value: `MYR ${unpaid.toLocaleString()}`,
-                  color: "bg-gray-300",
+                  color: "bg-red-500",
                 },
               ].map((item) => (
                 <div
@@ -374,7 +379,19 @@ export default function DashboardPage() {
                 </span>
 
                 {/* Bar background */}
-                <div className="relative w-full bg-gray-100 h-6 rounded-full overflow-hidden hover:cursor-pointer hover:bg-gray-200">
+                <div
+                  className={cn(
+                    "relative w-full bg-gray-100 h-6 rounded-full overflow-hidden ",
+                    item.value > 0 ? "cursor-pointer hover:bg-gray-200" : ""
+                  )}
+                  onClick={() => {
+                    if (item.value > 0) {
+                      router.push(
+                        `/tenancy?te=${item.label.match(/\d+/)?.[0] ?? ""}`
+                      );
+                    }
+                  }}
+                >
                   {/* Filled section */}
                   {item.value > 0 && (
                     <div

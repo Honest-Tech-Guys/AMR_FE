@@ -121,7 +121,7 @@ const CreateNewBooking = () => {
     }));
   }
   const { data } = useGetSelection(isOpen);
-  const { refetch } = useGetBooksList();
+  const { refetch } = useGetBooksList({});
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));

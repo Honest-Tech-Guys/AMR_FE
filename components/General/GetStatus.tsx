@@ -2,8 +2,8 @@ import { KeyRound } from "lucide-react";
 import { Separator } from "../ui/separator";
 
 const roomStatusConfig: Record<"Vacant" | "Occupied", { color: string }> = {
-  Vacant: { color: "red-500" },
-  Occupied: { color: "green-500" },
+  Vacant: { color: "green-500" },
+  Occupied: { color: "red-500" },
 };
 
 export const getStatus = (value: "Vacant" | "Occupied") => {

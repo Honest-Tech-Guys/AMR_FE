@@ -26,9 +26,12 @@ interface FilterConfig {
 
 interface FormFilters {
   property_name?: string;
+  tenant_name?: string;
+  owner_name?: string;
   unit_name?: string;
   rental_type?: string;
   Meter_and_lock?: string;
+  status?: string;
   date_range?: string; // store as stringified JSON or formatted string
   page: string;
   per_page: string;

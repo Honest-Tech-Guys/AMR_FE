@@ -109,7 +109,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
     formState: { errors },
   } = form;
   const { mutate, isPending } = useCreateTenancyDocument(tenancy.id);
-  const { refetch } = useGetTenancyList();
+  const { refetch } = useGetTenancyList({});
   const onSubmit = async (data: DocumentFormData) => {
     const private_documents = data.privateFiles
       ? fileDataToFileList((data.privateFiles || []) as FileData[])

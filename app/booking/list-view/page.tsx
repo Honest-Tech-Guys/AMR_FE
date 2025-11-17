@@ -7,13 +7,22 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import CreateNewBooking from "./CreateNewBooking";
 import Datatable, { Column } from "@/components/datatable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import { Book } from "@/types/BookType";
 import { Badge } from "@/components/ui/badge";
 import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
 import CreateBulkPropertyModal from "./CreateBulkBookingModal";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type PropertyTableRow = {
   property_id: string;
@@ -155,19 +164,16 @@ const bookingColumns: Column<Book>[] = [
   },
 ];
 
-interface PaginationData {
-  page: number;
-  per_page: number;
-}
-
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,
+    last_page: 1,
+    links: [],
   });
 
-  const { data, isLoading } = useGetBooksList(); // data: Book[]
+  // data: Book[]
 
   const filters = [
     <InputWithIcon key="booking" icon={Search} placeholder="Booking" />,
@@ -184,14 +190,35 @@ const Page = () => {
   );
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: "",
+    tenant_name: "",
+    owner_name: "",
+    status: "",
     data_range: "",
-    status: "all",
     page: "1",
     per_page: "10",
   });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, isPending } = useGetBooksList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
+
   return (
     <div>
       {/* <HeaderPage title="Booking (List View)" /> */}
@@ -205,25 +232,27 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Number",
+              name: "tenant_name",
+              placeholder: "Tenant Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
+              name: "owner_name",
+              placeholder: "Owner Name",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "status",
+              placeholder: "Status",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Pending", value: "Pending" },
+                { label: "Confirmed", value: "Confirmed" },
+                { label: "Completed", value: "Completed" },
+                { label: "Canceled", value: "Canceled" },
               ],
-              icon: Search,
-            },
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
-              type: "input",
               icon: Search,
             },
             {
@@ -235,7 +264,7 @@ const Page = () => {
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -245,7 +274,62 @@ const Page = () => {
           setFormFilters={setFormFilters as never}
         />
         {/* Actions */}
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             <CreateBulkPropertyModal />
             <CreateNewBooking />
@@ -256,7 +340,7 @@ const Page = () => {
 
         <Datatable<Book>
           columns={bookingColumns}
-          data={data ?? []}
+          data={data?.data ?? []}
           isPending={isLoading}
           pagination={pagination}
           setPagination={setPagination}
