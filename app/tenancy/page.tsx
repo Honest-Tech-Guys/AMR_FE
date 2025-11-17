@@ -52,17 +52,6 @@ const Page = () => {
   });
   const searchParams = useSearchParams();
   const query = Object.fromEntries(searchParams.entries());
-  // useEffect(() => {
-  //   console.log("in");
-  //   if (query.te) {
-  //     console.log("sss");
-  //     setFormFilters((prev) => ({
-  //       ...prev,
-  //       te: query.te,
-  //     }));
-  //   }
-  // }, [query.te]);
-
   console.log(query);
   const [appliedFilters, setAppliedFilters] = useState({});
   const { data, isLoading, isPending, error } =
@@ -79,15 +68,16 @@ const Page = () => {
     }
   }, [data]);
   useEffect(() => {
-    setFormFilters({ ...formFilters, te: query.te });
+    setFormFilters({ ...formFilters, te: query.te, status: query.status });
     setAppliedFilters({
       ...formFilters,
       te: query.te,
+      status: query.status,
       page: pagination.page.toString(),
       per_page: pagination.per_page.toString(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.per_page, query.te]);
+  }, [pagination.page, pagination.per_page, query.te, query.status]);
   function getStatusColor(status: string): string {
     switch (status) {
       case "Upcoming":
