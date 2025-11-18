@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
 import { useEffect } from "react";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Schema & type
 const schema = yup.object({
@@ -135,6 +136,7 @@ const CreateEquipment = ({ id, type, onOpenChange, open }: Props) => {
       reset();
     }
   }, [open, reset]);
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload = {
       ...data,
@@ -144,7 +146,7 @@ const CreateEquipment = ({ id, type, onOpenChange, open }: Props) => {
     mutate(payload, {
       onSuccess: () => {
         toast.success("Equipment created successfully!");
-        reset();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         refetch();
         onOpenChange(false);
       },

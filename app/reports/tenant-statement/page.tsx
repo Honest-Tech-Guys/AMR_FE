@@ -1,16 +1,9 @@
 "use client";
 
-import HeaderPage from "@/components/HeaderPage";
-import { Calendar, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ResponsiveFilter } from "@/components/responsive-filter";
-import Datatable, { Column } from "@/components/datatable";
-import { useEffect, useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { TenantStatementReport } from "@/types/TenetStatementReport";
-import useGetTenantStatementReport from "@/lib/services/hooks/useGetTenantStatementReport";
 import { createAuthenticatedFetch } from "@/app/tenancy/Tabs/Documents";
-import { formatDate } from "@/lib/utils";
+import Datatable, { Column } from "@/components/datatable";
+import { ResponsiveFilter } from "@/components/responsive-filter";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +13,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import useGetTenantStatementReport from "@/lib/services/hooks/useGetTenantStatementReport";
+import { formatDate } from "@/lib/utils";
+import { TenantStatementReport } from "@/types/TenetStatementReport";
+import { Calendar, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const TenantStatementPage = () => {
   const [pagination, setPagination] = useState<PaginationData>({

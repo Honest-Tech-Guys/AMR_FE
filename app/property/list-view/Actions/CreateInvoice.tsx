@@ -40,6 +40,7 @@ import useCreateInvoice from "@/lib/services/hooks/useCreateInvoice";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   tenant: yup.string().required("Tenant is required"),
@@ -99,6 +100,7 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
     }
   }, [tenancies, watch("tenancy"), setValue]);
   const [status, setStatus] = useState<"Draft" | "Sent">("Draft");
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const api_data = {
       tenancy_id: data.tenancy,
@@ -111,6 +113,7 @@ const CreateInvoice = ({ id, open, onOpenChange }: Props) => {
     mutate(api_data, {
       onSuccess: () => {
         toast.success("Invoice created successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         reset();
         onOpenChange(false);
       },

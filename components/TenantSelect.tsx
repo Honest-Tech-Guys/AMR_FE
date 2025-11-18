@@ -45,7 +45,7 @@ export function TenantSelect<T>({
   const [searchResult, setSearchResult] = useState<OptionType | null>(null);
 
   // API hook
-  const { data, refetch, isFetching } = useGetTenantByEmail(email);
+  const { data, isFetching } = useGetTenantByEmail(email);
 
   // Update searchResult when API returns
   useEffect(() => {
@@ -111,7 +111,6 @@ export function TenantSelect<T>({
                     // If no local match and looks like email, search API
                     if (!match && val.includes("@") && val.includes(".com")) {
                       setEmail(val);
-                      //   await refetch();
                     } else {
                       setSearchResult(null);
                     }

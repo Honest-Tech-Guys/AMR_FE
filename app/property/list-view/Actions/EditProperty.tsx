@@ -32,6 +32,7 @@ import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import { Property } from "@/types/PropertyType";
 import { Unit } from "@/types/UnitType";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 
 const unitColumns: Column<Unit>[] = [
   {
@@ -203,7 +204,7 @@ const EditProperty = ({
     { id: "kualaLumpur", name: "Kuala Lumpur" },
     { id: "putrajaya", name: "Putrajaya" },
   ].sort((a, b) => a.name.localeCompare(b.name));
-
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     if (!property?.id) return toast.error("No property selected");
 
@@ -228,6 +229,7 @@ const EditProperty = ({
       onSuccess: () => {
         toast.dismiss(loadingToast);
         toast.success("Property updated successfully");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         onSuccess?.();
         onOpenChange(false);
       },

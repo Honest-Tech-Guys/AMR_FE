@@ -31,7 +31,7 @@ interface Props {
 }
 const TopUp = ({ balance, open, onOpenChange }: Props) => {
   const { mutate, isPending } = useTopUp();
-  const { refetch } = useGetUser();
+
   const form = useForm<schemaType>({
     mode: "onTouched",
   });
@@ -49,7 +49,7 @@ const TopUp = ({ balance, open, onOpenChange }: Props) => {
       onSuccess: () => {
         // toast.success("Profile updated successfully!");
         reset();
-        refetch();
+
         onOpenChange(false);
       },
     });

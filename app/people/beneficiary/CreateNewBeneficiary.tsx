@@ -26,6 +26,7 @@ import PhoneInput from "@/components/phone-input";
 import { toast } from "sonner";
 import useCreateBeneficiary from "@/lib/services/hooks/useCreateBeneficiary";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // <-- your API hook
 const cities = [
   { id: "johor", name: "Johor" },
@@ -97,11 +98,14 @@ const CreateNewBeneficiary = () => {
   } = form;
 
   const { mutate, isPending } = useCreateBeneficiary();
-
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     mutate(data, {
       onSuccess: () => {
         toast.success("Beneficiary created successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["useGetBeneficiariesList"],
+        });
         reset();
         setIsOpen(false);
       },

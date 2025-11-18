@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import * as yup from "yup";
 import { Eye } from "lucide-react";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 interface Permission {
   id: number;
   name: string;
@@ -132,7 +133,7 @@ const EditRole = ({ role }: Props) => {
     methods.setValue("permissions", updatedPermissions);
   };
   const { mutate, isPending } = useUpdateRole();
-  const { refetch } = useGetRole();
+  const queryClient = useQueryClient();
   const onSubmit = (data: FormValues) => {
     mutate(
       { ...data, id: role.id },
@@ -140,7 +141,7 @@ const EditRole = ({ role }: Props) => {
         onSuccess: () => {
           toast.success("Role updated successfully!");
           reset();
-          refetch();
+          queryClient.invalidateQueries({ queryKey: ["GetRole"] });
           setIsOpen(false);
         },
         onError: (err: any) => {

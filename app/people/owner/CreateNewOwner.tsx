@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { COUNTRIES, NATIONALITIES } from "@/lib/utilities/Countries";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Schema & type
 const schema = yup.object({
@@ -92,11 +93,15 @@ const CreateNewOwner = () => {
     { id: "free_text", label: "Free Text" },
   ];
   const { mutate, isPending } = useCreateOwner();
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     mutate(data as never, {
       onSuccess: () => {
         toast.success("Owner created successfully!");
         reset();
+        queryClient.invalidateQueries({
+          queryKey: ["GetOwnersList"],
+        });
         setIsOpen(false);
       },
       onError: (err: any) => {

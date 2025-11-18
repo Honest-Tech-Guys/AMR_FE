@@ -47,7 +47,7 @@ const Page = () => {
   });
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_number: "",
+    owner_name: "",
     tenant_name: "",
     meter_serial: "",
     status: "",
@@ -92,8 +92,8 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_number",
-              placeholder: "Unit Number",
+              name: "owner_name",
+              placeholder: "Owner Name",
               type: "input",
               icon: Search,
             },

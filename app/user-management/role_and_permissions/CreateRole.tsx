@@ -35,6 +35,7 @@ import useCreateRole from "@/lib/services/hooks/useCreateRole";
 import useGetRole from "@/lib/services/hooks/useGetRole";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 interface Permission {
   id: number;
   name: string;
@@ -124,13 +125,13 @@ const CreateNewRole = () => {
     methods.setValue("permissions", updatedPermissions);
   };
   const { mutate, isPending } = useCreateRole();
-  const { refetch } = useGetRole();
+  const queryClient = useQueryClient();
   const onSubmit = (data: FormValues) => {
     mutate(data, {
       onSuccess: () => {
         toast.success("user created successfully!");
         reset();
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetRole"] });
         setIsOpen(false);
       },
       onError: (err: any) => {

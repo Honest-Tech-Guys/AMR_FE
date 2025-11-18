@@ -19,6 +19,7 @@ import useCreateNewUser from "@/lib/services/hooks/useCreateNewUser";
 import useGetRoleSelection from "@/lib/services/hooks/useGetRoleSelection";
 import useGetUserList from "@/lib/services/hooks/useGetUserList";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   Controller,
@@ -72,7 +73,7 @@ const CreateNewUser = () => {
   }, [data, setRoles]);
   console.log(roles);
   const { mutate, isPending } = useCreateNewUser();
-  const { refetch } = useGetUserList({});
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload = {
       name: data.username,
@@ -85,7 +86,7 @@ const CreateNewUser = () => {
       onSuccess: () => {
         toast.success("user created successfully!");
         reset();
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetUserList"] });
         setIsOpen(false);
       },
       onError: (err: any) => {

@@ -89,7 +89,7 @@ const Page = () => {
 
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_name: "",
+    owner_name: "",
     rental_type: "",
     Meter_and_lock: [],
     data_range: "",
@@ -218,8 +218,8 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Number",
+              name: "owner_name",
+              placeholder: "Owner Name",
               type: "input",
               icon: Search,
             },

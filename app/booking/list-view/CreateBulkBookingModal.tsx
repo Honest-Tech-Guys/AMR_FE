@@ -25,6 +25,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import CreateBulk from "./CreateBulk";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 
 const CreateBulkBookModal = () => {
@@ -34,7 +35,7 @@ const CreateBulkBookModal = () => {
   });
 
   const { mutate, isPending } = useCreateBulkBooking();
-  const { refetch } = useGetPropertiesList({});
+  const queryClient = useQueryClient();
   type Payload = {
     tenant_id: string;
     tenant_name: string;
@@ -53,7 +54,7 @@ const CreateBulkBookModal = () => {
     mutate(Bookings, {
       onSuccess: () => {
         toast.success(`bookings created successfully!`);
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetBooksList"] });
         setBookings([]);
         setIsOpen(false);
       },

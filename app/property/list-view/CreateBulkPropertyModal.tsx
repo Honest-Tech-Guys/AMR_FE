@@ -25,6 +25,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import CreateBulk from "./CreateBulk";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 
 const CreateBulkPropertyModal = () => {
@@ -34,7 +35,7 @@ const CreateBulkPropertyModal = () => {
   });
 
   const { mutate, isPending } = useCreateBulkProperty();
-  const { refetch } = useGetPropertiesList({});
+  const queryClient = useQueryClient();
   type Payload = {
     property_name: string;
     owner_id: string;
@@ -56,7 +57,7 @@ const CreateBulkPropertyModal = () => {
     mutate(Properties, {
       onSuccess: () => {
         toast.success(`properties created successfully!`);
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         setProperties([]);
         setIsOpen(false);
       },

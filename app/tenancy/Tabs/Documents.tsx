@@ -29,6 +29,7 @@ import useCreateTenancyDocument from "@/lib/services/hooks/useCreateTenancyDocum
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { fileDataToFileList } from "../Agreement/CreateAgreement";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 const getAuthToken = () => {
   // Try different token storage methods
   return (
@@ -109,7 +110,8 @@ const DocumentsTap = ({ tenancy }: Props) => {
     formState: { errors },
   } = form;
   const { mutate, isPending } = useCreateTenancyDocument(tenancy.id);
-  const { refetch } = useGetTenancyList({});
+  const queryClient = useQueryClient();
+
   const onSubmit = async (data: DocumentFormData) => {
     const private_documents = data.privateFiles
       ? fileDataToFileList((data.privateFiles || []) as FileData[])
@@ -125,7 +127,7 @@ const DocumentsTap = ({ tenancy }: Props) => {
       onSuccess: () => {
         toast.success("Rental agreement created successfully!");
         reset();
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetTenancyList"] });
       },
       onError: (err: any) => {
         ErrorToastHandel(err);
@@ -324,7 +326,9 @@ const DocumentsTap = ({ tenancy }: Props) => {
                   onSuccess: () => {
                     toast.success("Private Files successfully!");
                     reset();
-                    refetch();
+                    queryClient.invalidateQueries({
+                      queryKey: ["GetTenancyList"],
+                    });
                   },
                 }
               );
@@ -417,7 +421,9 @@ const DocumentsTap = ({ tenancy }: Props) => {
                   onSuccess: () => {
                     toast.success("Upload Shared Files successfully!");
                     reset();
-                    refetch();
+                    queryClient.invalidateQueries({
+                      queryKey: ["GetTenancyList"],
+                    });
                   },
                 }
               );

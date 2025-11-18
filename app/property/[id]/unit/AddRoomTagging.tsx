@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import useAddTagRoom from "@/lib/services/hooks/useAddTagRoom";
 import MapWithPoints from "@/components/MapwithSinglePoint";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   unit_id: number;
@@ -58,7 +59,7 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
       return [...filtered, { room_id, x: point.x, y: point.y, remark }];
     });
   };
-
+  const queryClient = useQueryClient();
   const onSubmit = () => {
     if (points.length === 0) {
       toast.error("Please add at least one point!");
@@ -69,6 +70,7 @@ const AddRoomTagging = ({ unit_id, rooms, url, open, onOpenChange }: Props) => {
       onSuccess: () => {
         toast.success("Added Room Tags successfully!");
         reset();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         setPoints([]);
         onOpenChange(false);
       },

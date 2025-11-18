@@ -161,11 +161,6 @@ const Navbar = () => {
           open={openDialog === "editProfile"}
           onOpenChange={(open) => setOpenDialog(open ? "editProfile" : null)}
         />
-        <TopUp
-          balance={data?.user.balance}
-          open={openDialog === "topUp"}
-          onOpenChange={(open) => setOpenDialog(open ? "topUp" : null)}
-        />
       </div>
     </header>
   );

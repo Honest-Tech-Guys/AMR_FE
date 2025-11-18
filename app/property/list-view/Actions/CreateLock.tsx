@@ -30,6 +30,7 @@ import useGetSelection, {
 import { toast } from "sonner";
 import useAddLock from "@/lib/services/hooks/useAddLock";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property id is required"),
@@ -108,6 +109,7 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
 
     return null;
   };
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     const self_check_options = facilities
       .filter((f) => (data as any)[f.id])
@@ -123,6 +125,7 @@ const CreateLock = ({ id, onOpenChange, open }: Props) => {
       onSuccess: () => {
         toast.success("Lock created successfully!");
         reset();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         // setIsOpen(false);
         onOpenChange(false);
       },

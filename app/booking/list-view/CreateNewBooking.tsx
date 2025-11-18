@@ -37,6 +37,7 @@ import useGetBooksList from "@/lib/services/hooks/usGetBooks";
 import useCreateBooking from "@/lib/services/hooks/useCreateBooking";
 import { TenantSelect } from "@/components/TenantSelect";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -121,7 +122,7 @@ const CreateNewBooking = () => {
     }));
   }
   const { data } = useGetSelection(isOpen);
-  const { refetch } = useGetBooksList({});
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));
@@ -159,7 +160,7 @@ const CreateNewBooking = () => {
       onSuccess: () => {
         toast.success("Booking created successfully!");
         reset();
-        refetch();
+        queryClient.invalidateQueries({ queryKey: ["GetBooksList"] });
         setIsOpen(false);
       },
       onError: (err: any) => {

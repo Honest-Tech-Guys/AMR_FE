@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import useAddMeter from "@/lib/services/hooks/useAddMeter";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // ✅ Schema based on `Meter` type
 const schema = yup.object({
   property_id: yup.string().required("Meter name is required"),
@@ -101,6 +102,7 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
 
     return null;
   };
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     const payload: any = {
       name: data.name,
@@ -116,6 +118,7 @@ const CreateMeter = ({ id, open, onOpenChange }: Props) => {
       onSuccess: () => {
         toast.success("Meter created successfully!");
         reset();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         onOpenChange(false);
       },
       onError: (err: any) => {

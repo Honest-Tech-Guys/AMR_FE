@@ -41,6 +41,7 @@ import { Unit } from "@/types/UnitType";
 import MapRoomViewer from "@/components/MapRoomViewer";
 import EquipmentType from "@/types/EquipmentType";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Schema & type
 const schema = yup.object({
@@ -280,6 +281,7 @@ const settingSchema = yup.object({
 type settingSchemaType = yup.InferType<typeof settingSchema>;
 
 const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
+  const queryClient = useQueryClient();
   const updateUnitMutation = useUpdateUnit();
   const updateSettingMutation = useUpdatePropertySetting();
   const [pagination, setPagination] = useState<PaginationData>({
@@ -558,6 +560,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         reset();
         toast.dismiss(loadingToast);
         toast.success("Unit updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         // Close the dialog
         onOpenChange(false);
       },
@@ -608,6 +611,7 @@ const EditUnit = ({ unit, onSuccess, open, onOpenChange }: EditUnitProps) => {
         onSuccess?.();
         toast.dismiss(loadingToast);
         toast.success("Settings updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
       },
       onError: (err: any) => {
         ErrorToastHandel(err);

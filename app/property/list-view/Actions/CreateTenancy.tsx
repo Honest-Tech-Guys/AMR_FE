@@ -24,6 +24,7 @@ import useGetTenantsList from "@/lib/services/hooks/useGetTenant";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   property_id: yup.string().required("Property name is required"),
@@ -97,6 +98,7 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
 
     return null;
   };
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     // Map facilities
 
@@ -116,6 +118,7 @@ const CreateNewTenancy = ({ id, onOpenChange, open, type }: Props) => {
       onSuccess: () => {
         toast.success("Tenancy created successfully!");
         reset();
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         onOpenChange(false);
       },
       onError: (err: any) => {

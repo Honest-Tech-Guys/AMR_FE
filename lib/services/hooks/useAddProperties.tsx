@@ -22,7 +22,6 @@ const useAddProperty = () => {
     onSuccess: () => {
       // Invalidate and refetch units list
       queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
-
       // Optionally update the cache directly for better UX
     },
   });

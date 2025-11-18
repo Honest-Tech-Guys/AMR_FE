@@ -34,6 +34,7 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TenantSelect } from "@/components/TenantSelect";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -134,7 +135,7 @@ const CreateBulk = ({ setPayload }: Props) => {
     }));
   }
   const { data } = useGetSelection(isOpen);
-  const { refetch } = useGetBooksList({});
+
   useEffect(() => {
     if (data) {
       setTreeData(mapToTreeData(data));

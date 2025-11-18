@@ -24,6 +24,7 @@ import useCreateAgreement from "@/lib/services/hooks/useCreateAgreement";
 import useGetTenancyList from "@/lib/services/hooks/useGetTenancyList";
 import { Tenancy } from "@/types/TenancyType";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 export interface RentalAgreement {
   agreement_date: string;
   landlord_name: string;
@@ -179,6 +180,7 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
 
   const { mutate, isPending } = useCreateAgreement(tenancy.id);
   const { refetch } = useGetTenancyList({});
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log(data.attachments);
     const payload: RentalAgreement = {
@@ -211,8 +213,8 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
     mutate(payload, {
       onSuccess: () => {
         toast.success("Rental agreement created successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetTenancyList"] });
         reset();
-        refetch();
         onOpenChange(false);
       },
       onError: (err: any) => {
