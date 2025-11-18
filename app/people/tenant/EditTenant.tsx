@@ -113,6 +113,7 @@ const EditTenant = ({ tenant, isOpen, setIsOpen }: EditTenantProps) => {
         setIsOpen(false);
       },
       onError: (err: any) => {
+        console.log(err);
         ErrorToastHandel(err);
       },
     });

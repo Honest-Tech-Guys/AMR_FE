@@ -87,7 +87,7 @@ const CreateLock = () => {
     { id: "IC Card", label: "IC Card" },
   ] as const;
   type FacilityId = (typeof facilities)[number]["id"];
-  const { mutate } = useAddLock();
+  const { mutate, isPending } = useAddLock();
   type Result = { room_id: number } | { unit_id: number } | null;
 
   const parseValue = (value: string): Result => {
@@ -225,8 +225,8 @@ const CreateLock = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button type="submit" className="text-white" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>

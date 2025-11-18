@@ -95,7 +95,8 @@ const CreateMeter = () => {
     mode: "onTouched",
     // resolver: yupResolver(schema),
   });
-  const { mutate } = useAddMeter();
+
+  const { mutate, isPending } = useAddMeter();
   const {
     setValue,
     watch,
@@ -302,8 +303,8 @@ const CreateMeter = () => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" className="text-white">
-                Submit
+              <Button type="submit" className="text-white" disabled={isPending}>
+                {isPending ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>

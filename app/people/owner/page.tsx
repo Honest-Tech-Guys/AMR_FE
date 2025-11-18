@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/pagination";
 
 const Page = () => {
-  const [isFilter, setIsFilter] = useState(false);
+  const [selectedOwner, setSelectedOwner] = useState<OwnerType>();
 
   const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
@@ -201,6 +201,7 @@ const Page = () => {
                 <label
                   className="font-bold text-[#337AB7] text-lg"
                   onClick={() => {
+                    setSelectedOwner(owner);
                     setOpen(true);
                   }}
                 >
@@ -266,16 +267,15 @@ const Page = () => {
                     </Badge>
                   </p>
                 </div>
-                <EditOwnerPage
-                  ownerData={owner}
-                  isOpen={open}
-                  setIsOpen={setOpen}
-                />
               </div>
             ))}
           </div>
         )}
-
+        <EditOwnerPage
+          ownerData={selectedOwner as OwnerType}
+          isOpen={open}
+          setIsOpen={setOpen}
+        />
         {/* Empty State */}
         {!isLoading && !error && (!data || data.data.length === 0) && (
           <div className="text-center py-8 text-gray-500">No owners found.</div>

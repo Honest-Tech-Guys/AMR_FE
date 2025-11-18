@@ -275,7 +275,7 @@ const CreateNewTenant = () => {
                   className="flex items-center gap-3"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Male" id="gender-male" />
+                    <RadioGroupItem value="Male" id="male" />
                     <Label htmlFor="male">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">

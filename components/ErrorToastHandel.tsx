@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 
 const ErrorToastHandel = (error: any) => {
+  console.log((error as any).response?.data?.message);
   return toast.error(
     error && (
       <div className=" text-red-600 rounded-md px-2">
