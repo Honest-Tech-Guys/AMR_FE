@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/pagination";
 
 const Page = () => {
-  const [isFilter, setIsFilter] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Meter>();
   const [pagination, setPagination] = useState<PaginationData>({
@@ -48,11 +47,10 @@ const Page = () => {
   });
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: [],
-    data_range: "",
-    status: "all",
+    unit_number: "",
+    tenant_name: "",
+    meter_serial: "",
+    status: "",
     page: "1",
     per_page: "10",
   });
@@ -70,7 +68,6 @@ const Page = () => {
     }
   }, [data]);
   useEffect(() => {
-    console.log(pagination.per_page);
     setAppliedFilters({
       ...formFilters,
       page: pagination.page.toString(),
@@ -95,32 +92,32 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_name",
+              name: "unit_number",
               placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
-              type: "select",
-              selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
-              ],
-              icon: Search,
-            },
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
+              name: "tenant_name",
+              placeholder: "Tenant Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
+              name: "meter_serial",
+              placeholder: "Meter Serial",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "status",
+              placeholder: "Status",
+              type: "select",
+              selectItems: [
+                { label: "ON", value: "on" },
+                { label: "OFF", value: "off" },
+              ],
+              icon: Search,
             },
           ]}
           actionButton={

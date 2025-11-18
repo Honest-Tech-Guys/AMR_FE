@@ -72,7 +72,7 @@ const CreateNewUser = () => {
   }, [data, setRoles]);
   console.log(roles);
   const { mutate, isPending } = useCreateNewUser();
-  const { refetch } = useGetUserList();
+  const { refetch } = useGetUserList({});
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     const payload = {
       name: data.username,

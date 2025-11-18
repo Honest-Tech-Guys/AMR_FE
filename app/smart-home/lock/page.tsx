@@ -4,11 +4,20 @@ import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useGetLocksList from "@/lib/services/hooks/useGetLockList";
 import CreateLock from "./CreateLock";
 import EditLock from "./EditLock";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 const options = [
   {
     value: "Vacant",
@@ -33,39 +42,47 @@ type property = {
   tenancy: string;
   status: string;
 };
-interface PaginationData {
-  page: number;
-  per_page: number;
-}
 
 const Page = () => {
-  const { data } = useGetLocksList();
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Locks>();
-  const [isFilter, setIsFilter] = useState(false);
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
 
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    per_page: 10,
+    last_page: 1,
+    links: [],
+  });
   const [formFilters, setFormFilters] = useState({
     property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: [],
-    data_range: "",
-    status: "all",
+    unit_number: "",
+    tenant_name: "",
+    lock_serial: "",
+    status: "",
     page: "1",
     per_page: "10",
   });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, isPending } = useGetLocksList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
   return (
     <div>
       {/* <HeaderPage title="Lock" /> */}
@@ -79,37 +96,37 @@ const Page = () => {
               icon: Search,
             },
             {
-              name: "unit_name",
+              name: "unit_number",
               placeholder: "Unit Number",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
-              type: "select",
-              selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
-              ],
-              icon: Search,
-            },
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
+              name: "tenant_name",
+              placeholder: "Tenant Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
+              name: "lock_serial",
+              placeholder: "Lock Serial",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "status",
+              placeholder: "Status",
+              type: "select",
+              selectItems: [
+                { label: "ON", value: "on" },
+                { label: "OFF", value: "off" },
+              ],
+              icon: Search,
             },
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -118,13 +135,68 @@ const Page = () => {
           formFilters={formFilters}
           setFormFilters={setFormFilters as never}
         />
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full items-center">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             <CreateLock />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 ">
-          {data?.map((lock) => (
+          {data?.data?.map((lock) => (
             <div className=" border rounded-2xl p-3">
               <label
                 className="font-bold text-[#337AB7] cursor-pointer"

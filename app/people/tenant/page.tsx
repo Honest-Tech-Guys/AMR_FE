@@ -5,7 +5,7 @@ import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import CreateNewTenant from "./CreateNewTenant";
@@ -13,35 +13,56 @@ import CreateNewTenant from "./CreateNewTenant";
 import useGetTenantList from "@/lib/services/hooks/useGetTenantsList";
 import EditTenant from "./EditTenant";
 import { TenantType } from "@/types/TenantType";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Page = () => {
-  const [isFilter, setIsFilter] = useState(false);
-  const { data, isLoading, error } = useGetTenantList();
   const [open, setOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<TenantType>();
-  const filters = [
-    <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
-
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    per_page: 10,
+    last_page: 1,
+    links: [],
+  });
   const [formFilters, setFormFilters] = useState({
-    property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: [],
-    data_range: "",
-    status: "all",
+    tenant_name: "",
+    tenant_email: "",
+    phone: "",
+    type: "",
+    identity_number: "",
     page: "1",
     per_page: "10",
   });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, isPending, error } =
+    useGetTenantList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
   return (
     <div>
       {/* <HeaderPage title="Tenant" /> */}
@@ -49,43 +70,43 @@ const Page = () => {
         <ResponsiveFilter
           filters={[
             {
-              name: "property_name",
-              placeholder: "Property Name",
+              name: "tenant_name",
+              placeholder: "Tenant Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Number",
+              name: "tenant_email",
+              placeholder: "Tenant Email",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
+              name: "phone",
+              placeholder: "Phone",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "type",
+              placeholder: "Type",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Individual", value: "Individual" },
+                { label: "Company", value: "Company" },
               ],
               icon: Search,
             },
             {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
+              name: "identity_number",
+              placeholder: "Identity Number",
               type: "input",
               icon: Search,
-            },
-            {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
             },
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -94,7 +115,62 @@ const Page = () => {
           formFilters={formFilters}
           setFormFilters={setFormFilters as never}
         />
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             <CreateNewTenant />
           </div>
@@ -114,7 +190,7 @@ const Page = () => {
 
         {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.map((tenant) => (
+            {data?.data.map((tenant) => (
               <div
                 key={tenant.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
@@ -192,7 +268,7 @@ const Page = () => {
           setIsOpen={setOpen}
         />
 
-        {!isLoading && !error && (!data || data.length === 0) && (
+        {!isLoading && !error && (!data?.data || data.data.length === 0) && (
           <div className="text-center py-8">
             <div className="text-gray-500">No tenants found.</div>
           </div>

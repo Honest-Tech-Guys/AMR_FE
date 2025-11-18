@@ -1,40 +1,60 @@
 "use client";
-import { InputWithIcon } from "@/components/InpuWithIcon";
 import Datatable, { Column } from "@/components/datatable";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import useGetUserList from "@/lib/services/hooks/useGetUserList";
 import type User from "@/types/UserType";
-import { Calendar, Search } from "lucide-react";
-import { useState } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import CreateNewUser from "./CreateNewUser";
-// import CreateInvoice from "./CreateInvoice";
-const options = [
-  {
-    value: "Vacant",
-    label: "Vacant (50)",
-  },
-  {
-    value: "Occupied",
-    label: "Occupied (32)",
-  },
-  {
-    value: "Deactivated ",
-    label: "Deactivated (24)",
-  },
-];
-interface PaginationData {
-  page: number;
-  per_page: number;
-}
+import useGetRoleSelection from "@/lib/services/hooks/useGetRoleSelection";
 
 const Page = () => {
-  const [isFilter, setIsFilter] = useState(false);
-  const [actionIsOpen, setActionsIsOpen] = useState(false);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     per_page: 10,
+    last_page: 1,
+    links: [],
   });
+  const [formFilters, setFormFilters] = useState({
+    username: "",
+    email: "",
+    role: "",
+    status: "",
+    page: "1",
+    per_page: "10",
+  });
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isPending, error } = useGetUserList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
+
   const UserColumns: Column<User>[] = [
     {
       title: "ID",
@@ -86,37 +106,18 @@ const Page = () => {
       ),
     },
   ];
-  const filters = [
-    <InputWithIcon key="user_name" icon={Search} placeholder="User Name" />,
-    <InputWithIcon key="user_id" icon={Search} placeholder="UserId" />,
-    <InputWithIcon key="status" icon={Search} placeholder="Status" />,
-  ];
-
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
-
-  // const { data, isLoading, error } = useGetPropertiesList({});
-  const { data, isPending, error } = useGetUserList();
-  // Map API data to table format
+  const [roles, setRoles] = useState([]);
+  const { data: rolesApi } = useGetRoleSelection(true);
+  useEffect(() => {
+    if (rolesApi) {
+      const dataT = rolesApi.map((role) => {
+        return { value: `${role.id}`, label: role.name };
+      });
+      setRoles(dataT as never);
+    }
+  }, [rolesApi, setRoles]);
   const users: User[] = data?.data || [];
-  const paginationData = {
-    page: data?.current_page || 1,
-    per_page: data?.per_page || 10,
-    last_page: data?.last_page || 1,
-  };
 
-  const [formFilters, setFormFilters] = useState({
-    property_name: "",
-    unit_name: "",
-    rental_type: "",
-    Meter_and_lock: [],
-    data_range: "",
-    page: "1",
-    per_page: "10",
-  });
   return (
     <div>
       {/* <HeaderPage title="User Management" /> */}
@@ -124,43 +125,38 @@ const Page = () => {
         <ResponsiveFilter
           filters={[
             {
-              name: "property_name",
-              placeholder: "Property Name",
+              name: "username",
+              placeholder: "Username",
               type: "input",
               icon: Search,
             },
             {
-              name: "unit_name",
-              placeholder: "Unit Number",
+              name: "email",
+              placeholder: "Email",
               type: "input",
               icon: Search,
             },
             {
-              name: "rental_type",
-              placeholder: "Rental Type",
+              name: "role",
+              placeholder: "Roles",
+              type: "select",
+              selectItems: roles,
+              icon: Search,
+            },
+            {
+              name: "status",
+              placeholder: "Status",
               type: "select",
               selectItems: [
-                { label: "whole unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
+                { label: "Active", value: "Active" },
+                { label: "Inactive", value: "Inactive" },
               ],
               icon: Search,
-            },
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and Lock",
-              type: "input",
-              icon: Search,
-            },
-            {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
             },
           ]}
           actionButton={
             <Button
-              // onClick={() => setAppliedFilters(formFilters)}
+              onClick={() => setAppliedFilters(formFilters)}
               className="text-white"
             >
               <Search />
@@ -169,7 +165,62 @@ const Page = () => {
           formFilters={formFilters}
           setFormFilters={setFormFilters as never}
         />
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full items-center">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             {/* <Button className="rounded-[6px] text-white ">
               Create New Expenses
@@ -182,10 +233,7 @@ const Page = () => {
           columns={UserColumns}
           data={users}
           isPending={isPending}
-          pagination={{
-            ...pagination,
-            last_page: paginationData.last_page,
-          }}
+          pagination={pagination}
           setPagination={setPagination}
           rowKey={(item: User) => item.id}
         />

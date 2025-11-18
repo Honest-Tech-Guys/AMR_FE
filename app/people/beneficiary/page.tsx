@@ -5,29 +5,63 @@ import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import useGetBeneficiariesList from "@/lib/services/hooks/useGetBeneficiariesList";
 import CreateNewBeneficiary from "./CreateNewBeneficiary";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationControl,
+  PaginationData,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [open, setOpen] = useState(false);
 
   // Fetch beneficiaries
-  const { data, isLoading, error } = useGetBeneficiariesList();
 
+  const [pagination, setPagination] = useState<PaginationData>({
+    page: 1,
+    per_page: 10,
+    last_page: 1,
+    links: [],
+  });
   const [formFilters, setFormFilters] = useState({
-    name: "",
-    nationality: "",
-    gender: "",
-    race: "",
-    date_range: "",
-    status: "all",
+    beneficiary_name: "",
+    beneficiary_email: "",
+    phone: "",
+    type: "",
+    identity_number: "",
     page: "1",
     per_page: "10",
   });
-
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const { data, isLoading, error, isPending } =
+    useGetBeneficiariesList(appliedFilters);
+  useEffect(() => {
+    if (data) {
+      setPagination((prev) => ({
+        ...prev,
+        page: data?.current_page ?? prev.page,
+        per_page: data?.per_page ?? prev.per_page,
+        last_page: data?.last_page ?? prev.last_page,
+        links: data?.links ?? prev.links,
+      }));
+    }
+  }, [data]);
+  useEffect(() => {
+    setAppliedFilters({
+      ...formFilters,
+      page: pagination.page.toString(),
+      per_page: pagination.per_page.toString(),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.page, pagination.per_page]);
   return (
     <div>
       {/* <HeaderPage title="Beneficiaries" /> */}
@@ -37,42 +71,45 @@ const Page = () => {
         <ResponsiveFilter
           filters={[
             {
-              name: "date_range",
+              name: "beneficiary_name",
               placeholder: "Beneficiary Name",
               type: "input",
               icon: Search,
             },
             {
-              name: "date_range",
-              placeholder: "Nationality",
+              name: "beneficiary_email",
+              placeholder: "Beneficiary Email",
               type: "input",
               icon: Search,
             },
             {
-              name: "date_range",
-              placeholder: "Gender",
+              name: "phone",
+              placeholder: "Phone",
+              type: "input",
+              icon: Search,
+            },
+            {
+              name: "type",
+              placeholder: "Type",
               type: "select",
               selectItems: [
-                { label: "Male", value: "Male" },
-                { label: "Female", value: "Female" },
+                { label: "Individual", value: "Individual" },
+                { label: "Organization", value: "Organization" },
               ],
               icon: Search,
             },
             {
-              name: "date_range",
-              placeholder: "Race",
+              name: "identity_number",
+              placeholder: "Identity Number",
               type: "input",
               icon: Search,
             },
-            {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
-            },
           ]}
           actionButton={
-            <Button className="text-white">
+            <Button
+              onClick={() => setAppliedFilters(formFilters)}
+              className="text-white"
+            >
               <Search />
             </Button>
           }
@@ -80,7 +117,62 @@ const Page = () => {
           setFormFilters={setFormFilters as never}
         />
 
-        <div className="flex w-full justify-end my-3">
+        <div className="flex w-full justify-between my-3">
+          <div>
+            {!isPending && (
+              <Pagination>
+                <PaginationContent className="flex justify-between w-full">
+                  <PaginationItem className="text-xs text-gray-600">
+                    Page {pagination.page} of {pagination.last_page}
+                  </PaginationItem>
+                  <PaginationItem className="flex gap-x-2">
+                    <PaginationControl
+                      pagination={pagination}
+                      setPagination={setPagination}
+                    />
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (pagination.page <= 1) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page - 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page > 1}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                    <PaginationNext
+                      onClick={() => {
+                        if (
+                          pagination.page >= (pagination.last_page as number)
+                        ) {
+                          null;
+                        } else {
+                          setPagination((prev) => ({
+                            ...prev,
+                            page: prev.page + 1,
+                          }));
+                        }
+                      }}
+                      isActive={pagination.page < (pagination.last_page ?? 1)}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           <div className="flex flex-wrap space-x-3">
             {/* Add new beneficiary button could go here */}
             <CreateNewBeneficiary />
@@ -104,7 +196,7 @@ const Page = () => {
         {/* Data Grid */}
         {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.map((beneficiary) => (
+            {data?.data?.map((beneficiary) => (
               <div
                 key={beneficiary.id}
                 className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
@@ -177,7 +269,7 @@ const Page = () => {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && (!data || data.length === 0) && (
+        {!isLoading && !error && (!data?.data || data?.data?.length === 0) && (
           <div className="text-center py-8">
             <div className="text-gray-500">No beneficiaries found.</div>
           </div>
