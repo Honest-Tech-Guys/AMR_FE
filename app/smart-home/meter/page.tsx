@@ -42,6 +42,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import useGetDeviceStatus from "@/lib/services/hooks/SyncMeter";
 import { cn } from "@/lib/utils";
+import useClearEnergy from "@/lib/services/hooks/CleanMeterBalance";
+import useToggleDevice from "@/lib/services/hooks/toogleMeter";
+import TopUpDialog from "@/components/TopUpMeter";
 export default function ModernMeterManagement() {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [openView, setOpenView] = useState(false);
@@ -109,14 +112,17 @@ export default function ModernMeterManagement() {
       color: "bg-green-50",
     },
   ];
-  const { refetch, isLoading: SyncLoading } = useGetDeviceStatus(
+  const { refetch: refetchSync, isLoading: SyncLoading } = useGetDeviceStatus(
     selectedItemSync?.id
   );
-
+  const { mutate: clearEnergy, isPending: clearLoading } = useClearEnergy();
+  const { mutate: toggleDevice, isPending: toggleLoading } = useToggleDevice();
+  const [topUpOpen, setTopUpOpen] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState<number | null>(null);
   return (
-    <div className="min-h-screen  p-6">
+    <div className="min-h-screen  p-3">
       {/* Header Section */}
-      <div className="mb-8">
+      <div className="mb-6 mt-3">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {stats.map((stat, index) => (
@@ -312,10 +318,12 @@ export default function ModernMeterManagement() {
                             onSelect={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              setSelectedItemSync(meter);
+                              if (meter.id === selectedItemSync?.id) {
+                                refetchSync();
+                              } else {
+                                setSelectedItemSync(meter);
+                              }
                             }}
-                            // onClick={() => {
-                            // }}
                             disabled={SyncLoading}
                           >
                             <RefreshCw
@@ -323,16 +331,43 @@ export default function ModernMeterManagement() {
                             />
                             <span>Sync</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="flex gap-2">
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSelectedDevice(meter.id);
+                              setTopUpOpen(true);
+                            }}
+                          >
                             <CirclePoundSterling />
                             <span>Top Up</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="flex gap-2">
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              clearEnergy(meter.id);
+                            }}
+                            disabled={clearLoading}
+                          >
                             <BrushCleaning />
                             <span>Clean Balance</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="flex gap-2">
-                            <Power />
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            disabled={toggleLoading}
+                            onSelect={(e) => {
+                              e.preventDefault(); // يمنع الإغلاق
+                              e.stopPropagation(); // يمنع Bubbling
+                              toggleDevice(meter.id);
+                            }}
+                          >
+                            <Power
+                              className={toggleLoading ? "animate-spin" : ""}
+                            />
+
                             <span>
                               {meter.power_status === "on"
                                 ? "Disconnect"
@@ -444,6 +479,12 @@ export default function ModernMeterManagement() {
                         : `${meter.meterable?.property?.owner?.name} `}
                     </span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Tenant:</span>
+                    <span className="text-slate-800 font-medium">
+                      {meter?.tenant_name}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Action Buttons */}
@@ -470,6 +511,11 @@ export default function ModernMeterManagement() {
           open={openView}
         />
       )}
+      <TopUpDialog
+        open={topUpOpen}
+        onOpenChange={setTopUpOpen}
+        deviceId={selectedDevice}
+      />
     </div>
   );
 }

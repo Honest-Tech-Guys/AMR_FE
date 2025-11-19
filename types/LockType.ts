@@ -4,6 +4,9 @@ import { Unit } from "./UnitType";
 type LockType = {
   id: number;
   lockable_type: string;
+  status: string;
+  has_gateway: number;
+  battery: number;
   lockable_id: number;
   lockable: Unit | Room;
   serial_number: string;

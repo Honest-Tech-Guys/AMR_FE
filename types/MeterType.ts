@@ -7,6 +7,7 @@ type MeterType = {
   meterable_id: number;
   name: string;
   serial_number: string;
+  tenant_name?: string;
   brand: string;
   model: string;
   used_unit: string;

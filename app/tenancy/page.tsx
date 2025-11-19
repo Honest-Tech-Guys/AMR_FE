@@ -13,6 +13,7 @@ import {
   DollarSign,
   FileText,
   Home,
+  LoaderCircle,
   Search,
   Timer,
   TrendingUp,
@@ -77,10 +78,10 @@ const Page = () => {
     if (data) {
       setPagination((prev) => ({
         ...prev,
-        page: data?.current_page ?? prev.page,
-        per_page: data?.per_page ?? prev.per_page,
-        last_page: data?.last_page ?? prev.last_page,
-        links: data?.links ?? prev.links,
+        page: data?.tenancies.current_page ?? prev.page,
+        per_page: data?.tenancies.per_page ?? prev.per_page,
+        last_page: data?.tenancies.last_page ?? prev.last_page,
+        links: data?.tenancies.links ?? prev.links,
       }));
     }
   }, [data]);
@@ -139,32 +140,39 @@ const Page = () => {
   const stats = [
     {
       label: "Total Tenancies",
-      value: "342",
+      value: data?.stats.total_tenancies,
       icon: FileText,
       color: "bg-green-50",
     },
     {
       label: "Active",
-      value: "298",
+      value: data?.stats.active,
       icon: CheckCircle2,
       color: "bg-green-50",
     },
     {
       label: "Expiring Soon",
-      value: "28",
+      value: data?.stats.expiry_soon,
       icon: AlertCircle,
       color: "bg-green-50",
     },
     {
-      label: "Monthly Revenue",
-      value: "RM 412K",
+      label: "Last Month",
+      value: data?.stats.last_month,
       icon: TrendingUp,
       color: "bg-green-50",
     },
   ];
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoaderCircle className="animate-spin text-primary w-10 h-10" />
+      </div>
+    );
+  }
   return (
     <div className="w-full p-3 ">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-3">
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -172,11 +180,11 @@ const Page = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-600 text-sm font-medium mb-1">
+                <p className="text-slate-600 text-xs font-medium mb-1">
                   {stat.label}
                 </p>
-                <p className="text-3xl font-bold text-slate-800">
-                  {stat.value}
+                <p className="text-xl font-bold text-slate-800">
+                  {stat.value ?? 0}
                 </p>
               </div>
               <div
@@ -316,8 +324,8 @@ const Page = () => {
         </div>
       )}
       {
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data?.data?.map((tenancy) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+          {data?.tenancies.data?.map((tenancy) => {
             const statusConfig = getStatusConfig(tenancy.status as never);
             const StatusIcon = statusConfig.icon;
 
@@ -504,9 +512,7 @@ const Page = () => {
                       </span>
                     </div>
                   </div>
-
                   {/* Action Button */}
-
                   <ViewTenancy tenancy={tenancy} />
                 </div>
               </div>

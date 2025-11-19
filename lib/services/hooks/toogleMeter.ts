@@ -3,27 +3,30 @@ import axiosInstance from "../ApiCore";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
 
-type ClearEnergyResponse = {
+type ToggleDeviceResponse = {
   success: boolean;
-  message?: string;
+  status: string; // "on" | "off"
   [key: string]: any;
 };
-const useClearEnergy = () => {
+
+const useToggleDevice = () => {
   return useMutation({
     mutationFn: async (deviceId: number) => {
-      const res = await axiosInstance.post<ClearEnergyResponse>(
-        `/tuya/devices/${deviceId}/clear-energy`
+      const res = await axiosInstance.post<ToggleDeviceResponse>(
+        `/tuya/devices/${deviceId}/toggle`
       );
       return res.data;
     },
+
     onSuccess: (data) => {
-      toast.success("Energy cleared successfully!");
-      console.log("API response:", data);
+      const newState = data?.status === "on" ? "Connected" : "Disconnected";
+      toast.success(`Device ${newState} successfully!`);
     },
+
     onError: (err: any) => {
       ErrorToastHandel(err);
     },
   });
 };
 
-export default useClearEnergy;
+export default useToggleDevice;

@@ -21,6 +21,7 @@ import {
   Key,
   DoorOpen,
   Signal,
+  Clock,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -37,6 +38,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import LockType from "@/types/LockType";
+import { cn } from "@/lib/utils";
 const Page = () => {
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState<LockType>();
@@ -114,10 +116,16 @@ const Page = () => {
     if (battery > 30) return "bg-gradient-to-r from-yellow-500 to-yellow-600";
     return "bg-gradient-to-r from-red-500 to-red-600";
   };
+
+  const getBatteryGradient = (battery: number) => {
+    if (battery > 70) return "from-green-500 to-green-600";
+    if (battery > 30) return "from-yellow-500 to-yellow-600";
+    return "from-red-500 to-red-600";
+  };
   return (
     <div>
       <div className="w-full  p-3 ">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-3">
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -141,7 +149,7 @@ const Page = () => {
             </div>
           ))}
         </div>
-        <div className=" my-3 bg-white p-5 rounded-2xl shadow-sm">
+        <div className=" mt-3 mb-6 bg-white p-5 rounded-2xl shadow-sm">
           <ResponsiveFilter
             filters={[
               {
@@ -253,27 +261,110 @@ const Page = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 ">
           {data?.data?.map((lock) => (
+            // <div
+            //   key={lock.id}
+            //   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"
+            //   // onMouseEnter={() => setHoveredCard(lock.id)}
+            //   // onMouseLeave={() => setHoveredCard(null)}
+            // >
+            //   {/* Card Header */}
+            //   <div className="bg-gradient-to-r from-primary to-primary/70 p-5 relative overflow-hidden">
+            //     <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+            //     <div className="flex items-start justify-between relative z-10">
+            //       <div className="flex items-center gap-3">
+            //         <div>
+            //           <h3
+            //             className="text-lg font-bold text-white"
+            //             onClick={() => {
+            //               setOpenView(true);
+            //               setSelectedItem(lock);
+            //             }}
+            //           >
+            //             {lock.serial_number}
+            //           </h3>
+            //           <p className="text-slate-300 text-sm">
+            //             {"unit" in lock.lockable
+            //               ? `${lock.lockable?.unit.property.property_name} ${lock.lockable?.unit.block_floor_unit_number} ${lock.lockable?.name}`
+            //               : `${lock.lockable?.property?.property_name} ${lock.lockable?.block_floor_unit_number}`}
+            //           </p>
+            //         </div>
+            //       </div>
+            //       <button className="p-2 hover:bg-white/10 rounded-lg transition-all">
+            //         <MoreVertical className="w-5 h-5 text-white" />
+            //       </button>
+            //     </div>
+            //   </div>
+
+            //   {/* Card Body */}
+            //   <div className="p-5">
+            //     {/* Status Indicators */}
+            //     <div className="flex gap-2 mb-4 flex-wrap">
+            //       {lock?.connection === "online" ? (
+            //         <span className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold border border-green-200">
+            //           <Signal className="w-3 h-3" />
+            //           Online
+            //         </span>
+            //       ) : (
+            //         <span className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-semibold border border-red-200">
+            //           <Signal className="w-3 h-3" />
+            //           Offline
+            //         </span>
+            //       )}
+            //       {lock?.status === "locked" ? (
+            //         <span className="flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold border border-indigo-200">
+            //           <Lock className="w-3 h-3" />
+            //           Locked
+            //         </span>
+            //       ) : (
+            //         <span className="flex items-center gap-1 px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold border border-orange-200">
+            //           <Unlock className="w-3 h-3" />
+            //           Unlocked
+            //         </span>
+            //       )}
+
+            //       <div
+            //         className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${getBatteryColor(
+            //           lock?.battery
+            //         )}`}
+            //       >
+            //         <Battery className="w-3 h-3" />
+            //         {lock?.battery}%
+            //       </div>
+            //       <span className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-semibold border ">
+            //         <Users className="w-3 h-3" />
+            //         10
+            //       </span>
+            //     </div>
+            //     <div className="border-t border-slate-200 pt-4 space-y-2 mb-4">
+            //       <div className="flex justify-between text-sm">
+            //         <span className="text-slate-500">Owner:</span>
+            //         <span className="text-slate-800 font-medium">
+            //           {"unit" in lock.lockable
+            //             ? ` ${lock.lockable?.unit?.property?.owner?.name} `
+            //             : `${lock.lockable?.property?.owner?.name}`}
+            //         </span>
+            //       </div>
+            //       <div className="flex justify-between text-sm">
+            //         <span className="text-slate-500">Tenant:</span>
+            //         <span className="text-slate-800 font-medium">
+            //           {lock?.tenant_name}
+            //         </span>
+            //       </div>
+            //     </div>
+            //   </div>
+            // </div>
             <div
               key={lock.id}
               className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"
-              // onMouseEnter={() => setHoveredCard(lock.id)}
-              // onMouseLeave={() => setHoveredCard(null)}
             >
-              {/* Card Header */}
+              {/* Card Header - Keep Original Style */}
               <div className="bg-gradient-to-r from-primary to-primary/70 p-5 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
                 <div className="flex items-start justify-between relative z-10">
                   <div className="flex items-center gap-3">
-                    <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-                      {/* {lock?.status === "locked" ? (
-                        <Lock className="w-6 h-6 text-white" />
-                      ) : (
-                        <Unlock className="w-6 h-6 text-white" />
-                      )} */}
-                    </div>
                     <div>
                       <h3
-                        className="text-lg font-bold text-white"
+                        className="text-lg font-bold text-white cursor-pointer hover:text-indigo-100 transition-colors"
                         onClick={() => {
                           setOpenView(true);
                           setSelectedItem(lock);
@@ -281,6 +372,11 @@ const Page = () => {
                       >
                         {lock.serial_number}
                       </h3>
+                      <p className="text-indigo-100 text-sm mt-1">
+                        {"unit" in lock.lockable
+                          ? `${lock.lockable?.unit.property.property_name} ${lock.lockable?.unit.block_floor_unit_number} ${lock.lockable?.name}`
+                          : `${lock.lockable?.property?.property_name} ${lock.lockable?.block_floor_unit_number}`}
+                      </p>
                     </div>
                   </div>
                   <button className="p-2 hover:bg-white/10 rounded-lg transition-all">
@@ -289,93 +385,61 @@ const Page = () => {
                 </div>
               </div>
 
-              {/* Card Body */}
-              <div className="p-5">
-                {/* Status Indicators */}
-                <div className="flex gap-2 mb-4 flex-wrap">
-                  {/* {lock?.connection === "online" ? (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold border border-green-200">
-                      <Signal className="w-3 h-3" />
+              {/* Enhanced Card Body */}
+              <div className="p-6">
+                {/* Status Badges Row */}
+                <div className="flex gap-2 mb-5 flex-wrap">
+                  {lock?.status === "online" ? (
+                    <span className="flex items-center gap-1.5 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-xs font-semibold border border-green-200">
+                      <Signal className="w-4 h-4" />
                       Online
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-semibold border border-red-200">
-                      <Signal className="w-3 h-3" />
+                    <span className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-semibold border border-red-200">
+                      <Signal className="w-4 h-4" />
                       Offline
                     </span>
-                  )} */}
-                  {/* {lock?.status === "locked" ? (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold border border-indigo-200">
-                      <Lock className="w-3 h-3" />
-                      Locked
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-semibold border border-orange-200">
-                      <Unlock className="w-3 h-3" />
-                      Unlocked
-                    </span>
-                  )} */}
-
-                  {/* <div
+                  )}
+                  <div
                     className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${getBatteryColor(
                       lock?.battery
                     )}`}
                   >
                     <Battery className="w-3 h-3" />
                     {lock?.battery}%
-                  </div> */}
-                  <span className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-semibold border ">
-                    <Users className="w-3 h-3" />
-                    10
-                  </span>
+                  </div>
                 </div>
-
-                {/* Battery Status */}
-
-                {/* Property Details */}
+                {/* Authorized Users - Featured Box */}
                 <div className="space-y-3 mb-4">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4 text-slate-600" />
-                      <span className="text-slate-600 text-sm font-medium">
-                        Property
-                      </span>
-                    </div>
-                    <span className="text-slate-800 font-semibold text-sm">
-                      {"unit" in lock.lockable
-                        ? `${lock.lockable?.unit.property.property_name} `
-                        : `${lock.lockable?.property?.property_name} `}
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                    <span className="text-slate-600 text-sm font-medium">
+                      Authorized Users
                     </span>
+                    <span className="text-slate-800 font-bold">{10}</span>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-slate-50 rounded-xl">
-                      <p className="text-slate-500 text-xs mb-1">Unit</p>
-                      <span className="text-slate-800 font-semibold text-sm">
-                        {"unit" in lock.lockable
-                          ? ` ${lock.lockable?.unit.block_floor_unit_number} `
-                          : `${lock.lockable?.block_floor_unit_number}`}
-                      </span>
-                    </div>
-                    <div className="p-3 bg-slate-50 rounded-xl">
-                      <p className="text-slate-500 text-xs mb-1">Room</p>
-                      <span className="text-slate-800 font-semibold text-sm">
-                        {"unit" in lock.lockable
-                          ? ` ${lock.lockable?.name}`
-                          : `-`}
-                      </span>
-                    </div>
+                  <div
+                    className={cn(
+                      "flex justify-between items-center p-3  rounded-xl",
+                      lock.has_gateway === 0 ? "bg-red-50" : "bg-green-50"
+                    )}
+                  >
+                    <span className="text-slate-600 text-sm font-medium">
+                      Gateway
+                    </span>
+                    {lock.has_gateway === 0 ? (
+                      <span className="text-red-700 font-bold">No</span>
+                    ) : (
+                      <span className="text-green-700 font-bold">Yes</span>
+                    )}
                   </div>
                 </div>
-
-                {/* Owner/Tenant Info */}
-                <div className="border-t border-slate-200 pt-4 space-y-2 mb-4">
+                <div className="border-t border-slate-200 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-500">Owner:</span>
                     <span className="text-slate-800 font-medium">
                       {"unit" in lock.lockable
-                        ? ` ${lock.lockable?.unit?.property?.owner?.name} `
-                        : `${lock.lockable?.property?.owner?.name}`}
+                        ? `${lock.lockable?.unit.property?.owner?.name} `
+                        : `${lock.lockable?.property?.owner?.name} `}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
