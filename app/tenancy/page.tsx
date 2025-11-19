@@ -96,6 +96,15 @@ const Page = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.per_page, query.te, query.status]);
+  // const getPaymentStatusConfig = (status: any) => {
+  //   const configs = {
+  //     Paid: { color: "bg-green-50 border-green-200 text-green-700" },
+  //     Pending: { color: "bg-orange-50 border-orange-200 text-orange-700" },
+  //     Overdue: { color: "bg-red-50 border-red-200 text-red-700" },
+  //     Upcoming: { color: "bg-blue-50 border-blue-200 text-blue-700" },
+  //   };
+  //   return configs[status] || configs["Upcoming"];
+  // };
   function getStatusColor(status: string): string {
     switch (status) {
       case "Upcoming":
@@ -338,42 +347,48 @@ const Page = () => {
               >
                 {/* Card Header */}
                 <div
-                  className={`bg-gradient-to-r ${statusConfig.color} p-5 relative overflow-hidden`}
+                  className={`bg-gradient-to-r ${statusConfig.color} p-3 relative overflow-hidden`}
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-                  <div className="flex items-start justify-between relative z-10">
-                    <div>
+                  {/* <div className="flex items-start justify-between relative z-10"> */}
+                  <div>
+                    <div className="w-full flex  justify-between ">
                       <div className="flex items-center gap-2 mb-2">
                         <StatusIcon className="w-5 h-5 text-white" />
                         <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">
                           {tenancy.status}
                         </span>
+                        <p className="text-white/90 text-sm">
+                          {tenancy.tenantable
+                            ? "unit" in tenancy.tenantable
+                              ? ` ${tenancy?.tenantable?.unit?.rental_type} `
+                              : `${tenancy?.tenantable?.rental_type}`
+                            : "-"}
+                        </p>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-1">
-                        {tenancy.code}
-                      </h3>
-                      <p className="text-white/90 text-sm">
-                        {tenancy.tenantable
-                          ? "unit" in tenancy.tenantable
-                            ? ` ${tenancy?.tenantable?.unit?.rental_type} `
-                            : `${tenancy?.tenantable?.rental_type}`
-                          : "-"}
-                      </p>
+                      <div>
+                        <div className=" flex gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
+                          <p className=" text-white text-xs font-medium">
+                            {daysBetween(
+                              tenancy.tenancy_period_start_date,
+                              tenancy.tenancy_period_end_date
+                            )}{" "}
+                          </p>
+                          <p className=" text-white text-xs font-medium">
+                            Days
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className=" flex gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                      <p className=" text-white text-xs font-medium">
-                        {daysBetween(
-                          tenancy.tenancy_period_start_date,
-                          tenancy.tenancy_period_end_date
-                        )}{" "}
-                      </p>
-                      <p className=" text-white text-xs font-medium">Days</p>
-                    </div>
+                    <h3 className="text-lg font-bold text-white mb-1">
+                      {tenancy.code}
+                    </h3>
                   </div>
+                  {/* </div> */}
                 </div>
 
                 {/* Card Body */}
-                <div className="p-5">
+                <div className="p-3 ">
                   {/* Status Badges */}
                   {/* <div className="flex gap-2 mb-4 flex-wrap">
                     <span
@@ -398,7 +413,7 @@ const Page = () => {
                   </div> */}
 
                   {/* Tenant Info */}
-                  <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                  <div className="mb-3 p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
                     <div className="flex items-center gap-3">
                       <div className="bg-green-50 text-green-600 p-3 rounded-xl">
                         <User className="w-5 h-5 " />
@@ -416,10 +431,10 @@ const Page = () => {
 
                   {/* Property Details */}
                   <div className="space-y-3 mb-4">
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
                       <Building2 className="w-4 h-4 text-slate-600 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs text-slate-500 mb-1">Property</p>
+                      <div className="flex-1 flex items-center gap-2">
+                        <p className="text-xs text-slate-500 ">Property :</p>
                         <p className="text-sm font-semibold text-slate-800">
                           {tenancy.tenantable
                             ? "unit" in tenancy.tenantable
@@ -449,7 +464,7 @@ const Page = () => {
                             Monthly Rental
                           </p>
                         </div>
-                        <p className="text-lg font-bold text-green-800">
+                        <p className="text-sm font-bold text-green-800">
                           RM {tenancy.rental_fee}
                         </p>
                       </div>
@@ -459,7 +474,7 @@ const Page = () => {
                             Type
                           </p>
                         </div>
-                        <p className="text-xs font-semibold text-blue-800">
+                        <p className="text-sm font-semibold text-blue-800">
                           {tenancy.rental_payment_frequency}
                         </p>
                       </div>
@@ -468,24 +483,26 @@ const Page = () => {
 
                   {/* Tenancy Period */}
                   <div className="p-4 bg-slate-50 rounded-xl mb-4 border border-slate-200">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="w-4 h-4 text-slate-600" />
-                      <p className="text-xs text-slate-600 font-semibold">
-                        Tenancy Period
-                      </p>
-                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-slate-500 mb-1">
-                          Start Date
-                        </p>
-                        <p className="text-sm font-semibold text-slate-800">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calendar className="w-4 h-4 text-slate-600" />
+                          <p className="text-xs text-slate-500 ">
+                            Tenancy Start Date
+                          </p>
+                        </div>
+                        <p className="text-sm font-semibold text-slate-800 ml-6">
                           {tenancy.tenancy_period_start_date}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-500 mb-1">End Date</p>
-                        <p className="text-sm font-semibold text-slate-800">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calendar className="w-4 h-4 text-slate-600" />
+                          <p className="text-xs text-slate-500 ">
+                            Tenancy End Date
+                          </p>
+                        </div>
+                        <p className="text-sm font-semibold text-slate-800 ml-6">
                           {tenancy.tenancy_period_end_date}
                         </p>
                       </div>
