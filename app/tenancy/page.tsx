@@ -176,7 +176,7 @@ const Page = () => {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 hover:scale-105"
+            className="bg-white hover:border-green-600 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 hover:scale-105"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -416,7 +416,7 @@ const Page = () => {
 
                   {/* Property Details */}
                   <div className="space-y-3 mb-4">
-                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
                       <Building2 className="w-4 h-4 text-slate-600 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-xs text-slate-500 mb-1">Property</p>
@@ -445,7 +445,6 @@ const Page = () => {
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-green-50 rounded-xl border border-green-200">
                         <div className="flex items-center gap-2 mb-1">
-                          <DollarSign className="w-4 h-4 text-green-600" />
                           <p className="text-xs text-green-700 font-medium">
                             Monthly Rental
                           </p>
@@ -456,7 +455,6 @@ const Page = () => {
                       </div>
                       <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
                         <div className="flex items-center gap-2 mb-1">
-                          <Home className="w-4 h-4 text-blue-600" />
                           <p className="text-xs text-blue-700 font-medium">
                             Type
                           </p>
