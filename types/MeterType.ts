@@ -1,4 +1,7 @@
-type Meter = {
+import { Room } from "./RoomType";
+import { Unit } from "./UnitType";
+
+type MeterType = {
   id: number;
   meterable_type: string;
   meterable_id: number;
@@ -18,23 +21,6 @@ type Meter = {
   remarks: string | null;
   created_at: string; // ISO datetime
   updated_at: string; // ISO datetime
-  meterable: {
-    id: number;
-    property_name: string;
-    property_type: string;
-    status: string;
-    owner_id: number;
-    created_by: number;
-    contact_name: string;
-    contact_phone: string;
-    remarks: string;
-    address_line_1: string;
-    city: string;
-    postcode: string;
-    state: string;
-    country: string;
-    facilities: string[];
-    created_at: string;
-    updated_at: string;
-  };
+  meterable: Unit | Room;
 };
+export default MeterType;

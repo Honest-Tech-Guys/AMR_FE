@@ -1,10 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
+import MeterType from "@/types/MeterType";
 
 // ✅ Update input type: everything except immutable fields
 export type UpdateMeterInput = Partial<
   Omit<
-    Meter,
+    MeterType,
     | "created_at"
     | "updated_at"
     | "created_by"
@@ -18,7 +19,7 @@ const useUpdateMeter = () => {
     mutationKey: ["UpdateMeter"],
     mutationFn: async (updatedMeter: UpdateMeterInput) => {
       const { id, ...payload } = updatedMeter;
-      const res = await axiosInstance.put<Meter>(`/meters/${id}`, payload);
+      const res = await axiosInstance.put<MeterType>(`/meters/${id}`, payload);
       return res.data;
     },
     onError: (error) => {

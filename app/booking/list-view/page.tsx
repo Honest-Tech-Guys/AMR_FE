@@ -220,9 +220,8 @@ const Page = () => {
   }, [pagination.page, pagination.per_page]);
 
   return (
-    <div>
-      {/* <HeaderPage title="Booking (List View)" /> */}
-      <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
+    <div className="w-full p-3 ">
+      <div className=" my-3 bg-white p-5 rounded-2xl shadow-sm">
         <ResponsiveFilter
           filters={[
             {
@@ -274,7 +273,7 @@ const Page = () => {
           setFormFilters={setFormFilters as never}
         />
         {/* Actions */}
-        <div className="flex w-full justify-between my-3">
+        <div className="flex w-full justify-between ">
           <div>
             {!isPending && (
               <Pagination>
@@ -335,9 +334,9 @@ const Page = () => {
             <CreateNewBooking />
           </div>
         </div>
-
-        {/* Filter toggle */}
-
+      </div>
+      {/* Filter toggle */}
+      <div className="bg-white rounded-2xl shadow-sm">
         <Datatable<Book>
           columns={bookingColumns}
           data={data?.data ?? []}

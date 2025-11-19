@@ -1,5 +1,7 @@
 import { AgreementType } from "./AgreementType";
 import { Invoice } from "./InvoiceType";
+import LockType from "./LockType";
+import MeterType from "./MeterType";
 import { Room } from "./RoomType";
 import { TenantType } from "./TenantType";
 import { Unit } from "./UnitType";
@@ -43,6 +45,6 @@ export type Tenancy = {
     url: string;
   }[];
   tenantable: Unit | Room;
-  meters: Meter[];
-  locks: Locks[];
+  meters: MeterType[];
+  locks: LockType[];
 };

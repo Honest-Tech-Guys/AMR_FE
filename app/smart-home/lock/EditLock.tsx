@@ -25,6 +25,7 @@ import useGetSelection, {
   PropertySelection,
 } from "@/lib/services/hooks/useGetSelection";
 import { toast } from "sonner";
+import LockType from "@/types/LockType";
 
 // Schema & type
 const schema = yup.object({
@@ -37,7 +38,7 @@ type SchemaType = yup.InferType<typeof schema> & {
 };
 
 type EditLockProps = {
-  lock: Locks | null;
+  lock: LockType | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };

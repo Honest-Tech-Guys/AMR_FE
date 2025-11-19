@@ -208,470 +208,473 @@ const Page = () => {
 
   return (
     <div>
-      <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
-        <ResponsiveFilter
-          filters={[
-            {
-              name: "property_name",
-              placeholder: "Property Name",
-              type: "input",
-              icon: Search,
-            },
-            {
-              name: "owner_name",
-              placeholder: "Owner Name",
-              type: "input",
-              icon: Search,
-            },
-            {
-              name: "rental_type",
-              placeholder: "Rental Type",
-              type: "select",
-              selectItems: [
-                { label: "Whole Unit", value: "Whole Unit" },
-                { label: "Room Rental", value: "Room Rental" },
-              ],
-              icon: Search,
-            },
+      <div className="w-full   p-3 ">
+        <div className=" my-3 bg-white p-5 rounded-2xl shadow-sm">
+          <ResponsiveFilter
+            filters={[
+              {
+                name: "property_name",
+                placeholder: "Property Name",
+                type: "input",
+                icon: Search,
+              },
+              {
+                name: "owner_name",
+                placeholder: "Owner Name",
+                type: "input",
+                icon: Search,
+              },
+              {
+                name: "rental_type",
+                placeholder: "Rental Type",
+                type: "select",
+                selectItems: [
+                  { label: "Whole Unit", value: "Whole Unit" },
+                  { label: "Room Rental", value: "Room Rental" },
+                ],
+                icon: Search,
+              },
 
-            {
-              name: "Meter_and_lock",
-              placeholder: "Meter and lock",
-              type: "select",
-              selectItems: [
-                { label: "Has Meter", value: "Has Meter" },
-                { label: "Has Lock", value: "Has Lock" },
-              ],
-              icon: Search,
-              isMulti: true,
-            },
-            {
-              name: "date_range",
-              placeholder: "Date Range",
-              type: "date",
-              icon: Calendar,
-            },
-          ]}
-          actionButton={
-            <Button
-              onClick={() => setAppliedFilters(formFilters)}
-              className="text-white"
-            >
-              <Search />
-            </Button>
-          }
-          formFilters={formFilters}
-          setFormFilters={setFormFilters as never}
-        />
-
-        {/* Actions */}
-        <div className="flex w-full justify-between my-3">
-          <div>
-            {!isPending && (
-              <Pagination>
-                <PaginationContent className="flex justify-between w-full items-center">
-                  <PaginationItem className="text-xs text-gray-600">
-                    Page {pagination.page} of {pagination.last_page}
-                  </PaginationItem>
-                  <PaginationItem className="flex gap-x-2">
-                    <PaginationControl
-                      pagination={pagination}
-                      setPagination={setPagination}
-                    />
-                    <PaginationPrevious
-                      onClick={() => {
-                        if (pagination.page <= 1) {
-                          null;
-                        } else {
-                          setPagination((prev) => ({
-                            ...prev,
-                            page: prev.page - 1,
-                          }));
-                        }
-                      }}
-                      isActive={pagination.page > 1}
-                      className={`bg-gray-100 cursor-pointer ${
-                        pagination.page <= 1
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                    />
-                    <PaginationNext
-                      onClick={() => {
-                        if (
-                          pagination.page >= (pagination.last_page as number)
-                        ) {
-                          null;
-                        } else {
-                          setPagination((prev) => ({
-                            ...prev,
-                            page: prev.page + 1,
-                          }));
-                        }
-                      }}
-                      isActive={pagination.page < (pagination.last_page ?? 1)}
-                      className={`bg-gray-100 cursor-pointer ${
-                        pagination.page >= (pagination.last_page as number)
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </div>
-          <div className="flex flex-wrap space-x-3">
-            <CreateBulkPropertyModal />
-            <CreateNewProperty />
-          </div>
-        </div>
-
-        <div className="flex items-end justify-between mb-4">
-          <RadioCardsDemo
-            options={options}
-            value={(appliedFilters as { status?: string })?.status || ""}
-            onChange={(val) =>
-              setAppliedFilters((prev) => ({ ...prev, status: val }))
+              {
+                name: "Meter_and_lock",
+                placeholder: "Meter and lock",
+                type: "select",
+                selectItems: [
+                  { label: "Has Meter", value: "Has Meter" },
+                  { label: "Has Lock", value: "Has Lock" },
+                ],
+                icon: Search,
+                isMulti: true,
+              },
+              {
+                name: "date_range",
+                placeholder: "Date Range",
+                type: "date",
+                icon: Calendar,
+              },
+            ]}
+            actionButton={
+              <Button
+                onClick={() => setAppliedFilters(formFilters)}
+                className="text-white"
+              >
+                <Search />
+              </Button>
             }
+            formFilters={formFilters}
+            setFormFilters={setFormFilters as never}
           />
+          {/* Actions */}
+          <div className="flex w-full justify-between ">
+            <div>
+              {!isPending && (
+                <Pagination>
+                  <PaginationContent className="flex justify-between w-full items-center">
+                    <PaginationItem className="text-xs text-gray-600">
+                      Page {pagination.page} of {pagination.last_page}
+                    </PaginationItem>
+                    <PaginationItem className="flex gap-x-2">
+                      <PaginationControl
+                        pagination={pagination}
+                        setPagination={setPagination}
+                      />
+                      <PaginationPrevious
+                        onClick={() => {
+                          if (pagination.page <= 1) {
+                            null;
+                          } else {
+                            setPagination((prev) => ({
+                              ...prev,
+                              page: prev.page - 1,
+                            }));
+                          }
+                        }}
+                        isActive={pagination.page > 1}
+                        className={`bg-gray-100 cursor-pointer ${
+                          pagination.page <= 1
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      />
+                      <PaginationNext
+                        onClick={() => {
+                          if (
+                            pagination.page >= (pagination.last_page as number)
+                          ) {
+                            null;
+                          } else {
+                            setPagination((prev) => ({
+                              ...prev,
+                              page: prev.page + 1,
+                            }));
+                          }
+                        }}
+                        isActive={pagination.page < (pagination.last_page ?? 1)}
+                        className={`bg-gray-100 cursor-pointer ${
+                          pagination.page >= (pagination.last_page as number)
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+            <div className="flex flex-wrap space-x-3">
+              <CreateBulkPropertyModal />
+              <CreateNewProperty />
+            </div>
+          </div>
         </div>
+        <div className="bg-white rounded-2xl shadow-sm">
+          <div className="flex items-end justify-between m-4">
+            <RadioCardsDemo
+              options={options}
+              value={(appliedFilters as { status?: string })?.status || ""}
+              onChange={(val) =>
+                setAppliedFilters((prev) => ({ ...prev, status: val }))
+              }
+            />
+          </div>
 
-        {/* Table */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="p-2 bg-gray-50 text-xs">
-                {/* Empty column for checkbox or icons */}
-                <TableHead className="w-12"></TableHead>
+          {/* Table */}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow className="p-2 bg-gray-50 text-xs">
+                  {/* Empty column for checkbox or icons */}
+                  <TableHead className="w-12"></TableHead>
 
-                {/* Property */}
-                <TableHead className="text-gray-600 py-4">
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-x-2">
-                      <span>Property</span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => handleSort("property_name")}
-                      >
-                        {sortKey === "property_name" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={12} />
-                          ) : (
-                            <ArrowDown size={12} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={12} />
-                        )}
-                      </span>
-                    </div>
-                    <Input
-                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
-                      placeholder="Search Property"
-                      value={searchTerms.property_name ?? ""}
-                      onChange={(e) =>
-                        setSearchTerms((prev) => ({
-                          ...prev,
-                          property_name: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </TableHead>
-
-                {/* Type */}
-                <TableHead className="text-gray-600 py-4">
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-x-2">
-                      <span>Type</span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => handleSort("property_type")}
-                      >
-                        {sortKey === "property_type" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={12} />
-                          ) : (
-                            <ArrowDown size={12} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={12} />
-                        )}
-                      </span>
-                    </div>
-                    <Input
-                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
-                      placeholder="Search Type"
-                      value={searchTerms.property_type ?? ""}
-                      onChange={(e) =>
-                        setSearchTerms((prev) => ({
-                          ...prev,
-                          property_type: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </TableHead>
-
-                {/* Owner */}
-                <TableHead className="text-gray-600 py-4">
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-x-2">
-                      <span>Owner</span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => handleSort("owner")}
-                      >
-                        {sortKey === "owner" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={12} />
-                          ) : (
-                            <ArrowDown size={12} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={12} />
-                        )}
-                      </span>
-                    </div>
-                    <Input
-                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
-                      placeholder="Search Owner"
-                      value={searchTerms.owner ?? ""}
-                      onChange={(e) =>
-                        setSearchTerms((prev) => ({
-                          ...prev,
-                          owner: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </TableHead>
-
-                {/* Address */}
-                <TableHead className="text-gray-600 py-4">
-                  <div className="flex flex-col items-center">
-                    <span>Address</span>
-                    <Input
-                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
-                      placeholder="Search Address"
-                      value={searchTerms.address ?? ""}
-                      onChange={(e) =>
-                        setSearchTerms((prev) => ({
-                          ...prev,
-                          address: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </TableHead>
-
-                {/* Facilities */}
-                <TableHead className="text-gray-600 py-4">
-                  <div className="flex flex-col items-center">
-                    <span>Facilities</span>
-                    <Input
-                      className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
-                      placeholder="Search Facilities"
-                      value={searchTerms.facilities ?? ""}
-                      onChange={(e) =>
-                        setSearchTerms((prev) => ({
-                          ...prev,
-                          facilities: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </TableHead>
-
-                {/* Actions */}
-                <TableHead className="text-gray-600 text-center pr-6">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : tableData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    No properties found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                tableData.map((property) => (
-                  <>
-                    {/* Property Row */}
-                    <TableRow
-                      key={property.id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => togglePropertyExpansion(property.id)}
-                    >
-                      <TableCell>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            togglePropertyExpansion(property.id);
-                          }}
-                          className="p-1 hover:bg-gray-200 rounded transition-colors"
+                  {/* Property */}
+                  <TableHead className="text-gray-600 py-4">
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center gap-x-2">
+                        <span>Property</span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => handleSort("property_name")}
                         >
-                          {expandedPropertyId === property.id ? (
-                            <ChevronUp className="w-5 h-5 text-gray-600" />
+                          {sortKey === "property_name" ? (
+                            sortOrder === "asc" ? (
+                              <ArrowUp size={12} />
+                            ) : (
+                              <ArrowDown size={12} />
+                            )
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-600" />
+                            <ArrowUpDown size={12} />
                           )}
-                        </button>
-                      </TableCell>
-                      <TableCell>
-                        <div
-                          className="flex items-center gap-2 text-primary font-medium cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedProperty(property);
-                            setOpenView(true);
-                          }}
-                        >
-                          <Home className="w-5 h-5 text-primary" />
-                          {property.property_name}
-                        </div>
-                      </TableCell>
-                      <TableCell>{property.property_type}</TableCell>
-                      <TableCell>{property.owner?.name}</TableCell>
-                      <TableCell>
-                        <div className="break-words whitespace-normal max-w-xs">
-                          {property.city},{property.state},
-                          {property.address_line_1}
-                        </div>
-                      </TableCell>
-                      <TableCell>{property?.facilities}</TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <PropertyDropdown property={property} />
-                      </TableCell>
-                    </TableRow>
+                        </span>
+                      </div>
+                      <Input
+                        className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                        placeholder="Search Property"
+                        value={searchTerms.property_name ?? ""}
+                        onChange={(e) =>
+                          setSearchTerms((prev) => ({
+                            ...prev,
+                            property_name: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </TableHead>
 
-                    {/* Expandable Units Row */}
-                    {expandedPropertyId === property.id && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={7}
-                          className="bg-gradient-to-r from-green-50 to-blue-50 p-0"
+                  {/* Type */}
+                  <TableHead className="text-gray-600 py-4">
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center gap-x-2">
+                        <span>Type</span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => handleSort("property_type")}
                         >
-                          <div className="px-12 py-6">
-                            <div className="mb-4 flex items-center justify-between">
-                              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <Grid className="w-5 h-5 text-primary" />
-                                Units in {property.property_name}
-                                <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                                  {property.units?.length || 0} units
-                                </span>
-                              </h3>
-                              <Button
-                                className="flex items-center gap-2 text-sm text-white"
-                                onClick={() => {
-                                  setOpenAddUnit(true);
-                                }}
-                              >
-                                <Plus className="w-4 h-4" />
-                                Add Unit
-                              </Button>
-                            </div>
+                          {sortKey === "property_type" ? (
+                            sortOrder === "asc" ? (
+                              <ArrowUp size={12} />
+                            ) : (
+                              <ArrowDown size={12} />
+                            )
+                          ) : (
+                            <ArrowUpDown size={12} />
+                          )}
+                        </span>
+                      </div>
+                      <Input
+                        className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                        placeholder="Search Type"
+                        value={searchTerms.property_type ?? ""}
+                        onChange={(e) =>
+                          setSearchTerms((prev) => ({
+                            ...prev,
+                            property_type: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </TableHead>
 
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                              {!property.units ||
-                              property.units.length === 0 ? (
-                                <div className="p-8 text-center text-gray-500">
-                                  No units available for this property
-                                </div>
-                              ) : (
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead>Unit Name</TableHead>
-                                      <TableHead>Status</TableHead>
-                                      <TableHead>Tenant</TableHead>
-                                      <TableHead>Rental Type</TableHead>
-                                      <TableHead>Monthly Rent</TableHead>
-                                      <TableHead>Actions</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {property.units.map((unit: Unit) => (
-                                      <TableRow
-                                        key={unit.id}
-                                        className="hover:bg-gray-50"
-                                      >
-                                        <TableCell className="font-medium">
-                                          {unit.block_floor_unit_number || "-"}
-                                        </TableCell>
-                                        <TableCell>
-                                          {unit.status === "Occupied" ||
-                                          unit.status === "occupied" ? (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                              <XCircle className="w-3 h-3" />
-                                              Occupied
-                                            </span>
-                                          ) : (
-                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                              <CheckCircle className="w-3 h-3" />
-                                              Vacant
-                                            </span>
-                                          )}
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex items-center gap-2">
-                                            <Users className="w-4 h-4 text-gray-400" />
-                                            <span className="text-sm">
-                                              {unit?.last_active_tenancy[0]
-                                                ?.tenant.name || "-"}
-                                            </span>
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          {unit.rental_type || "-"}
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-gray-400">
-                                              RM
-                                            </span>
-                                            <span className="font-medium">
-                                              {" "}
-                                              {unit.last_active_tenancy[0]
-                                                ?.rental_fee || "0"}
-                                            </span>
-                                          </div>
-                                        </TableCell>
-                                        <TableCell>
-                                          <UnitDropdown unit={unit} />
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              )}
-                            </div>
+                  {/* Owner */}
+                  <TableHead className="text-gray-600 py-4">
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center gap-x-2">
+                        <span>Owner</span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => handleSort("owner")}
+                        >
+                          {sortKey === "owner" ? (
+                            sortOrder === "asc" ? (
+                              <ArrowUp size={12} />
+                            ) : (
+                              <ArrowDown size={12} />
+                            )
+                          ) : (
+                            <ArrowUpDown size={12} />
+                          )}
+                        </span>
+                      </div>
+                      <Input
+                        className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                        placeholder="Search Owner"
+                        value={searchTerms.owner ?? ""}
+                        onChange={(e) =>
+                          setSearchTerms((prev) => ({
+                            ...prev,
+                            owner: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </TableHead>
+
+                  {/* Address */}
+                  <TableHead className="text-gray-600 py-4">
+                    <div className="flex flex-col items-center">
+                      <span>Address</span>
+                      <Input
+                        className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                        placeholder="Search Address"
+                        value={searchTerms.address ?? ""}
+                        onChange={(e) =>
+                          setSearchTerms((prev) => ({
+                            ...prev,
+                            address: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </TableHead>
+
+                  {/* Facilities */}
+                  <TableHead className="text-gray-600 py-4">
+                    <div className="flex flex-col items-center">
+                      <span>Facilities</span>
+                      <Input
+                        className="mt-2 w-full bg-white font-normal text-xs placeholder:text-xs"
+                        placeholder="Search Facilities"
+                        value={searchTerms.facilities ?? ""}
+                        onChange={(e) =>
+                          setSearchTerms((prev) => ({
+                            ...prev,
+                            facilities: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </TableHead>
+
+                  {/* Actions */}
+                  <TableHead className="text-gray-600 text-center pr-6">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                ) : tableData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      No properties found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  tableData.map((property) => (
+                    <>
+                      {/* Property Row */}
+                      <TableRow
+                        key={property.id}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => togglePropertyExpansion(property.id)}
+                      >
+                        <TableCell>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePropertyExpansion(property.id);
+                            }}
+                            className="p-1 hover:bg-gray-200 rounded transition-colors"
+                          >
+                            {expandedPropertyId === property.id ? (
+                              <ChevronUp className="w-5 h-5 text-gray-600" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-gray-600" />
+                            )}
+                          </button>
+                        </TableCell>
+                        <TableCell>
+                          <div
+                            className="flex items-center gap-2 text-primary font-medium cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedProperty(property);
+                              setOpenView(true);
+                            }}
+                          >
+                            <Home className="w-5 h-5 text-primary" />
+                            {property.property_name}
                           </div>
                         </TableCell>
+                        <TableCell>{property.property_type}</TableCell>
+                        <TableCell>{property.owner?.name}</TableCell>
+                        <TableCell>
+                          <div className="break-words whitespace-normal max-w-xs">
+                            {property.city},{property.state},
+                            {property.address_line_1}
+                          </div>
+                        </TableCell>
+                        <TableCell>{property?.facilities}</TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <PropertyDropdown property={property} />
+                        </TableCell>
                       </TableRow>
-                    )}
-                  </>
-                ))
-              )}
-            </TableBody>
-          </Table>
 
-          {/* Pagination */}
-          {/* {!isLoading && tableData.length > 0 && <PaginationControls />} */}
+                      {/* Expandable Units Row */}
+                      {expandedPropertyId === property.id && (
+                        <TableRow>
+                          <TableCell
+                            colSpan={7}
+                            className="bg-gradient-to-r from-green-50 to-blue-50 p-0"
+                          >
+                            <div className="px-12 py-6">
+                              <div className="mb-4 flex items-center justify-between">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                  <Grid className="w-5 h-5 text-primary" />
+                                  Units in {property.property_name}
+                                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                                    {property.units?.length || 0} units
+                                  </span>
+                                </h3>
+                                <Button
+                                  className="flex items-center gap-2 text-sm text-white"
+                                  onClick={() => {
+                                    setOpenAddUnit(true);
+                                  }}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  Add Unit
+                                </Button>
+                              </div>
+
+                              <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+                                {!property.units ||
+                                property.units.length === 0 ? (
+                                  <div className="p-8 text-center text-gray-500">
+                                    No units available for this property
+                                  </div>
+                                ) : (
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Unit Name</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Tenant</TableHead>
+                                        <TableHead>Rental Type</TableHead>
+                                        <TableHead>Monthly Rent</TableHead>
+                                        <TableHead>Actions</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {property.units.map((unit: Unit) => (
+                                        <TableRow
+                                          key={unit.id}
+                                          className="hover:bg-gray-50"
+                                        >
+                                          <TableCell className="font-medium">
+                                            {unit.block_floor_unit_number ||
+                                              "-"}
+                                          </TableCell>
+                                          <TableCell>
+                                            {unit.status === "Occupied" ||
+                                            unit.status === "occupied" ? (
+                                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                                <XCircle className="w-3 h-3" />
+                                                Occupied
+                                              </span>
+                                            ) : (
+                                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                <CheckCircle className="w-3 h-3" />
+                                                Vacant
+                                              </span>
+                                            )}
+                                          </TableCell>
+                                          <TableCell>
+                                            <div className="flex items-center gap-2">
+                                              <Users className="w-4 h-4 text-gray-400" />
+                                              <span className="text-sm">
+                                                {unit?.last_active_tenancy[0]
+                                                  ?.tenant.name || "-"}
+                                              </span>
+                                            </div>
+                                          </TableCell>
+                                          <TableCell>
+                                            {unit.rental_type || "-"}
+                                          </TableCell>
+                                          <TableCell>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-gray-400">
+                                                RM
+                                              </span>
+                                              <span className="font-medium">
+                                                {" "}
+                                                {unit.last_active_tenancy[0]
+                                                  ?.rental_fee || "0"}
+                                              </span>
+                                            </div>
+                                          </TableCell>
+                                          <TableCell>
+                                            <UnitDropdown unit={unit} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+
+            {/* Pagination */}
+            {/* {!isLoading && tableData.length > 0 && <PaginationControls />} */}
+          </div>
+
+          {error && (
+            <div className="text-red-500 mt-2">Error loading properties.</div>
+          )}
         </div>
-
-        {error && (
-          <div className="text-red-500 mt-2">Error loading properties.</div>
-        )}
       </div>
       <CreateUnit
         id={expandedPropertyId as number}

@@ -11,7 +11,7 @@ import { getStatusBadge } from "@/components/General/StatusBadge";
 
 const PropertyCard = ({ property }: { property: any }) => {
   return (
-    <div className="border rounded-2xl p-4 hover:shadow-md transition-shadow">
+    <div className="border rounded-2xl p-4 hover:shadow-md transition-shadow bg-white">
       <Accordion
         defaultValue="property"
         type="single"

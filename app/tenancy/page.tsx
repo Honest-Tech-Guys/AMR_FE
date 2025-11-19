@@ -4,7 +4,23 @@ import HeaderPage from "@/components/HeaderPage";
 import { InputWithIcon } from "@/components/InpuWithIcon";
 import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
-import { Calendar, Search } from "lucide-react";
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Home,
+  Search,
+  Timer,
+  TrendingUp,
+  User,
+  Users,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +43,7 @@ import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
 import CreateNewTenancy from "./CreateNewTenancy";
 import { useSearchParams } from "next/navigation";
+import { daysBetween } from "@/lib/utils";
 
 const Page = () => {
   const actionButton = (
@@ -92,10 +109,86 @@ const Page = () => {
         return "bg-gray-100 text-gray-800 border-gray-300";
     }
   }
+  const getStatusConfig = (
+    status: "Active" | "Expiring Soon" | "Inactive" | "Upcoming"
+  ) => {
+    const configs = {
+      Active: {
+        color: "from-green-500 to-green-600",
+        bgColor: "bg-green-50 border-green-200 text-green-700",
+        icon: CheckCircle2,
+      },
+      "Expiring Soon": {
+        color: "from-yellow-500 to-yellow-600",
+        bgColor: "bg-yellow-50 border-yellow-200 text-yellow-700",
+        icon: AlertCircle,
+      },
+      Inactive: {
+        color: "from-gray-500 to-gray-600",
+        bgColor: "bg-gray-50 border-gray-200 text-gray-700",
+        icon: XCircle,
+      },
+      Upcoming: {
+        color: "from-blue-500 to-blue-600",
+        bgColor: "bg-blue-50 border-blue-200 text-blue-700",
+        icon: Timer,
+      },
+    };
+    return configs[status] || configs["Inactive"];
+  };
+  const stats = [
+    {
+      label: "Total Tenancies",
+      value: "342",
+      icon: FileText,
+      color: "bg-green-50",
+    },
+    {
+      label: "Active",
+      value: "298",
+      icon: CheckCircle2,
+      color: "bg-green-50",
+    },
+    {
+      label: "Expiring Soon",
+      value: "28",
+      icon: AlertCircle,
+      color: "bg-green-50",
+    },
+    {
+      label: "Monthly Revenue",
+      value: "RM 412K",
+      icon: TrendingUp,
+      color: "bg-green-50",
+    },
+  ];
   return (
-    <div>
-      {/* <HeaderPage title="Tenancy" /> */}
-      <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
+    <div className="w-full p-3 ">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {stats.map((stat, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 hover:scale-105"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-600 text-sm font-medium mb-1">
+                  {stat.label}
+                </p>
+                <p className="text-3xl font-bold text-slate-800">
+                  {stat.value}
+                </p>
+              </div>
+              <div
+                className={`bg-gradient-to-br ${stat.color} p-4 rounded-xl shadow-lg`}
+              >
+                <stat.icon className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className=" my-3 bg-white p-5 rounded-2xl shadow-sm">
         <ResponsiveFilter
           filters={[
             {
@@ -208,134 +301,225 @@ const Page = () => {
             <CreateNewTenancy />
           </div>
         </div>
-        {/*
-         */}
-        {isLoading && (
-          <div className="text-center py-8">
-            <div className="text-gray-500">Loading tenancy...</div>
-          </div>
-        )}
+      </div>
+      {/*
+       */}
+      {isLoading && (
+        <div className="text-center py-8">
+          <div className="text-gray-500">Loading tenancy...</div>
+        </div>
+      )}
 
-        {error && (
-          <div className="text-center py-8">
-            <div className="text-red-500">Error loading tenancy.</div>
-          </div>
-        )}
-        {
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data?.data.map((tenancy) => (
+      {error && (
+        <div className="text-center py-8">
+          <div className="text-red-500">Error loading tenancy.</div>
+        </div>
+      )}
+      {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {data?.data?.map((tenancy) => {
+            const statusConfig = getStatusConfig(tenancy.status as never);
+            const StatusIcon = statusConfig.icon;
+
+            return (
               <div
                 key={tenancy.id}
-                className="border rounded-2xl p-4 hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"
+                // onMouseEnter={() => setHoveredCard(tenancy.id as never)}
+                // onMouseLeave={() => setHoveredCard(null)}
               >
-                {/* <label className="font-bold text-[#337AB7] text-lg">
-                  {tenancy.name}
-                </label> */}
-                <p className="flex items-center gap-2">
-                  <Badge className={getStatusColor(tenancy.status)}>
-                    {tenancy.status}
-                  </Badge>
-                  <Badge className="bg-gray-100 text-black font-normal  border-1">
-                    Auto Pay Not Activated
-                  </Badge>
-                </p>
-                <p className="text-sm text-gray-600">
-                  <p className="font-medium">Tenant</p>{" "}
-                  <span className="font-bold text-lg">
-                    {tenancy.tenant.name}
-                  </span>
-                </p>
-                <div className="mt-3 space-y-2">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Type:</span>{" "}
-                    {tenancy.tenantable
-                      ? "unit" in tenancy.tenantable
-                        ? "Room Rental"
-                        : (tenancy.tenantable as Unit).rental_type
-                      : "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Property:</span>{" "}
-                    {tenancy.tenantable ? (
-                      "unit" in tenancy.tenantable ? (
-                        // tenantable is a Room
-                        <>
-                          {tenancy.tenantable.unit?.property?.property_name}{" "}
-                          {"\\"}
-                          {
-                            tenancy.tenantable.unit?.block_floor_unit_number
-                          }{" "}
-                          {tenancy.tenantable.name
-                            ? `\\${tenancy.tenantable.name}`
-                            : ""}
-                        </>
-                      ) : (
-                        // tenantable is a Unit
-                        <>
-                          {tenancy.tenantable.property?.property_name} {"\\"}
-                          {tenancy.tenantable.block_floor_unit_number}
-                        </>
-                      )
-                    ) : (
-                      "N/A"
-                    )}
-                  </p>
-
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Tenancy:</span> {tenancy.code}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Rental:</span> MRY
-                    {" " + tenancy.rental_fee}
-                  </p>
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-600">
-                      <p className="font-medium">Tenancy Start Date</p>{" "}
-                      {tenancy.tenancy_period_start_date}
-                    </p>
-                    <p className="text-sm text-gray-600 max-w-29">
-                      <p className="font-medium">Tenancy End Date</p>{" "}
-                      {tenancy.tenancy_period_end_date}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className=" flex  flex-col gap-2">
-                      <p className="text-sm text-gray-600">
-                        <p className="font-medium">Owner</p>{" "}
-                        {(tenancy?.tenantable as Unit)?.property?.owner?.name ??
-                          ""}
-                        {(tenancy?.tenantable as Room)?.unit?.property?.owner
-                          ?.name ?? ""}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <p className="font-medium">Smart Meter</p>{" "}
-                        {tenancy.meters ? "" : "no smart meter"}
+                {/* Card Header */}
+                <div
+                  className={`bg-gradient-to-r ${statusConfig.color} p-5 relative overflow-hidden`}
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                  <div className="flex items-start justify-between relative z-10">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <StatusIcon className="w-5 h-5 text-white" />
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">
+                          {tenancy.status}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-1">
+                        {tenancy.code}
+                      </h3>
+                      <p className="text-white/90 text-sm">
+                        {tenancy.tenantable
+                          ? "unit" in tenancy.tenantable
+                            ? ` ${tenancy?.tenantable?.unit?.rental_type} `
+                            : `${tenancy?.tenantable?.rental_type}`
+                          : "-"}
                       </p>
                     </div>
-                    <div>
-                      {" "}
-                      <p className="text-sm text-gray-600 max-w-28">
-                        <p className="font-medium ">Top Up</p>
-                        {/* {tenancy.top_up} */}
+                    <div className=" flex gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
+                      <p className=" text-white text-xs font-medium">
+                        {daysBetween(
+                          tenancy.tenancy_period_start_date,
+                          tenancy.tenancy_period_end_date
+                        )}{" "}
                       </p>
+                      <p className=" text-white text-xs font-medium">Days</p>
                     </div>
                   </div>
                 </div>
-                <Separator className="my-5" />
-                <div className="flex justify-center text-sm font-normal text-primary">
+
+                {/* Card Body */}
+                <div className="p-5">
+                  {/* Status Badges */}
+                  {/* <div className="flex gap-2 mb-4 flex-wrap">
+                    <span
+                      className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${
+                        getPaymentStatusConfig(tenancy.payment_status).color
+                      }`}
+                    >
+                      <CreditCard className="w-3 h-3" />
+                      {tenancy.payment_status}
+                    </span>
+                    {!tenancy.auto_pay && (
+                      <span className="flex items-center gap-1 px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-medium border border-gray-200">
+                        Auto Pay Off
+                      </span>
+                    )}
+                    {tenancy.has_smart_meter && (
+                      <span className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium border border-blue-200">
+                        <Zap className="w-3 h-3" />
+                        Smart Meter
+                      </span>
+                    )}
+                  </div> */}
+
+                  {/* Tenant Info */}
+                  <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-green-50 text-green-600 p-3 rounded-xl">
+                        <User className="w-5 h-5 " />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 font-medium">
+                          Tenant
+                        </p>
+                        <p className="text-lg font-bold text-slate-800">
+                          {tenancy.tenant.name}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Property Details */}
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+                      <Building2 className="w-4 h-4 text-slate-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-xs text-slate-500 mb-1">Property</p>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {tenancy.tenantable
+                            ? "unit" in tenancy.tenantable
+                              ? ` ${tenancy.tenantable?.unit?.property?.property_name} `
+                              : `${tenancy.tenantable?.property?.property_name}`
+                            : "-"}
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          {tenancy.tenantable
+                            ? "unit" in tenancy.tenantable
+                              ? ` ${tenancy.tenantable?.unit?.block_floor_unit_number} `
+                              : `${tenancy.tenantable?.block_floor_unit_number}`
+                            : "-"}
+                          {tenancy.tenantable
+                            ? "unit" in tenancy.tenantable
+                              ? `  ${tenancy.tenantable?.name}  `
+                              : ``
+                            : ""}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-green-50 rounded-xl border border-green-200">
+                        <div className="flex items-center gap-2 mb-1">
+                          <DollarSign className="w-4 h-4 text-green-600" />
+                          <p className="text-xs text-green-700 font-medium">
+                            Monthly Rental
+                          </p>
+                        </div>
+                        <p className="text-lg font-bold text-green-800">
+                          RM {tenancy.rental_fee}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Home className="w-4 h-4 text-blue-600" />
+                          <p className="text-xs text-blue-700 font-medium">
+                            Type
+                          </p>
+                        </div>
+                        <p className="text-xs font-semibold text-blue-800">
+                          {tenancy.rental_payment_frequency}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tenancy Period */}
+                  <div className="p-4 bg-slate-50 rounded-xl mb-4 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Calendar className="w-4 h-4 text-slate-600" />
+                      <p className="text-xs text-slate-600 font-semibold">
+                        Tenancy Period
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          Start Date
+                        </p>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {tenancy.tenancy_period_start_date}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">End Date</p>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {tenancy.tenancy_period_end_date}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Owner Info */}
+                  <div className="border-t border-slate-200 pt-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-slate-600" />
+                        <span className="text-xs text-slate-500 font-medium">
+                          Owner:
+                        </span>
+                      </div>
+                      <span className="text-sm text-slate-800 font-semibold">
+                        {tenancy.tenantable
+                          ? "unit" in tenancy.tenantable
+                            ? ` ${tenancy.tenantable?.unit?.property?.owner?.name} `
+                            : `${tenancy.tenantable?.property?.owner?.name}`
+                          : ""}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+
                   <ViewTenancy tenancy={tenancy} />
                 </div>
               </div>
-            ))}
-          </div>
-        }
+            );
+          })}
+        </div>
+      }
 
-        {/* {!isLoading && !error && (!data || data.length === 0) && (
+      {/* {!isLoading && !error && (!data || data.length === 0) && (
           <div className="text-center py-8">
             <div className="text-gray-500">No owners found.</div>
           </div>
         )} */}
-      </div>
     </div>
   );
 };

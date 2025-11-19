@@ -12,7 +12,6 @@ const useGetInvoicesList = () => {
         return axiosInstance
           .get<PaginationType<Invoice[]>>(url)
           .then((res) => {
-            console.log("SS");
             return res.data.data;
           })
           .catch((error) => {

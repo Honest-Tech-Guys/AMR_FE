@@ -1,4 +1,6 @@
 import EquipmentType from "./EquipmentType";
+import LockType from "./LockType";
+import MeterType from "./MeterType";
 import PropertySettingType from "./PropertySetting";
 import { Tenancy } from "./TenancyType";
 import { Unit } from "./UnitType";
@@ -9,9 +11,9 @@ export type Room = {
   unit_id: number;
   unit: Unit;
   status: "Vacant" | "Occupied";
-  locks: Locks[];
+  locks: LockType[];
   coordinates: { x: string; y: string } | null;
-  meters: Meter[];
+  meters: MeterType[];
   description: string;
   equipment?: EquipmentType[];
   setting?: PropertySettingType;

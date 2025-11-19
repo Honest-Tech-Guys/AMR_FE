@@ -1,4 +1,6 @@
 import EquipmentType from "./EquipmentType";
+import LockType from "./LockType";
+import MeterType from "./MeterType";
 import PropertySettingType from "./PropertySetting";
 import { Property } from "./PropertyType";
 import { Room } from "./RoomType";
@@ -29,8 +31,8 @@ export type Unit = {
   last_active_tenancy: Tenancy[];
   created_at: string;
   updated_at: string;
-  meters: Meter[];
-  locks: Locks[];
+  meters: MeterType[];
+  locks: LockType[];
   rooms: Room[];
   carparks: Carpark[];
   equipment?: EquipmentType[];

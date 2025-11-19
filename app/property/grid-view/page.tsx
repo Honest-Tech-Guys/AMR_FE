@@ -59,10 +59,69 @@ const Page = () => {
   console.log(pagination.last_page);
   return (
     <div>
+      <div className="flex w-full justify-between my-3 bg-white p-5 rounded-2xl shadow-sm">
+        <div>
+          {!isPending && (
+            <Pagination>
+              <PaginationContent className="flex justify-between w-full">
+                <PaginationItem className="text-xs text-gray-600">
+                  Page {pagination.page} of {pagination.last_page}
+                </PaginationItem>
+                <PaginationItem className="flex gap-x-2">
+                  <PaginationControl
+                    pagination={pagination}
+                    setPagination={setPagination}
+                  />
+                  <PaginationPrevious
+                    onClick={() => {
+                      if (pagination.page <= 1) {
+                        null;
+                      } else {
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page - 1,
+                        }));
+                      }
+                    }}
+                    isActive={pagination.page > 1}
+                    className={`bg-gray-100 cursor-pointer ${
+                      pagination.page <= 1
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  />
+                  <PaginationNext
+                    onClick={() => {
+                      if (pagination.page >= (pagination.last_page as number)) {
+                        null;
+                      } else {
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page + 1,
+                        }));
+                      }
+                    }}
+                    isActive={pagination.page < (pagination.last_page ?? 1)}
+                    className={`bg-gray-100 cursor-pointer ${
+                      pagination.page >= (pagination.last_page as number)
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </div>
+        <div className="flex flex-wrap space-x-3">
+          <CreateBulkPropertyModal />
+          <CreateNewProperty />
+        </div>
+      </div>
       {/* <HeaderPage title="Property (Grid View)" /> */}
-      <div className="w-full mt-5 rounded-[6px] p-3 bg-white">
+      <div className="w-full mt-5 p-3">
         {/* Actions */}
-        <div className="flex w-full justify-between my-3 items-center">
+        {/* <div className="flex w-full justify-between my-3 items-center">
           <div>
             {!isPending && (
               <Pagination>
@@ -119,10 +178,9 @@ const Page = () => {
             )}
           </div>
           <div className="flex flex-wrap space-x-3">
-            <CreateBulkPropertyModal />
-            <CreateNewProperty />
+            
           </div>
-        </div>
+        </div> */}
 
         {/* Properties */}
         <div className="grid grid-cols-1 gap-5">

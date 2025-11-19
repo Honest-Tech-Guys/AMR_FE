@@ -117,6 +117,7 @@ const CreateNewTenancy = () => {
     mutate(payload, {
       onSuccess: () => {
         toast.success("Tenancy created successfully!");
+
         reset();
         onOpenChange(false);
       },

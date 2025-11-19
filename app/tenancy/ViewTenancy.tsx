@@ -15,6 +15,7 @@ import SmartHomeTap from "./Tabs/SmartHome";
 import DocumentsTap from "./Tabs/Documents";
 import AuditLogsTap from "./Tabs/AuditLogs";
 import { Tenancy } from "@/types/TenancyType";
+import { FileText } from "lucide-react";
 
 const tabItems = [
   { label: "Basic", value: "basic" },
@@ -31,9 +32,10 @@ const ViewTenancy = ({ tenancy }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-md text-white cursor-pointer">
+        <button className="w-full cursor-pointer  justify-center  bg-gradient-to-r from-primary to-primary/80  text-white px-6 py-3 rounded-xl text-center font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group">
+          <FileText className="w-4 h-4 group-hover:scale-110 transition-transform" />
           View More
-        </Button>
+        </button>
       </DialogTrigger>
 
       <DialogContent className="md:max-w-[1000px] bg-white z-[200] md:p-10 h-[95vh] overflow-y-auto">

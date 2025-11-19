@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import useAddMeter from "@/lib/services/hooks/useAddMeter";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { Plus } from "lucide-react";
 // ✅ Schema based on `Meter` type
 const schema = yup.object({
   property_id: yup.string().required("Meter name is required"),
@@ -149,7 +150,10 @@ const CreateMeter = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
-        <Button className="rounded-[6px] text-white">Create New Meter</Button>
+        <Button className="bg-gradient-to-r from-primary to-primary/80  text-white px-6 py-3 rounded-[6px] font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group">
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+          Create New Meter
+        </Button>
       </DialogTrigger>
 
       <DialogContent
