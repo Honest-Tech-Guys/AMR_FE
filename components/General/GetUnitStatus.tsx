@@ -33,7 +33,7 @@ export const unitStatusConfig: Record<
 > = {
   "Fully Occupied": {
     label: "Fully Occupied",
-    badgeClass: "bg-green-600 text-white",
+    badgeClass: "bg-red-500 text-white",
   },
   "Partially Occupied": {
     label: "Partially Occupied",
@@ -41,7 +41,7 @@ export const unitStatusConfig: Record<
   },
   Vacant: {
     label: "Vacant",
-    badgeClass: "bg-red-500 text-white",
+    badgeClass: "bg-green-500 text-white",
   },
   "No Rooms": {
     label: "No Rooms",

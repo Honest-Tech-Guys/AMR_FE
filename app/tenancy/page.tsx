@@ -6,14 +6,17 @@ import { ResponsiveFilter } from "@/components/responsive-filter";
 import { Button } from "@/components/ui/button";
 import {
   AlertCircle,
+  ArrowUpToLine,
   Building2,
   Calendar,
   CheckCircle2,
   CreditCard,
   DollarSign,
   FileText,
+  Gauge,
   Home,
   LoaderCircle,
+  RefreshCw,
   Search,
   Timer,
   TrendingUp,
@@ -44,9 +47,14 @@ import { Unit } from "@/types/UnitType";
 import { Room } from "@/types/RoomType";
 import CreateNewTenancy from "./CreateNewTenancy";
 import { useSearchParams } from "next/navigation";
-import { daysBetween } from "@/lib/utils";
+import { cn, daysBetween } from "@/lib/utils";
+import TopUpDialog from "@/components/TopUpMeter";
+import MeterType from "@/types/MeterType";
+import useGetDeviceStatus from "@/lib/services/hooks/SyncMeter";
 
 const Page = () => {
+  const [topUpOpen, setTopUpOpen] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState<number | null>(null);
   const actionButton = (
     <Button key="search" className="rounded-[6px]">
       <Search className="size-4 text-white" strokeWidth={2.5} />
@@ -172,6 +180,12 @@ const Page = () => {
       color: "bg-green-50",
     },
   ];
+  const [selectedItemSync, setSelectedItemSync] = useState<MeterType>();
+  const {
+    refetch: refetchSync,
+    isLoading: SyncLoading,
+    isRefetching: SyncRefetching,
+  } = useGetDeviceStatus(selectedItemSync?.id);
   if (isPending) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -479,6 +493,96 @@ const Page = () => {
                         </p>
                       </div>
                     </div>
+                    {tenancy.tenantable ? (
+                      tenancy.tenantable.meters.length > 0 ? (
+                        <div className="p-3 bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-700 space-y-2">
+                          <div className="flex justify-between">
+                            <div className="flex items-center gap-2 mb-1">
+                              {/* <Gauge className="w-4 h-4  mt-0.5" /> */}
+                              <p className="text-xs  font-medium">
+                                Smart Meter :
+                              </p>
+                              <p className="text-sm  font-medium">
+                                {tenancy.tenantable?.meters[0]?.name}
+                              </p>
+                            </div>
+                            <div>
+                              {" "}
+                              <p
+                                className="flex items-center gap-1 text-sm text-green-700 p-1 rounded-2xl font-medium cursor-pointer"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSelectedDevice(
+                                    tenancy.tenantable?.meters[0]?.id
+                                  );
+                                  setTopUpOpen(true);
+                                }}
+                              >
+                                <ArrowUpToLine className="h-4 w-4" />
+                                Top Up
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex justify-between">
+                            <p className="flex gap-2 items-center">
+                              <p className="text-xs  font-medium">Balance :</p>
+                              <p className="text-sm  font-medium">
+                                {" "}
+                                {
+                                  tenancy.tenantable.meters[0]?.balance_unit
+                                }{" "}
+                                Unit
+                              </p>
+                            </p>
+                            <div
+                              key={tenancy.id}
+                              className={cn(
+                                "flex items-center gap-1 text-sm text-blue-600 py-1 px-2.5 rounded-2xl font-medium",
+                                (SyncLoading || SyncRefetching) &&
+                                  tenancy.tenantable?.meters[0]?.id ===
+                                    selectedItemSync?.id
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "cursor-pointer"
+                              )}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (
+                                  tenancy.tenantable?.meters[0]?.id ===
+                                  selectedItemSync?.id
+                                ) {
+                                  refetchSync();
+                                } else {
+                                  setSelectedItemSync(
+                                    tenancy.tenantable?.meters[0]
+                                  );
+                                }
+                              }}
+                            >
+                              <RefreshCw
+                                className={cn(
+                                  (SyncLoading || SyncRefetching) &&
+                                    tenancy.tenantable?.meters[0]?.id ===
+                                      selectedItemSync?.id
+                                    ? "animate-spin"
+                                    : "",
+                                  "w-4 h-4"
+                                )}
+                              />
+                              Sync
+                            </div>
+                          </div>
+                          {/* <p className="text-sm font-semibold ">
+                            {tenancy.rental_payment_frequency}
+                          </p> */}
+                        </div>
+                      ) : (
+                        <div className="h-[89.6px] flex items-center justify-center bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-700 ">
+                          No Meter
+                        </div>
+                      )
+                    ) : null}
                   </div>
 
                   {/* Tenancy Period */}
@@ -510,15 +614,15 @@ const Page = () => {
                   </div>
 
                   {/* Owner Info */}
-                  <div className="border-t border-slate-200 pt-4 mb-4">
-                    <div className="flex items-center justify-between">
+                  <div className="border-t border-slate-200 pt-4 mb-4 px-2">
+                    <div className="flex items-center justify-between ">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-slate-600" />
                         <span className="text-xs text-slate-500 font-medium">
                           Owner:
                         </span>
                       </div>
-                      <span className="text-sm text-slate-800 font-semibold">
+                      <span className="text-sm text-slate-800 font-semibold ">
                         {tenancy.tenantable
                           ? "unit" in tenancy.tenantable
                             ? ` ${tenancy.tenantable?.unit?.property?.owner?.name} `
@@ -541,6 +645,11 @@ const Page = () => {
             <div className="text-gray-500">No owners found.</div>
           </div>
         )} */}
+      <TopUpDialog
+        open={topUpOpen}
+        onOpenChange={setTopUpOpen}
+        deviceId={selectedDevice}
+      />
     </div>
   );
 };
