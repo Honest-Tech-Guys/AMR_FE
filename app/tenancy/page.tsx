@@ -1,4 +1,5 @@
 "use client";
+import { useQueryClient } from "@tanstack/react-query";
 import HeaderPage from "@/components/HeaderPage";
 
 import { InputWithIcon } from "@/components/InpuWithIcon";
@@ -25,7 +26,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 // import CreateNewOwner from "./CreateNewOwner";
@@ -53,6 +54,7 @@ import MeterType from "@/types/MeterType";
 import useGetDeviceStatus from "@/lib/services/hooks/SyncMeter";
 
 const Page = () => {
+  const queryClient = useQueryClient();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<number | null>(null);
   const actionButton = (
@@ -182,10 +184,64 @@ const Page = () => {
   ];
   const [selectedItemSync, setSelectedItemSync] = useState<MeterType>();
   const {
+    data: syncData,
     refetch: refetchSync,
     isLoading: SyncLoading,
     isRefetching: SyncRefetching,
   } = useGetDeviceStatus(selectedItemSync?.id);
+
+  const prevSyncDataRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (syncData && syncData !== prevSyncDataRef.current) {
+      prevSyncDataRef.current = syncData;
+      if (syncData.success && syncData.data) {
+        const meterId = syncData.data.id;
+        const newBalance = syncData.data.balance_unit;
+
+        queryClient.setQueryData(
+          ["GetTenancyList", appliedFilters],
+          (oldData: any) => {
+            if (!oldData || !oldData.tenancies || !oldData.tenancies.data)
+              return oldData;
+
+            const newTenanciesData = oldData.tenancies.data.map(
+              (tenancy: any) => {
+                if (tenancy.tenantable?.meters) {
+                  const meterIndex = tenancy.tenantable.meters.findIndex(
+                    (m: any) => m.id === meterId
+                  );
+                  if (meterIndex !== -1) {
+                    const updatedMeters = [...tenancy.tenantable.meters];
+                    updatedMeters[meterIndex] = {
+                      ...updatedMeters[meterIndex],
+                      balance_unit: newBalance,
+                    };
+                    return {
+                      ...tenancy,
+                      tenantable: {
+                        ...tenancy.tenantable,
+                        meters: updatedMeters,
+                      },
+                    };
+                  }
+                }
+                return tenancy;
+              }
+            );
+
+            return {
+              ...oldData,
+              tenancies: {
+                ...oldData.tenancies,
+                data: newTenanciesData,
+              },
+            };
+          }
+        );
+      }
+    }
+  }, [syncData, queryClient, appliedFilters]);
   if (isPending) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -297,11 +353,10 @@ const Page = () => {
                         }
                       }}
                       isActive={pagination.page > 1}
-                      className={`bg-gray-100 cursor-pointer ${
-                        pagination.page <= 1
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
+                      className={`bg-gray-100 cursor-pointer ${pagination.page <= 1
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                        }`}
                     />
                     <PaginationNext
                       onClick={() => {
@@ -317,11 +372,10 @@ const Page = () => {
                         }
                       }}
                       isActive={pagination.page < (pagination.last_page ?? 1)}
-                      className={`bg-gray-100 cursor-pointer ${
-                        pagination.page >= (pagination.last_page as number)
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
+                      className={`bg-gray-100 cursor-pointer ${pagination.page >= (pagination.last_page as number)
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                        }`}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -356,8 +410,8 @@ const Page = () => {
               <div
                 key={tenancy.id}
                 className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"
-                // onMouseEnter={() => setHoveredCard(tenancy.id as never)}
-                // onMouseLeave={() => setHoveredCard(null)}
+              // onMouseEnter={() => setHoveredCard(tenancy.id as never)}
+              // onMouseLeave={() => setHoveredCard(null)}
               >
                 {/* Card Header */}
                 <div
@@ -541,7 +595,7 @@ const Page = () => {
                                 "flex items-center gap-1 text-sm text-blue-600 py-1 px-2.5 rounded-2xl font-medium",
                                 (SyncLoading || SyncRefetching) &&
                                   tenancy.tenantable?.meters[0]?.id ===
-                                    selectedItemSync?.id
+                                  selectedItemSync?.id
                                   ? "opacity-50 cursor-not-allowed"
                                   : "cursor-pointer"
                               )}
@@ -564,7 +618,7 @@ const Page = () => {
                                 className={cn(
                                   (SyncLoading || SyncRefetching) &&
                                     tenancy.tenantable?.meters[0]?.id ===
-                                      selectedItemSync?.id
+                                    selectedItemSync?.id
                                     ? "animate-spin"
                                     : "",
                                   "w-4 h-4"
@@ -649,6 +703,51 @@ const Page = () => {
         open={topUpOpen}
         onOpenChange={setTopUpOpen}
         deviceId={selectedDevice}
+        onSuccess={(response) => {
+          if (response.success && selectedDevice) {
+            const newBalance = response.balance_unit;
+            queryClient.setQueryData(
+              ["GetTenancyList", appliedFilters],
+              (oldData: any) => {
+                if (!oldData || !oldData.tenancies || !oldData.tenancies.data)
+                  return oldData;
+
+                const newTenanciesData = oldData.tenancies.data.map(
+                  (tenancy: any) => {
+                    if (tenancy.tenantable?.meters) {
+                      const meterIndex = tenancy.tenantable.meters.findIndex(
+                        (m: any) => m.id === selectedDevice
+                      );
+                      if (meterIndex !== -1) {
+                        const updatedMeters = [...tenancy.tenantable.meters];
+                        updatedMeters[meterIndex] = {
+                          ...updatedMeters[meterIndex],
+                          balance_unit: newBalance,
+                        };
+                        return {
+                          ...tenancy,
+                          tenantable: {
+                            ...tenancy.tenantable,
+                            meters: updatedMeters,
+                          },
+                        };
+                      }
+                    }
+                    return tenancy;
+                  }
+                );
+
+                return {
+                  ...oldData,
+                  tenancies: {
+                    ...oldData.tenancies,
+                    data: newTenanciesData,
+                  },
+                };
+              }
+            );
+          }
+        }}
       />
     </div>
   );

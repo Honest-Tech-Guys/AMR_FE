@@ -15,9 +15,15 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   deviceId: number | null;
+  onSuccess?: (data: any) => void;
 };
 
-export default function TopUpDialog({ open, onOpenChange, deviceId }: Props) {
+export default function TopUpDialog({
+  open,
+  onOpenChange,
+  deviceId,
+  onSuccess,
+}: Props) {
   const { mutate: topUp, isPending } = useTopUpDevice();
 
   const { register, handleSubmit, reset } = useForm({
@@ -32,9 +38,12 @@ export default function TopUpDialog({ open, onOpenChange, deviceId }: Props) {
     topUp(
       { deviceId, unit: Number(data.unit) },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
           reset();
           onOpenChange(false);
+          if (onSuccess) {
+            onSuccess(response);
+          }
         },
       }
     );
