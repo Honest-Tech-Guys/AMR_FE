@@ -38,6 +38,7 @@ import useCreateBooking from "@/lib/services/hooks/useCreateBooking";
 import { TenantSelect } from "@/components/TenantSelect";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
 import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 // Schema & type
 const schema = yup.object({
   // Basic Information
@@ -173,7 +174,10 @@ const CreateNewBooking = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-[6px] text-white">Create New Booking</Button>
+        <Button className="bg-gradient-to-r from-primary to-primary/80  text-white px-6 py-3 rounded-[6px] font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group">
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+          Create New Booking
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="md:max-w-[1000px] bg-white md:p-10 max-h-[95vh] overflow-y-auto">

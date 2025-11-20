@@ -17,6 +17,7 @@ import useAddProperty from "@/lib/services/hooks/useAddProperties";
 import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Controller,
@@ -154,7 +155,8 @@ const CreateNewProperty = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-[6px] text-white cursor-pointer">
+        <Button className="bg-gradient-to-r from-primary to-primary/80  text-white px-6 py-3 rounded-[6px] font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group">
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
           Create New Property
         </Button>
       </DialogTrigger>

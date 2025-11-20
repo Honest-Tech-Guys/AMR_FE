@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import useCreateBulkProperty from "@/lib/services/hooks/useCreateBulkProperty";
 import useGetPropertiesList from "@/lib/services/hooks/useGetProperties";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import CreateBulk from "./CreateBulk";
@@ -70,7 +70,8 @@ const CreateBulkPropertyModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-black rounded-[6px] text-white hover:bg-black/70 cursor-pointer">
+        <Button className="bg-gradient-to-r from-black to-black/80  text-white px-6 py-3 rounded-[6px] font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group">
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
           Create Bulk Property
         </Button>
       </DialogTrigger>
