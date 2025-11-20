@@ -179,7 +179,6 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
   } = form;
 
   const { mutate, isPending } = useCreateAgreement(tenancy.id);
-  const { refetch } = useGetTenancyList({});
   const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     console.log(data.attachments);
@@ -240,9 +239,9 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
         landlord_phone:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.owner_profile
-                ?.emergency_contact_phone ?? null
+                ?.emergency_phone ?? null
             : tenancy.tenantable.property.owner?.owner_profile
-                ?.emergency_contact_phone ?? null,
+                ?.emergency_phone ?? null,
         landlord_address:
           "unit" in tenancy.tenantable
             ? tenancy.tenantable.unit.property.owner?.owner_profile
@@ -251,16 +250,16 @@ const CreateAgreement = ({ tenancy, open, onOpenChange }: Props) => {
                 ?.address_line_1 ?? null,
         landlord_identity_number:
           "unit" in tenancy.tenantable
-            ? tenancy.tenantable.unit.property.owner?.owner_profile?.nric_number
-            : tenancy.tenantable.property.owner?.owner_profile?.nric_number ??
-              null,
+            ? tenancy.tenantable.unit.property.owner?.owner_profile
+                ?.identity_number
+            : tenancy.tenantable.property.owner?.owner_profile
+                ?.identity_number ?? null,
         tenant_name: tenancy.tenant?.name ?? null,
         tenant_email: tenancy.tenant?.email ?? null,
-        tenant_phone:
-          tenancy.tenant.tenant_profile?.emergency_contact_phone ?? "",
+        tenant_phone: tenancy.tenant.tenant_profile?.emergency_phone ?? "",
         tenant_address: tenancy.tenant.tenant_profile?.address_line_1 ?? null,
         tenant_identity_number:
-          tenancy.tenant.tenant_profile?.nric_number ?? null,
+          tenancy.tenant.tenant_profile?.identity_number ?? null,
       });
     }
   }, [tenancy, reset]);

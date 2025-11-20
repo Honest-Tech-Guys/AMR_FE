@@ -43,20 +43,8 @@ const CreateNewProperty = () => {
       state: yup.string().required("State is required"),
       property_name: yup.string().required("Property name is required"),
       property_type: yup.string().required("Property type is required"),
-      owner_id:
-        role !== "Owner"
-          ? yup.string().required("Owner is required")
-          : yup.string().nullable(),
-      owner_phone_number:
-        role !== "Owner"
-          ? yup.string().required("Owner phone number is required")
-          : yup.string().optional(),
-      contact_name: !sameInfo
-        ? yup.string().required("Contact name is required")
-        : yup.string().nullable(),
-      contact_phone_number: !sameInfo
-        ? yup.string().required("Contact phone number is required")
-        : yup.string().optional(),
+      contact_name: yup.string().optional(),
+      contact_phone_number: yup.string().optional(),
       remarks: yup.string().nullable(),
       address: yup.string().required("Address is required"),
       facilities: yup.string().nullable(),
@@ -126,8 +114,6 @@ const CreateNewProperty = () => {
   const onSubmit: SubmitHandler<SchemaType> = (data) => {
     const payload = {
       property_name: data.property_name,
-      owner_id: data.owner_id,
-      owner_phone: data.owner_phone_number,
       contact_name: data.contact_name || null,
       contact_phone: data.contact_phone_number || null,
       property_type: data.property_type,
@@ -186,99 +172,39 @@ const CreateNewProperty = () => {
                 options={PartnerType}
               />
 
-              {user_role !== "Owner" && (
-                <>
-                  <SelectWithForm<SchemaType>
-                    name="owner_id"
-                    title="Owner"
-                    options={owners}
-                  />
-
-                  <div>
-                    <label className="block mb-1 text-sm font-medium">
-                      Owner Phone Number
-                    </label>
-                    <Controller
-                      control={control}
-                      name="owner_phone_number"
-                      render={({ field }) => (
-                        <PhoneInput
-                          {...field}
-                          placeholder="Enter Owner Number"
-                        />
-                      )}
-                    />
-                    {errors.owner_phone_number && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.owner_phone_number.message}
-                      </p>
-                    )}
-                  </div>
-                </>
-              )}
-
-              <div className="col-span-2">
+              <>
                 <CustomInput
-                  id="sameInformation"
-                  name="sameInformation"
-                  label="Contact The Same"
-                  type="checkbox"
-                  checkboxDefaultValue={sameInformation}
-                  onCheckedChange={(checked) => {
-                    setSameInformation(checked as boolean);
-                    if (checked) {
-                      const owner = data?.find(
-                        (item) =>
-                          item.id === parseInt(watch("owner_id") as string)
-                      );
-                      setValue("contact_name", owner?.name || "");
-                      setValue(
-                        "contact_phone_number",
-                        watch("owner_phone_number") || ""
-                      );
-                    } else {
-                      setValue("contact_name", null);
-                      setValue("contact_phone_number", undefined);
-                    }
-                  }}
+                  id="contact_name"
+                  name="contact_name"
+                  type="text"
+                  value={watch("contact_name")}
+                  label="Contact Name"
+                  onChange={(e) => setValue("contact_name", e.target.value)}
+                  errors={errors.contact_name?.message}
+                  placeholder="Enter Contact Name"
                 />
-              </div>
 
-              {!sameInformation && (
-                <>
-                  <CustomInput
-                    id="contact_name"
-                    name="contact_name"
-                    type="text"
-                    value={watch("contact_name")}
-                    label="Contact Name"
-                    onChange={(e) => setValue("contact_name", e.target.value)}
-                    errors={errors.contact_name?.message}
-                    placeholder="Enter Contact Name"
-                  />
-
-                  <div>
-                    <label className="block mb-1 text-sm font-medium">
-                      Contact Phone Number
-                    </label>
-                    <Controller
-                      control={control}
-                      name="contact_phone_number"
-                      render={({ field }) => (
-                        <PhoneInput
-                          {...field}
-                          placeholder="Enter Contact Number"
-                        />
-                      )}
-                    />
-                    {errors.contact_phone_number && (
-                      <p className="text-sm text-red-500 mt-1">
-                        {errors.contact_phone_number.message}
-                      </p>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    Contact Phone Number
+                  </label>
+                  <Controller
+                    control={control}
+                    name="contact_phone_number"
+                    render={({ field }) => (
+                      <PhoneInput
+                        {...field}
+                        placeholder="Enter Contact Number"
+                      />
                     )}
-                  </div>
-                </>
-              )}
+                  />
+                  {errors.contact_phone_number && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.contact_phone_number.message}
+                    </p>
+                  )}
+                </div>
+              </>
 
               <div className="col-span-2">
                 <CustomInput

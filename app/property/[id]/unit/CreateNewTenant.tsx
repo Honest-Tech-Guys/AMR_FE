@@ -28,6 +28,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import useAddTenant from "@/lib/services/hooks/useAddTenant";
 import { toast } from "sonner";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import { useQueryClient } from "@tanstack/react-query";
 // Schema & type
 const schema = yup.object({
   type: yup.string().required("Type is required"),
@@ -95,10 +96,12 @@ const CreateNewTenant = () => {
     { id: "free_text", label: "Free Text" },
   ];
   const { mutate, isPending } = useAddTenant();
+  const queryClient = useQueryClient();
   const onSubmit: SubmitHandler<schemaType> = (data) => {
     mutate(data as never, {
       onSuccess: () => {
         toast.success("Tenant created successfully!");
+        queryClient.invalidateQueries({ queryKey: ["GetPropertiesList"] });
         reset();
       },
       onError: (err: any) => {

@@ -4,7 +4,7 @@ export type OwnerProfile = {
   type: string; // e.g., "Individual" or "Company"
   alt_phone_number: string;
   nationality: string;
-  nric_number: string;
+  identity_number: string;
   race: string;
   gender: string;
   address_line_1: string;
@@ -12,10 +12,10 @@ export type OwnerProfile = {
   postcode: string;
   state: string;
   country: string;
-  emergency_contact_name: string;
-  emergency_contact_relationship: string;
-  emergency_contact_phone: string;
-  emergency_contact_email: string;
+  emergency_name: string;
+  emergency_relationship: string;
+  emergency_phone: string;
+  emergency_email: string;
   remarks: string;
   created_at: string;
   updated_at: string;

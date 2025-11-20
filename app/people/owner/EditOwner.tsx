@@ -113,7 +113,7 @@ export default function EditOwnerPage({
         alt_phone_number: profile?.alt_phone_number ?? "",
         nationality: profile?.nationality ?? "",
         identity_type: "NRIC", // not in API, set default or derive if possible
-        identity_number: profile?.nric_number ?? "",
+        identity_number: profile?.identity_number ?? "",
         race: profile?.race ?? "",
         gender: profile?.gender ?? "",
         address_line_1: profile?.address_line_1 ?? "",
@@ -121,10 +121,10 @@ export default function EditOwnerPage({
         postcode: profile?.postcode ?? "",
         state: profile?.state ?? "",
         country: profile?.country ?? "",
-        emergency_name: profile?.emergency_contact_name ?? "",
-        emergency_relationship: profile?.emergency_contact_relationship ?? "",
-        emergency_phone: profile?.emergency_contact_phone ?? "",
-        emergency_email: profile?.emergency_contact_email ?? "",
+        emergency_name: profile?.emergency_name ?? "",
+        emergency_relationship: profile?.emergency_relationship ?? "",
+        emergency_phone: profile?.emergency_phone ?? "",
+        emergency_email: profile?.emergency_email ?? "",
         account_holder_name: "", // not in API, adjust if exists
         account_number: "", // not in API, adjust if exists
         remarks: profile?.remarks ?? "",

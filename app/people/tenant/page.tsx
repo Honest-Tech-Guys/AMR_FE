@@ -231,7 +231,7 @@ const Page = () => {
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Identity:</span>{" "}
                     {tenant?.tenant_profile?.type} -{" "}
-                    {tenant?.tenant_profile?.nric_number}
+                    {tenant?.tenant_profile?.identity_number}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Address:</span>{" "}
@@ -241,12 +241,12 @@ const Page = () => {
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Contact:</span>{" "}
-                    {tenant?.tenant_profile?.emergency_contact_name} (
-                    {tenant?.tenant_profile?.emergency_contact_relationship})
+                    {tenant?.tenant_profile?.emergency_name} (
+                    {tenant?.tenant_profile?.emergency_relationship})
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Emergency Phone:</span>{" "}
-                    {tenant?.tenant_profile?.emergency_contact_phone}
+                    {tenant?.tenant_profile?.emergency_phone}
                   </p>
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">iCoins:</span> -

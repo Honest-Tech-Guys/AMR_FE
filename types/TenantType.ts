@@ -14,7 +14,7 @@ export type TenantType = {
     type: string;
     alt_phone_number: string | null;
     nationality: string;
-    nric_number: string;
+    identity_number: string;
     race: string;
     gender: string;
     address_line_1: string;
@@ -22,10 +22,10 @@ export type TenantType = {
     postcode: string;
     state: string;
     country: string;
-    emergency_contact_name: string;
-    emergency_contact_relationship: string;
-    emergency_contact_phone: string | null;
-    emergency_contact_email: string | null;
+    emergency_name: string;
+    emergency_relationship: string;
+    emergency_phone: string | null;
+    emergency_email: string | null;
     remarks: string | null;
     created_at: string;
     updated_at: string;

@@ -36,6 +36,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const schema = yup.object({
   type: yup.string().required("Type is required"),
   name: yup.string().required("Name is required"),
+  bank_id: yup.string().required("Bank is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phone_number: yup.string().required("Phone number is required"),
   alt_phone_number: yup.string().required("Alt phone number is required"),
@@ -58,6 +59,8 @@ const schema = yup.object({
     .string()
     .email("Invalid email")
     .required("Emergency email is required"),
+  account_holder_name: yup.string().required("Account holder name is required"),
+  account_number: yup.string().required("Account number is required"),
   remarks: yup.string().required("Remarks is required"),
 });
 type schemaType = yup.InferType<typeof schema>;
@@ -102,7 +105,12 @@ const CreateNewTenant = () => {
       },
     });
   };
-
+  const BankType = [
+    { id: "1", name: "Maybank" },
+    { id: "2", name: "CIMB" },
+    { id: "3", name: "Public Bank" },
+    { id: "4", name: "Hong Leong Bank" },
+  ];
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -140,7 +148,7 @@ const CreateNewTenant = () => {
                 </p>
               )}
             </div>
-            <HeaderSection title="Tenants Detail" />
+            <HeaderSection title="Tenant Detail" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput
                 id="name"
@@ -170,7 +178,7 @@ const CreateNewTenant = () => {
                   control={control}
                   name="phone_number"
                   render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Owner Number" />
+                    <PhoneInput {...field} placeholder="Enter Tenant Number" />
                   )}
                 />
                 {errors.phone_number && (
@@ -378,7 +386,7 @@ const CreateNewTenant = () => {
                   control={control}
                   name="emergency_phone"
                   render={({ field }) => (
-                    <PhoneInput {...field} placeholder="Enter Owner Number" />
+                    <PhoneInput {...field} placeholder="Enter Tenant Number" />
                   )}
                 />
                 {errors.emergency_phone && (
@@ -411,14 +419,45 @@ const CreateNewTenant = () => {
                 />
               </div>
             </div>
+            <HeaderSection title="Bank Information" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SelectWithForm<schemaType>
+                name="bank_id"
+                title="Bank"
+                options={BankType}
+              />
+              <CustomInput
+                id="account_holder_name"
+                name="account_holder_name"
+                type="text"
+                label="Account Holder Name"
+                value={watch("account_holder_name")}
+                onChange={(e) =>
+                  setValue("account_holder_name", e.target.value)
+                }
+                errors={errors.account_holder_name?.message}
+                placeholder="Enter Account Holder Name"
+              />
+
+              <div className="col-span-1 md:col-span-2">
+                <CustomInput
+                  id="account_number"
+                  name="account_number"
+                  type="text"
+                  label="Account Number"
+                  value={watch("account_number")}
+                  onChange={(e) => setValue("account_number", e.target.value)}
+                  errors={errors.account_number?.message}
+                  placeholder="Enter Account Number"
+                />
+              </div>
+            </div>
             <DialogFooter className="mt-6">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => setIsOpen(false)}
-              >
-                Cancel
-              </Button>
+              <DialogClose asChild>
+                <Button variant="outline" type="button">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" className="text-white" disabled={isPending}>
                 {isPending ? "Submitting..." : "Submit"}
               </Button>

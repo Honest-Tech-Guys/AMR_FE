@@ -88,7 +88,7 @@ const EditTenant = ({ tenant, isOpen, setIsOpen }: EditTenantProps) => {
         alt_phone_number: tenant?.tenant_profile?.alt_phone_number || "",
         nationality: tenant?.tenant_profile?.nationality,
         identity_type: "NRIC",
-        identity_number: tenant?.tenant_profile?.nric_number,
+        identity_number: tenant?.tenant_profile?.identity_number,
         race: tenant?.tenant_profile?.race,
         gender: tenant?.tenant_profile?.gender,
         address_line_1: tenant?.tenant_profile?.address_line_1,
@@ -96,11 +96,10 @@ const EditTenant = ({ tenant, isOpen, setIsOpen }: EditTenantProps) => {
         postcode: tenant?.tenant_profile?.postcode,
         state: tenant?.tenant_profile?.state,
         country: tenant?.tenant_profile?.country,
-        emergency_name: tenant?.tenant_profile?.emergency_contact_name,
-        emergency_relationship:
-          tenant?.tenant_profile?.emergency_contact_relationship,
-        emergency_phone: tenant?.tenant_profile?.emergency_contact_phone || "",
-        emergency_email: tenant?.tenant_profile?.emergency_contact_email || "",
+        emergency_name: tenant?.tenant_profile?.emergency_name,
+        emergency_relationship: tenant?.tenant_profile?.emergency_relationship,
+        emergency_phone: tenant?.tenant_profile?.emergency_phone || "",
+        emergency_email: tenant?.tenant_profile?.emergency_email || "",
         remarks: tenant?.tenant_profile?.remarks || "",
       });
     }

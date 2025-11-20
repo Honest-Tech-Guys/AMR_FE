@@ -38,12 +38,12 @@ export default function DashboardPage() {
   const stats = [
     {
       title: "Active Tenancies",
-      value: dashboard.top_stats.active_tenancies,
+      value: dashboard?.top_stats.active_tenancies,
       icon: Users,
     },
-    { title: "Properties", value: dashboard.top_stats.properties, icon: Home },
-    { title: "Units", value: dashboard.top_stats.units, icon: Grid },
-    { title: "Rooms", value: dashboard.top_stats.rooms, icon: BedDouble },
+    { title: "Properties", value: dashboard?.top_stats.properties, icon: Home },
+    { title: "Units", value: dashboard?.top_stats.units, icon: Grid },
+    { title: "Rooms", value: dashboard?.top_stats.rooms, icon: BedDouble },
   ];
 
   // ✅ Occupancy Overview data

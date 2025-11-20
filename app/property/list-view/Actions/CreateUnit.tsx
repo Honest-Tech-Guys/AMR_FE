@@ -36,6 +36,7 @@ import { FileData } from "@/types/FileData";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/lib/stores/authStore";
 import ErrorToastHandel from "@/components/ErrorToastHandel";
+import useGetOwnersSelection from "@/lib/services/hooks/useGetOwnerSelection";
 
 // 👇 Define the schema factory function so it can depend on user_role
 const createSchema = (user_role: string) =>
@@ -48,7 +49,7 @@ const createSchema = (user_role: string) =>
     floor: yup.string().required("Floor  is required"),
     remarks: yup.string().optional().nullable(),
     description: yup.string().optional().nullable(),
-
+    owner_id: yup.string().required("Owner Name is required"),
     meeting_room: yup.boolean().default(false),
     game_room: yup.boolean().default(false),
     basketball_court: yup.boolean().default(false),
@@ -283,7 +284,17 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
       },
     });
   };
-
+  const { data: OwnersData } = useGetOwnersSelection(open);
+  const [owners, setOwners] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    if (OwnersData) {
+      const ownersData = OwnersData.map((owner) => ({
+        id: `${owner.id}`,
+        name: owner.name,
+      }));
+      setOwners(ownersData);
+    }
+  }, [OwnersData]);
   return (
     <div
       onClick={(e) => {
@@ -317,6 +328,11 @@ const CreateUnit = ({ id, open, onOpenChange }: Props) => {
                   errors={errors.unit_number?.message}
                   placeholder="Enter Unit Number"
                 />{" "}
+                <SelectWithForm<SchemaType>
+                  name="owner_id"
+                  title="Owner"
+                  options={owners}
+                />
                 <CustomInput
                   id="block"
                   name="block"

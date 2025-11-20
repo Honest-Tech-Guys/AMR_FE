@@ -225,8 +225,8 @@ const Page = () => {
                     {owner?.owner_profile?.race}
                   </p>
                   <p>
-                    <span className="font-medium">NRIC Number:</span>{" "}
-                    {owner?.owner_profile?.nric_number}
+                    <span className="font-medium">Identity Number:</span>{" "}
+                    {owner?.owner_profile?.identity_number}
                   </p>
                   <p>
                     <span className="font-medium">Type:</span>{" "}
@@ -244,16 +244,16 @@ const Page = () => {
                   </p>
                   <p>
                     <span className="font-medium">Emergency Contact:</span>{" "}
-                    {owner?.owner_profile?.emergency_contact_name} (
-                    {owner?.owner_profile?.emergency_contact_relationship})
+                    {owner?.owner_profile?.emergency_name} (
+                    {owner?.owner_profile?.emergency_relationship})
                   </p>
                   <p>
                     <span className="font-medium">Emergency Phone:</span>{" "}
-                    {owner?.owner_profile?.emergency_contact_phone}
+                    {owner?.owner_profile?.emergency_phone}
                   </p>
                   <p>
                     <span className="font-medium">Emergency Email:</span>{" "}
-                    {owner?.owner_profile?.emergency_contact_email}
+                    {owner?.owner_profile?.emergency_email}
                   </p>
                   <p>
                     <span className="font-medium">Remarks:</span>{" "}

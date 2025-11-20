@@ -43,10 +43,8 @@ export function TenantSelect<T>({
   const [search, setSearch] = useState("");
   const [email, setEmail] = useState("");
   const [searchResult, setSearchResult] = useState<OptionType | null>(null);
-
   // API hook
   const { data, isFetching } = useGetTenantByEmail(email);
-
   // Update searchResult when API returns
   useEffect(() => {
     if (data) {

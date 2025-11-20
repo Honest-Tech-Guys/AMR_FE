@@ -146,7 +146,7 @@ const CreateNewOwner = () => {
                 </p>
               )}
             </div>
-            <HeaderSection title="Tenants Detail" />
+            <HeaderSection title="Owner Detail" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <CustomInput
                 id="name"
@@ -281,7 +281,7 @@ const CreateNewOwner = () => {
                   className="flex items-center gap-3"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Male" id="gender-male" />
+                    <RadioGroupItem value="Male" id="male" />
                     <Label htmlFor="male">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">
