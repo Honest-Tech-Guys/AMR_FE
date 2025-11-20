@@ -54,7 +54,7 @@ interface PaginationData {
 
 const Page = () => {
   const [isFilter, setIsFilter] = useState(false);
-  const { data, refetch } = useGetNotificationList();
+  const { data } = useGetNotificationList();
   const filters = [
     <InputWithIcon key="property" icon={Search} placeholder="Property Name" />,
     <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,

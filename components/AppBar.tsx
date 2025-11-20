@@ -197,8 +197,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       className={
                         isItemActive
-                          ? "bg-primary-foreground text-white   py-5  rounded-sm hover:bg-primary-foreground hover:text-white"
-                          : "font-semibold py-5 rounded-sm hover:bg-primary-foreground hover:text-white "
+                          ? "bg-gradient-to-r from-primary to-primary/80 text-white   py-5  rounded-sm hover:bg-primary-foreground hover:text-white"
+                          : "font-semibold py-5 rounded-sm hover:bg-gradient-to-r from-primary to-primary/80 hover:text-white "
                       }
                     >
                       <Link

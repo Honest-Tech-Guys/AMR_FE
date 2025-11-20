@@ -124,16 +124,23 @@ const Page = () => {
       case "inactive":
         return "bg-gray-100 text-gray-800 border-gray-300";
       case "Active":
+        return "bg-green-500 text-green-900 border-green-300";
+      case "Last Month":
         return "bg-green-100 text-green-800 border-green-300";
       default:
         return "bg-gray-100 text-gray-800 border-gray-300";
     }
   }
   const getStatusConfig = (
-    status: "Active" | "Expiring Soon" | "Inactive" | "Upcoming"
+    status: "Active" | "Expiring Soon" | "Inactive" | "Upcoming" | "Last Month"
   ) => {
     const configs = {
       Active: {
+        color: "from-primary to-primary/80 ",
+        bgColor: "bg-green-50 border-green-200 text-green-700",
+        icon: CheckCircle2,
+      },
+      "Last Month": {
         color: "from-green-500 to-green-600",
         bgColor: "bg-green-50 border-green-200 text-green-700",
         icon: CheckCircle2,
@@ -242,6 +249,7 @@ const Page = () => {
       }
     }
   }, [syncData, queryClient, appliedFilters]);
+  const today = new Date().toISOString().split("T")[0];
   if (isPending) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -280,7 +288,7 @@ const Page = () => {
           filters={[
             {
               name: "property_name",
-              placeholder: "Property Name",
+              placeholder: "Property , Unit , Room",
               type: "input",
               icon: Search,
             },
@@ -353,10 +361,11 @@ const Page = () => {
                         }
                       }}
                       isActive={pagination.page > 1}
-                      className={`bg-gray-100 cursor-pointer ${pagination.page <= 1
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                        }`}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page <= 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
                     />
                     <PaginationNext
                       onClick={() => {
@@ -372,10 +381,11 @@ const Page = () => {
                         }
                       }}
                       isActive={pagination.page < (pagination.last_page ?? 1)}
-                      className={`bg-gray-100 cursor-pointer ${pagination.page >= (pagination.last_page as number)
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                        }`}
+                      className={`bg-gray-100 cursor-pointer ${
+                        pagination.page >= (pagination.last_page as number)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -405,13 +415,35 @@ const Page = () => {
           {data?.tenancies.data?.map((tenancy) => {
             const statusConfig = getStatusConfig(tenancy.status as never);
             const StatusIcon = statusConfig.icon;
+            const days = (() => {
+              switch (tenancy.status) {
+                case "Active":
+                case "Expiring Soon":
+                case "Last Month":
+                  return `${daysBetween(
+                    today,
+                    tenancy.tenancy_period_end_date
+                  )} Day Left`;
+
+                case "Upcoming":
+                  return `Starts In ${daysBetween(
+                    today,
+                    tenancy.tenancy_period_start_date
+                  )} Day`;
+
+                case "Inactive":
+                  return "Expired";
+                default:
+                  return 0;
+              }
+            })();
 
             return (
               <div
                 key={tenancy.id}
                 className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"
-              // onMouseEnter={() => setHoveredCard(tenancy.id as never)}
-              // onMouseLeave={() => setHoveredCard(null)}
+                // onMouseEnter={() => setHoveredCard(tenancy.id as never)}
+                // onMouseLeave={() => setHoveredCard(null)}
               >
                 {/* Card Header */}
                 <div
@@ -422,7 +454,7 @@ const Page = () => {
                   <div>
                     <div className="w-full flex  justify-between ">
                       <div className="flex items-center gap-2 mb-2">
-                        <StatusIcon className="w-5 h-5 text-white" />
+                        {/* <StatusIcon className="w-5 h-5 text-white" /> */}
                         <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">
                           {tenancy.status}
                         </span>
@@ -437,20 +469,24 @@ const Page = () => {
                       <div>
                         <div className=" flex gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
                           <p className=" text-white text-xs font-medium">
-                            {daysBetween(
-                              tenancy.tenancy_period_start_date,
-                              tenancy.tenancy_period_end_date
-                            )}{" "}
-                          </p>
-                          <p className=" text-white text-xs font-medium">
-                            Days
+                            {days}
                           </p>
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-1">
-                      {tenancy.code}
-                    </h3>
+                    <div className="flex items-center gap-3  text-white">
+                      {/* <Building2 className="w-4 h-4  mt-0.5" /> */}
+                      <div className="flex-1 flex items-center gap-2">
+                        {/* <p className="text-xs  ">Property :</p> */}
+                        <p className=" text-sm">
+                          {tenancy.tenantable
+                            ? "unit" in tenancy.tenantable
+                              ? ` ${tenancy.tenantable?.unit?.property?.property_name} ${tenancy.tenantable?.unit?.block_floor_unit_number} ${tenancy.tenantable?.name} `
+                              : `${tenancy.tenantable?.property?.property_name} ${tenancy.tenantable?.block_floor_unit_number}`
+                            : "-"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   {/* </div> */}
                 </div>
@@ -499,32 +535,6 @@ const Page = () => {
 
                   {/* Property Details */}
                   <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                      <Building2 className="w-4 h-4 text-slate-600 mt-0.5" />
-                      <div className="flex-1 flex items-center gap-2">
-                        <p className="text-xs text-slate-500 ">Property :</p>
-                        <p className="text-sm font-semibold text-slate-800">
-                          {tenancy.tenantable
-                            ? "unit" in tenancy.tenantable
-                              ? ` ${tenancy.tenantable?.unit?.property?.property_name} `
-                              : `${tenancy.tenantable?.property?.property_name}`
-                            : "-"}
-                        </p>
-                        <p className="text-xs text-slate-600 mt-1">
-                          {tenancy.tenantable
-                            ? "unit" in tenancy.tenantable
-                              ? ` ${tenancy.tenantable?.unit?.block_floor_unit_number} `
-                              : `${tenancy.tenantable?.block_floor_unit_number}`
-                            : "-"}
-                          {tenancy.tenantable
-                            ? "unit" in tenancy.tenantable
-                              ? `  ${tenancy.tenantable?.name}  `
-                              : ``
-                            : ""}
-                        </p>
-                      </div>
-                    </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-green-50 rounded-xl border border-green-200">
                         <div className="flex items-center gap-2 mb-1">
@@ -595,7 +605,7 @@ const Page = () => {
                                 "flex items-center gap-1 text-sm text-blue-600 py-1 px-2.5 rounded-2xl font-medium",
                                 (SyncLoading || SyncRefetching) &&
                                   tenancy.tenantable?.meters[0]?.id ===
-                                  selectedItemSync?.id
+                                    selectedItemSync?.id
                                   ? "opacity-50 cursor-not-allowed"
                                   : "cursor-pointer"
                               )}
@@ -618,7 +628,7 @@ const Page = () => {
                                 className={cn(
                                   (SyncLoading || SyncRefetching) &&
                                     tenancy.tenantable?.meters[0]?.id ===
-                                    selectedItemSync?.id
+                                      selectedItemSync?.id
                                     ? "animate-spin"
                                     : "",
                                   "w-4 h-4"
@@ -632,8 +642,9 @@ const Page = () => {
                           </p> */}
                         </div>
                       ) : (
-                        <div className="h-[89.6px] flex items-center justify-center bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-700 ">
-                          No Meter
+                        <div className="h-[89.6px] flex items-center justify-center flex-col bg-yellow-50 rounded-xl border border-yellow-200 text-yellow-700 cursor-pointer ">
+                          <p className="text-xl">No Meter</p>
+                          <p className="text-xs">Add New Meter</p>
                         </div>
                       )
                     ) : null}
