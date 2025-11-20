@@ -22,6 +22,7 @@ import {
   DoorOpen,
   Signal,
   Clock,
+  LoaderCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -64,10 +65,10 @@ const Page = () => {
     if (data) {
       setPagination((prev) => ({
         ...prev,
-        page: data?.current_page ?? prev.page,
-        per_page: data?.per_page ?? prev.per_page,
-        last_page: data?.last_page ?? prev.last_page,
-        links: data?.links ?? prev.links,
+        page: data?.locks.current_page ?? prev.page,
+        per_page: data?.locks.per_page ?? prev.per_page,
+        last_page: data?.locks.last_page ?? prev.last_page,
+        links: data?.locks.links ?? prev.links,
       }));
     }
   }, [data]);
@@ -82,25 +83,25 @@ const Page = () => {
   const stats = [
     {
       label: "Total Locks",
-      value: "248",
+      value: data?.stats.total_locks,
       icon: Lock,
       color: "bg-green-50",
     },
     {
       label: "Active",
-      value: "235",
+      value: data?.stats.active_locks,
       icon: Shield,
       color: "bg-green-50",
     },
     {
       label: "Low Battery",
-      value: "12",
+      value: data?.stats.low_battery_locks,
       icon: Battery,
       color: "bg-green-50",
     },
     {
       label: "Total Users",
-      value: "1,247",
+      value: data?.stats.total_users,
       icon: Users,
       color: "bg-green-50",
     },
@@ -122,6 +123,13 @@ const Page = () => {
     if (battery > 30) return "from-yellow-500 to-yellow-600";
     return "from-red-500 to-red-600";
   };
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoaderCircle className="animate-spin text-primary w-10 h-10" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="w-full  p-3 ">
@@ -260,7 +268,7 @@ const Page = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 ">
-          {data?.data?.map((lock) => (
+          {data?.locks?.data?.map((lock) => (
             // <div
             //   key={lock.id}
             //   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 overflow-hidden group"

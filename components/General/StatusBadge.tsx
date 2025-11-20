@@ -10,19 +10,19 @@ export const getStatusBadge = (status: string) => {
   > = {
     "Fully Occupied": {
       variant: "default",
-      className: "bg-red-500 hover:bg-green-600 text-white",
+      className: "bg-red-500 hover:bg-red-500 text-white",
     },
     "Partially Occupied": {
       variant: "secondary",
-      className: "bg-blue-500 hover:bg-blue-600 text-white border-blue-500",
+      className: "bg-blue-500 hover:bg-blue-500 text-white border-blue-500",
     },
     Vacant: {
       variant: "outline",
-      className: "bg-green-500 hover:bg-red-600 text-white",
+      className: "bg-green-500 hover:bg-green-500 text-white",
     },
     Deactivated: {
       variant: "destructive",
-      className: "bg-gray-500 hover:bg-gray-600 text-black",
+      className: "bg-gray-500 hover:bg-gray-500 text-black",
     },
   };
 

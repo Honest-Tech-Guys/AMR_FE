@@ -1,6 +1,12 @@
 "use client";
 import useGetBooksList from "@/lib/services/hooks/usGetBooks";
-import { LoaderCircle } from "lucide-react";
+import {
+  CheckCheck,
+  FileText,
+  LoaderCircle,
+  TrendingDownIcon,
+  TrendingUp,
+} from "lucide-react";
 import BookingCard from "./BookingCard";
 import { useEffect, useState } from "react";
 import {
@@ -53,11 +59,61 @@ const Page = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.per_page]);
 
+  const stats = [
+    {
+      label: "Total Booking",
+      value: "100",
+      icon: FileText,
+      color: "bg-green-50",
+    },
+    {
+      label: "Completed",
+      value: "3",
+      icon: CheckCheck,
+      color: "bg-green-50",
+    },
+    {
+      label: "Last Month",
+      value: "80",
+      icon: TrendingDownIcon,
+      color: "bg-green-50",
+    },
+    {
+      label: "Next Month",
+      value: "4",
+      icon: TrendingUp,
+      color: "bg-green-50",
+    },
+  ];
   if (isPending) {
     return <LoaderCircle className="animate-spin" />;
   }
   return (
-    <div>
+    <div className="w-full p-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-3">
+        {stats.map((stat, index) => (
+          <div
+            key={index}
+            className="bg-white hover:border-green-600 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 hover:scale-105"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-600 text-xs font-medium mb-1">
+                  {stat.label}
+                </p>
+                <p className="text-xl font-bold text-slate-800">
+                  {stat.value ?? 0}
+                </p>
+              </div>
+              <div
+                className={`bg-gradient-to-br ${stat.color} p-4 rounded-xl shadow-lg`}
+              >
+                <stat.icon className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       {/* <HeaderPage title="Booking (List View)" /> */}
       <div className="flex w-full justify-between my-3 bg-white p-5 rounded-2xl shadow-sm">
         <div>

@@ -2,6 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../ApiCore";
 import PaginationType from "@/types/PaginationType";
 import MeterType from "@/types/MeterType";
+interface responseMeter {
+  stats: {
+    total_meters: number;
+    active_meters: number;
+    total_balance: number;
+    total_usage: number;
+  };
+  meters: PaginationType<MeterType[]>;
+}
 const useGetMetersList = (params: Object) => {
   const isParamsValid = Object.keys(params).length > 0;
   return useQuery({
@@ -11,7 +20,7 @@ const useGetMetersList = (params: Object) => {
       const url = "/meters";
       {
         return axiosInstance
-          .get<PaginationType<MeterType[]>>(url, { params })
+          .get<responseMeter>(url, { params })
           .then((res) => {
             console.log("SS");
             return res.data;

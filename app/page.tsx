@@ -155,7 +155,7 @@ export default function DashboardPage() {
           >
             <Card
               className={cn(
-                "hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-2xl",
+                "hover:-translate-y-1 transition-all duration-300 shadow-lg rounded-2xl hover:border hover:border-green-600",
                 stat.title === "Units" || stat.title === "Rooms"
                   ? ""
                   : "cursor-pointer"
@@ -188,7 +188,7 @@ export default function DashboardPage() {
                     {"View"}
                   </p>
                 </div>
-                <div className="bg-green-50 rounded-xl p-4">
+                <div className="bg-gradient-to-br bg-green-50 p-4 rounded-xl shadow-lg">
                   <stat.icon className="w-10 h-10 text-green-600" />
                 </div>
               </div>

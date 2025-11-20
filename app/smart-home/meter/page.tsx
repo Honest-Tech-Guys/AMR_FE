@@ -17,6 +17,7 @@ import {
   BrushCleaning,
   ChartLine,
   QrCode,
+  LoaderCircle,
 } from "lucide-react";
 import useGetMetersList from "@/lib/services/hooks/useGetMeterList";
 import {
@@ -71,10 +72,10 @@ export default function ModernMeterManagement() {
     if (data) {
       setPagination((prev) => ({
         ...prev,
-        page: data?.current_page ?? prev.page,
-        per_page: data?.per_page ?? prev.per_page,
-        last_page: data?.last_page ?? prev.last_page,
-        links: data?.links ?? prev.links,
+        page: data?.meters.current_page ?? prev.page,
+        per_page: data?.meters.per_page ?? prev.per_page,
+        last_page: data?.meters.last_page ?? prev.last_page,
+        links: data?.meters.links ?? prev.links,
       }));
     }
   }, [data]);
@@ -89,25 +90,25 @@ export default function ModernMeterManagement() {
   const stats = [
     {
       label: "Total Meters",
-      value: "156",
+      value: data?.stats.total_meters,
       icon: Zap,
       color: "bg-green-50",
     },
     {
       label: "Active",
-      value: "142",
+      value: data?.stats.active_meters,
       icon: Power,
       color: "bg-green-50",
     },
     {
       label: "Total Usage",
-      value: "12.4K kWh",
+      value: `${data?.stats.total_usage} unit`,
       icon: Activity,
       color: "bg-green-50",
     },
     {
       label: "Total Balance",
-      value: "85%",
+      value: `${data?.stats.total_balance} unit`,
       icon: TrendingUp,
       color: "bg-green-50",
     },
@@ -119,6 +120,13 @@ export default function ModernMeterManagement() {
   const { mutate: toggleDevice, isPending: toggleLoading } = useToggleDevice();
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<number | null>(null);
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoaderCircle className="animate-spin text-primary w-10 h-10" />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen  p-3">
       {/* Header Section */}
@@ -264,7 +272,7 @@ export default function ModernMeterManagement() {
 
       {/* Meter Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data?.data.map((meter) => {
+        {data?.meters?.data.map((meter) => {
           function calculateEfficiency(meter: MeterType): number {
             const used = parseFloat(meter.used_unit) || 0;
             const balance = parseFloat(meter.balance_unit) || 0;

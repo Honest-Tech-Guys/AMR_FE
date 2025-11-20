@@ -105,19 +105,6 @@ const Page = () => {
     page: 1,
     per_page: 10,
   });
-  const filters = [
-    <InputWithIcon key="booking" icon={Search} placeholder="Booking" />,
-    <InputWithIcon key="unit" icon={Search} placeholder="Unit Number" />,
-    <InputWithIcon key="rental" icon={Search} placeholder="Rental Type" />,
-    <InputWithIcon key="meter" icon={Search} placeholder="Meter & Lock" />,
-    <InputWithIcon key="date" icon={Calendar} placeholder="Date Range" />,
-  ];
-
-  const actionButton = (
-    <Button key="search" className="rounded-[6px]">
-      <Search className="size-4 text-white" strokeWidth={2.5} />
-    </Button>
-  );
   const [formFilters, setFormFilters] = useState({
     property_name: "",
     unit_name: "",
